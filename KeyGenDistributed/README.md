@@ -22,14 +22,18 @@ For full instructions on how to build this code sample from scratch, look at [TO
                /bin (Windows)
                /include
                /lib
-               /res (Windows)
+               /res
 
 ## Build
 In a terminal, change to the KeyGenDistributed folder and enter the following to build the KeyGenDistibuted console application.
 
     ./build.sh --build_type=Debug
 
-Upon a successful build, the KeyGenDistributed console application can be found in the build/Debug folder.
+Upon a successful build, the KeyGenDistributed console application can be found in the following folder:
+
+*Linux/Mac - KeyGenDistributed/build*
+
+*Windows - KeyGenDistributed/build/Debug* 
 
 Enter the following command for a complete set of build options:
 
@@ -39,14 +43,20 @@ Enter the following command for a complete set of build options:
 ### Run as Alice
 This will display the shared key and write out the metadata file for Bob.
 
-Change to the *KeyGenDistributed/build/Debug* folder and enter the following command:
+Change to the following folder:
+
+*Linux/Mac - KeyGenDistributed/build*
+
+*Windows - KeyGenDistributed/build/Debug* 
+
+Enter the following command:
 
     ./KeyGenDistributed --user=alice --token=${QRYPT_TOKEN} --key-type=aes --filename=metadata.bin
  
 ### Run as Bob
 This will consume the metadata file created by Alice above and display the shared key.
 
-Make sure you are still in the  *KeyGenDistributed/build/Debug* folder and enter the following command:
+Make sure you are still in the folder as specified above and enter the following command:
 
     ./KeyGenDistributed --user=bob --token=${QRYPT_TOKEN} --filename=metadata.bin
 

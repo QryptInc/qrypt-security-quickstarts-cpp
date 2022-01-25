@@ -26,10 +26,16 @@ target_include_directories(KeyGenDistributed PUBLIC
     "lib/QryptSecurity/include"
 )
 
-# Link against QryptSecurity.lib
-target_link_libraries(KeyGenDistributed
-    "../lib/QryptSecurity/lib/QryptSecurity"
-)
+# Link against QryptSecurity dynamic library
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    target_link_libraries(KeyGenDistributed
+        "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/QryptSecurity"
+    )
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    target_link_libraries(KeyGenDistributed
+        "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/libQryptSecurity.dylib"
+    )
+endif()
 
 # If on Windows, copy QryptSecurity.dll to the directory where the executable is built
 # so that the executable can find it.

@@ -21,14 +21,18 @@ For full instructions on how to build this code sample from scratch, look at [TO
                /bin (Windows)
                /include
                /lib
-               /res (Windows)
+               /res
 
 ## Build
 In a terminal, change to the KeyGenLocal folder and enter the following to build the KeyGenLocal console application.
 
     ./build.sh --build_type=Debug
 
-Upon a successful build, the KeyGenLocal console application can be found in the build/Debug folder.
+Upon a successful build, the KeyGenLocal console application can be found in the following folder:
+
+*Linux/Mac - KeyGenLocal/build*
+
+*Windows - KeyGenLocal/build/Debug* 
 
 Enter the following command for a complete set of build options:
 
@@ -37,7 +41,13 @@ Enter the following command for a complete set of build options:
 ## Run
 This will display the locally generated AES key.
 
-Change to the *KeyGenLocal/build/Debug* folder and enter the following command:
+Change to the followng folder:
+
+*Linux/Mac - KeyGenLocal/build*
+
+*Windows - KeyGenLocal/build/Debug* 
+
+Enter the following command:
 
     ./KeyGenLocal ${QRYPT_TOKEN}
  
