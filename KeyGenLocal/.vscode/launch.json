@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Linux/Mac: KeyGenLocal",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/KeyGenLocal",
+            "cwd": "${workspaceFolder}/build",
+            "args": [
+                "${env:QRYPT_TOKEN}"
+            ]
+        },
+        {
+            "name": "Windows: KeyGenLocal",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "console":"integratedTerminal",
+            "program": "${workspaceFolder}/build/Debug/KeyGenLocal.exe",
+            "cwd": "${workspaceFolder}/build/Debug",
+            "args": [
+                "${env:QRYPT_TOKEN}"
+            ]
+        }
+    ]
+}
