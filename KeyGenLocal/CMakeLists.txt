@@ -35,6 +35,10 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(KeyGenLocal
         "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/libQryptSecurity.dylib"
     )
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_link_libraries(KeyGenLocal
+        "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/libQryptSecurity.so"
+    )
 endif()
 
 # If on Windows, copy QryptSecurity.dll to the directory where the executable is built

@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <iterator>
 #include <sstream>
+#include <string.h>
 #include <vector>
 
 #include "qrypt/qryptsecurity.h"
