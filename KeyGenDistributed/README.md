@@ -51,14 +51,14 @@ Change to the following folder:
 
 Enter the following command:
 
-    ./KeyGenDistributed --user=alice --token=${QRYPT_TOKEN} --key-type=aes --filename=metadata.bin
+    ./KeyGenDistributed --user=alice --token=${QRYPT_TOKEN} --key-type=aes --metadata-filename=metadata.bin
  
 ### Run as Bob
 This will consume the metadata file created by Alice above and display the shared key.
 
 Make sure you are still in the folder as specified above and enter the following command:
 
-    ./KeyGenDistributed --user=bob --token=${QRYPT_TOKEN} --filename=metadata.bin
+    ./KeyGenDistributed --user=bob --token=${QRYPT_TOKEN} --metadata-filename=metadata.bin
 
 ## Debug
 If you open the folder KeyGenDistributed In Visual Studio Code, you will find debug setups for running as Alice and Bob.

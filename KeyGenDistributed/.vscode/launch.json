@@ -11,19 +11,19 @@
                 "--user=alice",
                 "--token=${env:QRYPT_TOKEN}",
                 "--key-type=aes",
-                "--filename=metadata.bin"
+                "--metadata-filename=metadata.bin"
             ]
         },
         {
             "name": "Linux/Mac: Bob - KeyGenDistributed",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}build/KeyGenDistributed",
+            "program": "${workspaceFolder}/build/KeyGenDistributed",
             "cwd": "${workspaceFolder}/build",
             "args": [
                 "--user=bob",
                 "--token=${env:QRYPT_TOKEN}",
-                "--filename=metadata.bin"
+                "--metadata-filename=metadata.bin"
             ]
         },
         {
@@ -37,7 +37,7 @@
                 "--user=alice",
                 "--token=${env:QRYPT_TOKEN}",
                 "--key-type=aes",
-                "--filename=metadata.bin"
+                "--metadata-filename=metadata.bin"
             ]
         },
         {
@@ -50,7 +50,7 @@
             "args": [
                 "--user=bob",
                 "--token=${env:QRYPT_TOKEN}",
-                "--filename=metadata.bin"
+                "--metadata-filename=metadata.bin"
             ]
         }
     ]

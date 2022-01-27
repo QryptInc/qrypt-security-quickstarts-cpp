@@ -1,13 +1,13 @@
 
+#include "qrypt/qryptsecurity.h"
+#include "qrypt/qryptsecurity_exceptions.h"
+
 #include <fstream>
 #include <iomanip>
 #include <iterator>
 #include <sstream>
-#include <string.h>
+#include <string>
 #include <vector>
-
-#include "qrypt/qryptsecurity.h"
-#include "qrypt/qryptsecurity_exceptions.h"
 
 using namespace QryptSecurity;
 
@@ -23,27 +23,27 @@ std::string getUsage() {
     "-----\n"
     "1. Run as alice to generate the shared key and a metadata file to be sent to bob.\n"
     "\n"
-    "   % KeyGenDistributed --user=alice --token=<EaaS token> --key-type=<aes|otp> [--otp-len=<desired OTP length>] --filename=<metadata filename>\n"
+    "   % KeyGenDistributed --user=alice --token=<EaaS token> --key-type=<aes|otp> [--otp-len=<desired OTP length>] --metadata-filename=<metadata filename>\n"
     "\n"
     "2. Run as bob, which will read in the metadata file to generate the shared key.\n"
     "\n"
-    "   % KeyGenDistributed --user=bob --filename=<metadata filename>\n"
+    "   % KeyGenDistributed --user=bob --metadata-filename=<metadata filename>\n"
     "\n"
     "Options:\n"
-    "--user=<alice|bob>      Set the user to either alice or bob.\n"
+    "--user=<alice|bob>             Set the user to either alice or bob.\n"
     "\n"
-    "--token=<EaaS token>    A Qrypt EaaS token. Retrieve from the Qrypt Portal (http://portal.qrypt.com).\n"
-    "                        Tip: Assign token to an environment variable and pass in the environment variable.\n"
+    "--token=<EaaS token>           A Qrypt EaaS token. Retrieve from the Qrypt Portal (http://portal.qrypt.com).\n"
+    "                               Tip: Assign token to an environment variable and pass in the environment variable.\n"
     "\n"
-    "--key-type=<aes|otp>    Set to the type of key you would like to produce.\n"
-    "                        aes - A 32 byte AES key.\n"
-    "                        otp - A OTP pad. Use the otp_len parameter to set the length of the OTP.\n"
+    "--key-type=<aes|otp>           Set to the type of key you would like to produce.\n"
+    "                               aes - A 32 byte AES key.\n"
+    "                               otp - A OTP pad. Use the otp_len parameter to set the length of the OTP.\n"
     "\n"
-    "--otp_len=<length>      If otp is specified for --key-type, then this will be the desried length of the OTP.\n"
+    "--otp_len=<length>             If otp is specified for --key-type, then this will be the desried length of the OTP.\n"
     "\n"
-    "--filename=<filename>   The filename for the metadata file to be created or consumed.\n"
+    "--metadata-filename=<filename> The filename for the metadata file to be created or consumed.\n"
     "\n"
-    "--help                  Display help.\n"
+    "--help                         Display help.\n"
     "\n"
     "";
 
@@ -67,51 +67,40 @@ std::string convertByteVecToHexStr(std::vector<uint8_t> bytes) {
 }
 
 int main(int argc, char **argv) {
-
-    // TODO: Change to prod url
-    std::string qdeaFQDN = "https://qdea-directory.stage.qrypt.com";
     
-    std::string setUserFlag = "--user=";
-    std::string user = "";
-    std::string setTokenFlag = "--token=";
-    std::string token = "";
-    std::string setKeyTypeFlag = "--key-type=";
-    std::string keyType = "";
-    std::string setOTPLenFlag = "--otp-len=";
+    std::string user, token, keyType, metadataFilename;
     int otpLen = 0;
-    std::string setFilenameFlag = "--filename=";
-    std::string filename = "";
+    std::string setUserFlag = "--user=";
+    std::string setTokenFlag = "--token=";
+    std::string setKeyTypeFlag = "--key-type=";
+    std::string setOTPLenFlag = "--otp-len=";
+    std::string setMetadataFilenameFlag = "--metadata-filename=";
 
     // Parse command line parameters
     while(*++argv) {
-       
-        if (std::string(*argv).find(setUserFlag) == 0) {
-            std::string argument = std::string(*argv);
-            user = argument.substr(setUserFlag.size(), argument.size() - setUserFlag.size());
+        std::string argument(*argv);
+
+        if (argument.find(setUserFlag) == 0) {            
+            user = argument.substr(setUserFlag.size());
         }
-        else if (std::string(*argv).find(setTokenFlag) == 0) {
-            std::string argument = std::string(*argv);
-            token = argument.substr(setTokenFlag.size(), argument.size() - setTokenFlag.size());
+        else if (argument.find(setTokenFlag) == 0) {
+            token = argument.substr(setTokenFlag.size());
         }
-        else if (std::string(*argv).find(setKeyTypeFlag) == 0) {
-            std::string argument = std::string(*argv);
-            keyType = argument.substr(setKeyTypeFlag.size(), argument.size() - setKeyTypeFlag.size());
+        else if (argument.find(setKeyTypeFlag) == 0) {
+            keyType = argument.substr(setKeyTypeFlag.size());
         }
-        else if (std::string(*argv).find(setOTPLenFlag) == 0) {
-            std::string argument = std::string(*argv);
-            otpLen = std::stoi(argument.substr(setOTPLenFlag.size(), argument.size() - setOTPLenFlag.size()));
+        else if (argument.find(setOTPLenFlag) == 0) {
+            otpLen = std::stoi(argument.substr(setOTPLenFlag.size()));
         }
-        else if (std::string(*argv).find(setFilenameFlag) == 0) {
-            std::string argument = std::string(*argv);
-            filename = argument.substr(setFilenameFlag.size(), argument.size() - setFilenameFlag.size());
+        else if (argument.find(setMetadataFilenameFlag) == 0) {
+            metadataFilename = argument.substr(setMetadataFilenameFlag.size());
         }
-        // Display help
-        else if (!strcmp(*argv, "-h") || !strcmp(*argv, "--help")) {
+        else if ((argument == "-h") || (argument == "--help")) {
             displayUsage();
             return 0;
         }
-        // Invalid param
         else {
+            printf("Invalid parameter: %s\n", argument.c_str());
             displayUsage();
             return 1;
         }
@@ -119,56 +108,56 @@ int main(int argc, char **argv) {
 
     // Validate arguments
     if (token.empty()) {
+        printf("Missing token.\n");
         displayUsage();
         return 1;
     }
-    if (filename.empty()) {
+    if (metadataFilename.empty()) {
+        printf("Missing metadata filename.\n");
         displayUsage();
         return 1;        
     }
     if (keyType == "otp" && otpLen == 0) {
+        printf("Invalid OTP length.\n");
         displayUsage();
         return 1;        
     }
 
     // Create and initialize our keygen client
     KeyAgreementConfig keyAgreementConfig = {};
-    keyAgreementConfig.qdeaFQDN = qdeaFQDN;
+    // TODO: Change to prod url
+    keyAgreementConfig.qdeaFQDN = "https://qdea-directory.stage.qrypt.com";
     auto keyGenClient = IKeyGenDistributedClient::create();
     keyGenClient->initialize(token, keyAgreementConfig);
     
-    // Are we generating the shared key and metadata?
+    // Alice is the sender
     if (user == "alice") {
-        // What type of key do we want to create?
+        // 2. Generate the key and metadata
         SymmetricKeyData keyInit = {};
         if (keyType == "aes") {
-            // Create the aes key and metadata
-            auto symmetricKeyMode = QryptSecurity::SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256;
-            keyInit = keyGenClient->genInit(symmetricKeyMode);
+            keyInit = keyGenClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256);
         }
         else if (keyType == "otp") {
-            // Create the OTP and metadata
-            auto symmetricKeyMode = QryptSecurity::SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP;
-            keyInit = keyGenClient->genInit(symmetricKeyMode, otpLen);
+            keyInit = keyGenClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, otpLen);
         }
 
         // Display the shared key
         std::string key = convertByteVecToHexStr(keyInit.key);
         printf("Alice - Key: %s", key.c_str());
 
-        // Write out metadata to be used by bob
-        std::ofstream output(filename, std::ios::out | std::ios::binary);
+        // 3. Write out metadata for bob
+        std::ofstream output(metadataFilename, std::ios::out | std::ios::binary);
         output.write((char*)&keyInit.metadata[0], keyInit.metadata.size());
         output.close();
     }
-    // Are we recreating the shared key using the metadata?
+    // Bob is the receiver
     else if (user == "bob") {
-        // Read in the metadata
-        std::ifstream input(filename, std::ios::binary);
+        // 2. Read in metadata
+        std::ifstream input(metadataFilename, std::ios::binary);
         std::vector<unsigned char> metadata(std::istreambuf_iterator<char>(input), {});
         input.close();
 
-        // Recreate our shared key using the metadata
+        // 3. Generate the key using the metadata
         std::vector<uint8_t> keySync = keyGenClient->genSync(metadata);
 
         // Display our shared key

@@ -1,4 +1,7 @@
 
+#include "qrypt/qryptsecurity.h"
+#include "qrypt/qryptsecurity_exceptions.h"
+
 #include <chrono>
 #include <iomanip>
 #include <sstream>
@@ -6,14 +9,36 @@
 #include <sys/types.h>
 #include <thread>
 
-#include "qrypt/qryptsecurity.h"
-#include "qrypt/qryptsecurity_exceptions.h"
-
 using namespace QryptSecurity;
 
 const uint64_t KB = 1024;
 const uint64_t MB = 1024 * KB;
 const uint64_t GB = 1024 * MB;
+
+std::string getUsage() {
+    std::string usage = 
+    "\n"
+    "KeyGenLocal\n"
+    "===============\n"
+    "\n"
+    "Exercises local key generation.\n"
+    "\n"
+    "Options\n"
+    "-------\n"
+    "--token=<token>                Qrypt token retrieved from Qrypt portal (http://portal.qrypt.com).\n"
+    "                               Make sure the token has the ENTROPY scope.\n"
+    "\n"
+    "--help                         Display help.\n"
+    "\n"
+    "";
+
+    return usage;
+}
+
+void displayUsage() {
+    std::string usage = getUsage();
+    printf("%s", usage.c_str());
+}
 
 std::vector<uint8_t> strToVector(std::string in) {
     std::vector<uint8_t> vec((uint8_t *)in.c_str(), (uint8_t *)in.c_str() + in.size());
@@ -41,10 +66,33 @@ void waitForCacheReady(IKeyGenLocalClient* pKeyGenClient) {
 
 int main(int argc, char **argv) {
 
-    if(argc != 2) {
-        printf("Incorrect usage. Provide token.");
+    std::string token, cacheDir;
+    std::string setTokenFlag = "--token=";
+
+    // Parse command line parameters
+    while(*++argv) {
+        std::string argument(*argv);
+
+        if (argument.find(setTokenFlag) == 0) {
+            token = argument.substr(setTokenFlag.size());
+        }
+        else if ((argument == "-h") || (argument == "--help")) {
+            displayUsage();
+            return 0;
+        }
+        else {
+            printf("Invalid parameter: %s\n", argument.c_str());
+            displayUsage();
+            return 1;
+        }
     }
-    std::string qryptToken = argv[1];
+
+    // Validate arguments
+    if (token.empty()) {
+        printf("Missing token.\n");
+        displayUsage();
+        return 1;
+    }
 
     // 1. Setup configurations
     LocationConfig locationConfig = {};
@@ -64,7 +112,7 @@ int main(int argc, char **argv) {
 
     // 2. Initialize key generation client
     std::unique_ptr<IKeyGenLocalClient> keyGenClient = IKeyGenLocalClient::create();
-    keyGenClient->initializeAsync(qryptToken, cacheConfig);
+    keyGenClient->initializeAsync(token, cacheConfig);
 
     // 3. Wait for random to download
     waitForCacheReady(keyGenClient.get());

@@ -49,7 +49,7 @@ Change to the followng folder:
 
 Enter the following command:
 
-    ./KeyGenLocal ${QRYPT_TOKEN}
+    ./KeyGenLocal --token=${QRYPT_TOKEN}
  
 ## Debug
 If you open the folder KeyGenLocal In Visual Studio Code, you will find a debug setup for KeyGenLocal.

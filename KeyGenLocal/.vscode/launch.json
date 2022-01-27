@@ -8,7 +8,7 @@
             "program": "${workspaceFolder}/build/KeyGenLocal",
             "cwd": "${workspaceFolder}/build",
             "args": [
-                "${env:QRYPT_TOKEN}"
+                "--token=${env:QRYPT_TOKEN}"
             ]
         },
         {
@@ -19,7 +19,7 @@
             "program": "${workspaceFolder}/build/Debug/KeyGenLocal.exe",
             "cwd": "${workspaceFolder}/build/Debug",
             "args": [
-                "${env:QRYPT_TOKEN}"
+                "--token=${env:QRYPT_TOKEN}"
             ]
         }
     ]
