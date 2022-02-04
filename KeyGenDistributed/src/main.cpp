@@ -125,8 +125,7 @@ int main(int argc, char **argv) {
 
     // Create and initialize our keygen client
     KeyAgreementConfig keyAgreementConfig = {};
-    // TODO: Change to prod url
-    keyAgreementConfig.qdeaFQDN = "https://qdea-directory.stage.qrypt.com";
+    keyAgreementConfig.qdeaFQDN = "https://qdea-directory.qrypt.com";
     auto keyGenClient = IKeyGenDistributedClient::create();
     keyGenClient->initialize(token, keyAgreementConfig);
     
