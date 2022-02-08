@@ -29,7 +29,7 @@ target_include_directories(KeyGenLocal PUBLIC
 # Link against QryptSecurity dynamic library
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_link_libraries(KeyGenLocal
-        "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/QryptSecurity"
+        "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/QryptSecurity.lib"
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(KeyGenLocal
