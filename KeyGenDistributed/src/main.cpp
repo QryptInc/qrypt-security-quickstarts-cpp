@@ -124,10 +124,8 @@ int main(int argc, char **argv) {
     }
 
     // Create and initialize our keygen client
-    KeyAgreementConfig keyAgreementConfig = {};
-    keyAgreementConfig.qdeaFQDN = "https://qdea-directory.qrypt.com";
     auto keyGenClient = IKeyGenDistributedClient::create();
-    keyGenClient->initialize(token, keyAgreementConfig);
+    keyGenClient->initialize(token);
     
     // Alice is the sender
     if (user == "alice") {

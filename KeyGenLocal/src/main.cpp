@@ -108,7 +108,6 @@ int main(int argc, char **argv) {
     cacheConfig.maintenanceInterval = 1;
     cacheConfig.maxNumCachedBytes = 1 * MB;
     cacheConfig.minNumCachedBytes = 32 * KB;
-    cacheConfig.rpsFQDN = "api-eus.qrypt.com";  
 
     // 2. Initialize key generation client
     std::unique_ptr<IKeyGenLocalClient> keyGenClient = IKeyGenLocalClient::create();
