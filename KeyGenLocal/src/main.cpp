@@ -9,6 +9,13 @@
 #include <sys/types.h>
 #include <thread>
 
+#if defined(_WIN32)
+    #include <direct.h>
+    #define MAKEDIR(dir) _mkdir(dir)
+#else
+    #define MAKEDIR(dir) mkdir(dir, 0777)
+#endif
+
 using namespace QryptSecurity;
 
 const uint64_t KB = 1024;
@@ -27,6 +34,9 @@ std::string getUsage() {
     "-------\n"
     "--token=<token>                Qrypt token retrieved from Qrypt portal (http://portal.qrypt.com).\n"
     "                               Make sure the token has the ENTROPY scope.\n"
+    "\n"
+    "--cache-dir=<filename>         The directory to store cached random files.\n"
+    "                               The directory will be created if it does not exist.\n"
     "\n"
     "--help                         Display help.\n"
     "\n"
@@ -56,7 +66,7 @@ std::string convertByteVecToHexStr(std::vector<uint8_t> bytes) {
     return result;
 }
 
-void waitForCacheReady(IKeyGenLocalClient* pKeyGenClient) {
+void WaitForCacheReady(IKeyGenLocalClient* pKeyGenClient) {
     CacheStatus status = {};
     do {
         status = pKeyGenClient->checkCacheStatus();
@@ -68,6 +78,7 @@ int main(int argc, char **argv) {
 
     std::string token, cacheDir;
     std::string setTokenFlag = "--token=";
+    std::string setCacheDirFlag = "--cache-dir=";
 
     // Parse command line parameters
     while(*++argv) {
@@ -75,6 +86,9 @@ int main(int argc, char **argv) {
 
         if (argument.find(setTokenFlag) == 0) {
             token = argument.substr(setTokenFlag.size());
+        }
+        else if (argument.find(setCacheDirFlag) == 0) {
+            cacheDir = argument.substr(setCacheDirFlag.size());
         }
         else if ((argument == "-h") || (argument == "--help")) {
             displayUsage();
@@ -93,37 +107,48 @@ int main(int argc, char **argv) {
         displayUsage();
         return 1;
     }
+    if (cacheDir.empty()) {
+        printf("Missing cache directory.\n");
+        displayUsage();
+        return 1;
+    }
 
-    // 1. Setup configurations
-    LocationConfig locationConfig = {};
-    locationConfig.id = "c67cf9e5-b88e-49ff-8b94-fd29914eb8ff";
-    locationConfig.availableSize = 32 * MB;
-    locationConfig.path = ".";
-    std::vector<LocationConfig> locations;
-    locations.push_back(locationConfig);
+    // 0. Make sure we have a cache folder to receive random files
+    //    as specified in our LocationConfig setup.
+    //    Important, we need a mode of 0777 for this folder or else
+    //    sqlite operations will fail.
+    MAKEDIR(cacheDir.c_str());
 
-    CacheConfig cacheConfig = {};
-    cacheConfig.deviceSecret = strToVector("Password123");
-    cacheConfig.locations = locations;
-    cacheConfig.maintenanceInterval = 1;
-    cacheConfig.maxNumCachedBytes = 1 * MB;
-    cacheConfig.minNumCachedBytes = 32 * KB;
-
-    // 2. Initialize key generation client
-    std::unique_ptr<IKeyGenLocalClient> keyGenClient = IKeyGenLocalClient::create();
-    keyGenClient->initializeAsync(token, cacheConfig);
-
-    // 3. Wait for random to download
-    waitForCacheReady(keyGenClient.get());
-
-    // 4. Generate symmetric key
-    std::vector<uint8_t> aesKey;
     try {
-        aesKey = keyGenClient->genSymmetricKey(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256);
-    }
-    catch(QryptSecurityException &e) {
-        printf("%s\n", e.what());
-    }
+        // 1. Setup configurations
+        LocationConfig locationConfig = {};
+        locationConfig.id = "c67cf9e5-b88e-49ff-8b94-fd29914eb8ff";
+        locationConfig.availableSize = 32 * MB;
+        locationConfig.path = cacheDir;
+        std::vector<LocationConfig> locations;
+        locations.push_back(locationConfig);
 
-    printf("AES Key: %s\n", convertByteVecToHexStr(aesKey).c_str());
+        CacheConfig cacheConfig = {};
+        cacheConfig.deviceSecret = strToVector("Password123");
+        cacheConfig.locations = locations;
+        cacheConfig.maintenanceInterval = 1;
+        cacheConfig.maxNumCachedBytes = 1 * MB;
+        cacheConfig.minNumCachedBytes = 32 * KB;
+
+        // 2. Initialize key generation client
+        std::unique_ptr<IKeyGenLocalClient> keyGenClient = IKeyGenLocalClient::create();
+        keyGenClient->initializeAsync(token, cacheConfig);
+
+        // 3. Wait for random to download
+        WaitForCacheReady(keyGenClient.get());
+
+        // 4. Generate symmetric key
+        std::vector<uint8_t> aesKey;
+
+        aesKey = keyGenClient->genSymmetricKey(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256);
+        printf("AES Key: %s\n", convertByteVecToHexStr(aesKey).c_str());
+
+    } catch(QryptSecurityException &e) {
+        printf("Error: %s\n", e.what());
+    }
 }
