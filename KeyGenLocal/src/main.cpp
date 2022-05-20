@@ -1,6 +1,11 @@
 
-#include "qrypt/qryptsecurity.h"
-#include "qrypt/qryptsecurity_exceptions.h"
+#ifdef MACOS_FRAMEWORK
+    #include "qryptsecurity.h"
+    #include "qryptsecurity_exceptions.h"
+#else
+    #include "qrypt/qryptsecurity.h"
+    #include "qrypt/qryptsecurity_exceptions.h"
+#endif
 
 #include <chrono>
 #include <iomanip>
