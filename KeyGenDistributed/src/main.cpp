@@ -4,8 +4,8 @@
     #include "qryptsecurity.h"
     #include "qryptsecurity_exceptions.h"
 #else
-    #include "qrypt/qryptsecurity.h"
-    #include "qrypt/qryptsecurity_exceptions.h"
+    #include "QryptSecurity/qryptsecurity.h"
+    #include "QryptSecurity/qryptsecurity_exceptions.h"
 #endif
 
 #include <fstream>
