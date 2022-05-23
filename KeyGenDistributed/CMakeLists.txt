@@ -22,9 +22,16 @@ endif()
 add_executable(KeyGenDistributed src/main.cpp)
 
 # Pull in Qrypt Security header files
-target_include_directories(KeyGenDistributed PUBLIC
-    "lib/QryptSecurity/include"
-)
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    target_compile_definitions(KeyGenDistributed PUBLIC MACOS_FRAMEWORK)
+    target_include_directories(KeyGenDistributed PUBLIC
+        "$ENV{HOME}/Library/Frameworks/QryptSecurity.framework/Headers"
+    )
+else()
+    target_include_directories(KeyGenDistributed PUBLIC
+        "lib/QryptSecurity/include"
+    )
+endif()
 
 # Link against QryptSecurity dynamic library
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -33,7 +40,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(KeyGenDistributed
-        "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/libQryptSecurity.dylib"
+       "$ENV{HOME}/Library/Frameworks/QryptSecurity.framework/QryptSecurity"
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(KeyGenDistributed
