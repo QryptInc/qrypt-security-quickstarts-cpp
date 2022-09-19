@@ -1,14 +1,6 @@
-
-
-#ifdef MACOS_FRAMEWORK
-    #include "qryptsecurity.h"
-    #include "qryptsecurity_exceptions.h"
-    #include "qryptsecurity_logging.h"
-#else
-    #include "QryptSecurity/qryptsecurity.h"
-    #include "QryptSecurity/qryptsecurity_exceptions.h"
-    #include "QryptSecurity/qryptsecurity_logging.h"
-#endif
+#include "QryptSecurity/qryptsecurity.h"
+#include "QryptSecurity/qryptsecurity_exceptions.h"
+#include "QryptSecurity/qryptsecurity_logging.h"
 
 #include <fstream>
 #include <iomanip>
