@@ -154,7 +154,7 @@ int main(int argc, char **argv) {
 
             // Display the shared key
             std::string key = convertByteVecToHexStr(keyInit.key);
-            printf("\nAlice - Key: %s\n", key.c_str());
+            printf("\nAlice - Key: %s\n\n", key.c_str());
 
             // 3. Write out metadata for bob
             std::ofstream output(metadataFilename, std::ios::out | std::ios::binary);
@@ -173,7 +173,7 @@ int main(int argc, char **argv) {
 
             // Display our shared key
             std::string key = convertByteVecToHexStr(keySync);
-            printf("\nBob - Key: %s\n", key.c_str());
+            printf("\nBob - Key: %s\n\n", key.c_str());
         }
         else {
             displayUsage();
