@@ -1,12 +1,6 @@
-
-
-#ifdef MACOS_FRAMEWORK
-    #include "qryptsecurity.h"
-    #include "qryptsecurity_exceptions.h"
-#else
-    #include "QryptSecurity/qryptsecurity.h"
-    #include "QryptSecurity/qryptsecurity_exceptions.h"
-#endif
+#include "QryptSecurity/qryptsecurity.h"
+#include "QryptSecurity/qryptsecurity_exceptions.h"
+#include "QryptSecurity/qryptsecurity_logging.h"
 
 #include <fstream>
 #include <iomanip>
@@ -130,6 +124,10 @@ int main(int argc, char **argv) {
         return 1;        
     }
 
+    // Enable QryptSecurity logging
+    logging::getLogWriter()->setLogLevel(logging::LogLevel::QRYPTLIB_LOG_LEVEL_INFO);
+    logging::getLogWriter()->enableFileLogging();
+
     try {
         // 1. Create and initialize our keygen client
         auto keyGenClient = IKeyGenDistributedClient::create();
@@ -148,7 +146,7 @@ int main(int argc, char **argv) {
 
             // Display the shared key
             std::string key = convertByteVecToHexStr(keyInit.key);
-            printf("Alice - Key: %s", key.c_str());
+            printf("\nAlice - Key: %s\n\n", key.c_str());
 
             // 3. Write out metadata for bob
             std::ofstream output(metadataFilename, std::ios::out | std::ios::binary);
@@ -167,7 +165,7 @@ int main(int argc, char **argv) {
 
             // Display our shared key
             std::string key = convertByteVecToHexStr(keySync);
-            printf("Bob - Key: %s", key.c_str());
+            printf("\nBob - Key: %s\n\n", key.c_str());
         }
         else {
             displayUsage();
