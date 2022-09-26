@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+    alice:
+        container_name: alice_container
+        image: alice_image
+        build:
+            context: ..
+            dockerfile: demo/Dockerfile
+            args:
+                persona: alice
+        environment:
+            QRYPT_TOKEN: ${QRYPT_TOKEN}
+            PERSONA: alice
+
+    bob:
+        container_name: bob_container
+        image: bob_image
+        build:
+            context: ..
+            dockerfile: demo/Dockerfile
+            args:
+                persona: bob
+        environment:
+            QRYPT_TOKEN: ${QRYPT_TOKEN}
+            PERSONA: bob

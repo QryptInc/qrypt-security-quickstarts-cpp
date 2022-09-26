@@ -1,13 +1,9 @@
 #include "QryptSecurity/qryptsecurity.h"
 #include "QryptSecurity/qryptsecurity_exceptions.h"
 #include "QryptSecurity/qryptsecurity_logging.h"
+#include "common.h"
 
 #include <fstream>
-#include <iomanip>
-#include <iterator>
-#include <sstream>
-#include <string>
-#include <vector>
 
 using namespace QryptSecurity;
 
@@ -18,16 +14,6 @@ std::string getUsage() {
     "=====================\n"
     "\n"
     "Exercises distributed key generation.\n"
-    "\n"
-    "Usage\n"
-    "-----\n"
-    "1. Run as alice to generate the shared key and metadata file to be sent to bob.\n"
-    "\n"
-    "   % KeyGenDistributed --user=alice --token=<token> --key-type=<aes|otp> [--otp-len=<length>] --metadata-filename=<filename>\n"
-    "\n"
-    "2. Run as bob, which will read in the metadata file to generate the shared key.\n"
-    "\n"
-    "   % KeyGenDistributed --user=bob --token=<token> --metadata-filename=<filename>\n"
     "\n"
     "Options\n"
     "-------\n"
@@ -44,6 +30,8 @@ std::string getUsage() {
     "\n"
     "--metadata-filename=<filename> The filename for the metadata file to be created or consumed.\n"
     "\n"
+    "--key-filename=<filename>      The filename to save the generated key.\n"
+    "\n"
     "--help                         Display help.\n"
     "\n"
     "";
@@ -56,26 +44,17 @@ void displayUsage() {
     printf("%s", usage.c_str());
 }
 
-std::string convertByteVecToHexStr(std::vector<uint8_t> bytes) {
-    std::ostringstream oss;
-    oss << std::hex << std::setfill('0');
-    for (auto byte : bytes) {
-        int byteValue = byte;
-        oss << std::setw(2) << byteValue;
-    }
-    std::string result = oss.str();
-    return result;
-}
 
 int main(int argc, char **argv) {
-
-    std::string user, token, keyType, metadataFilename;
+    std::string user, token, metadataFilename, keyFilename;
+    std::string keyType = "aes";
     int otpLen = 0;
     std::string setUserFlag = "--user=";
     std::string setTokenFlag = "--token=";
     std::string setKeyTypeFlag = "--key-type=";
     std::string setOTPLenFlag = "--otp-len=";
     std::string setMetadataFilenameFlag = "--metadata-filename=";
+    std::string setKeyFilenameFlag = "--key-filename=";
 
     // Parse command line parameters
     while(*++argv) {
@@ -95,6 +74,9 @@ int main(int argc, char **argv) {
         }
         else if (argument.find(setMetadataFilenameFlag) == 0) {
             metadataFilename = argument.substr(setMetadataFilenameFlag.size());
+        }
+        else if (argument.find(setKeyFilenameFlag) == 0) {
+            keyFilename = argument.substr(setKeyFilenameFlag.size());
         }
         else if ((argument == "-h") || (argument == "--help")) {
             displayUsage();
@@ -118,6 +100,11 @@ int main(int argc, char **argv) {
         displayUsage();
         return 1;        
     }
+    if (keyFilename.empty()) {
+        printf("Missing key filename.\n");
+        displayUsage();
+        return 1;        
+    }
     if (keyType == "otp" && otpLen == 0) {
         printf("Invalid OTP length.\n");
         displayUsage();
@@ -132,7 +119,7 @@ int main(int argc, char **argv) {
         // 1. Create and initialize our keygen client
         auto keyGenClient = IKeyGenDistributedClient::create();
         keyGenClient->initialize(token);
-
+        
         // Alice is the sender
         if (user == "alice") {
             // 2. Generate the key and metadata
@@ -148,17 +135,14 @@ int main(int argc, char **argv) {
             std::string key = convertByteVecToHexStr(keyInit.key);
             printf("\nAlice - Key: %s\n\n", key.c_str());
 
-            // 3. Write out metadata for bob
-            std::ofstream output(metadataFilename, std::ios::out | std::ios::binary);
-            output.write((char*)&keyInit.metadata[0], keyInit.metadata.size());
-            output.close();
+            // 3. Write out metadata for bob and key for encryption
+            writeToFile(metadataFilename, keyInit.metadata);
+            writeToFile(keyFilename, keyInit.key);
         }
         // Bob is the receiver
         else if (user == "bob") {
-            // 2. Read in metadata
-            std::ifstream input(metadataFilename, std::ios::binary);
-            std::vector<unsigned char> metadata(std::istreambuf_iterator<char>(input), {});
-            input.close();
+            // 2. Read in metadata from alice
+            std::vector<uint8_t> metadata = readFromFile(metadataFilename);
 
             // 3. Generate the key using the metadata
             std::vector<uint8_t> keySync = keyGenClient->genSync(metadata);
@@ -166,12 +150,16 @@ int main(int argc, char **argv) {
             // Display our shared key
             std::string key = convertByteVecToHexStr(keySync);
             printf("\nBob - Key: %s\n\n", key.c_str());
+
+            // 4. Write out key for decryption
+            writeToFile(keyFilename, keySync);
         }
         else {
             displayUsage();
             return 1;
         }
-    } catch (QryptSecurityException &e) {
-        printf("Error: %s", e.what());
+    } catch(QryptSecurityException &e) {
+        printf("Error: %s\n", e.what());
     }
 }
+

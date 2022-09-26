@@ -13,8 +13,6 @@ usage() {
     echo "Options:"
     echo "--help                    Displays help menu"
     echo ""
-    echo "--build_encrypt_tool      Build Encryption Tool. This function requires the Openssl library pre-installed in the system."
-    echo ""    
     echo "--build_type=<option>     Defaults to Release."
     echo "                          Release - Build targeted for releasing."
     echo "                          Debug   - Build targeted for debugging."
@@ -24,8 +22,6 @@ usage() {
     exit
 }
 
-BUILD_ENCRYPT_TOOL=OFF
-
 # Parse input arguments
 for i in "$@"
 do
@@ -34,10 +30,6 @@ case $i in
     usage
     shift
     ;;
-    --build_encrypt_tool)
-    BUILD_ENCRYPT_TOOL=ON
-    shift
-    ;;    
     --build_type=*)
     BUILD_TYPE="${i#*=}"
     shift
@@ -69,7 +61,7 @@ cd build
 echo "***************************************"
 echo "* BUILD"
 echo "***************************************"
-cmake -DBUILD_ENCRYPT_TOOL=$BUILD_ENCRYPT_TOOL -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
+cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
 cmake --build .
 
 cd ..
