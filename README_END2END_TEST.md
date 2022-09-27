@@ -1,4 +1,4 @@
-## Manual test environment
+## Test environment
 
 The test commands shown in this tutorial should be run on an Ubuntu system.
 
