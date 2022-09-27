@@ -40,11 +40,7 @@ Alice encrypts the bmp image file using the AES key.
 $ build/EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=../files/tux.bmp --output-filename=aes_encrypted_tux.bmp
 ```
 
-Alice sends the metadata and the encrypted image file to Bob.
-
-Remark: To find Bob's IP, run `ifconfig eth0 | grep "inet " | awk '{print $2}'` on Bob's host.
-
-Below is a sample command that sends the files to Bob's host using scp.
+Alice sends the metadata and the encrypted image file to Bob. **Remark:** To find Bob's IP, run `ifconfig eth0 | grep "inet " | awk '{print $2}'` on Bob's host. Below is a sample command that sends the files to Bob's host using scp.
 ```
 $ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' metadata.bin aes_encrypted_tux.bmp ubuntu@<Bob's IP>:/home/ubuntu
 ```
