@@ -3,7 +3,7 @@
 The test commands in this tutorial should be run on an Ubuntu system.
 
 ## Prerequisite
-Go through [Quickstarts guide](README.md) and make sure that the qrypt token is ready.
+Go through [Quickstarts guide](https://docs.qrypt.com/sdk/quickstarts/cpp/keygendistributed/) and make sure that the qrypt token is ready.
 ```
 $ echo $QRYPT_TOKEN
 ```

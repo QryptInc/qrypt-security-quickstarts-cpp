@@ -2,8 +2,10 @@
 
 The test commands shown in this tutorial should be run on an Ubuntu system.
 
+**Remarks:** This tutorial demonstrates the steps to setup and run end-to-end tests manually. However, we note that a [docker version](demo/README.md) that automates these steps in a docker environment is also available.
+
 ## Prerequisite (on both Alice's and Bob's hosts)
-Go through [Quickstarts guide](README.md) and make sure that the qrypt token is ready.
+Go through [Quickstarts guide](https://docs.qrypt.com/sdk/quickstarts/cpp/keygendistributed/) and make sure that the qrypt token is ready.
 ```
 $ echo $QRYPT_TOKEN
 ```
@@ -40,7 +42,11 @@ Alice encrypts the bmp image file using the AES key.
 $ build/EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=../files/tux.bmp --output-filename=aes_encrypted_tux.bmp
 ```
 
-Alice sends the metadata and the encrypted image file to Bob. **Remark:** To find Bob's IP, run `ifconfig eth0 | grep "inet " | awk '{print $2}'` on Bob's host. Below is a sample command that sends the files to Bob's host using scp.
+Alice sends the metadata and the encrypted image file to Bob. 
+
+**Remarks:** To find Bob's IP, run `ifconfig eth0 | grep "inet " | awk '{print $2}'` on Bob's host. 
+
+Below is a sample command that sends the files to Bob's host using scp.
 ```
 $ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' metadata.bin aes_encrypted_tux.bmp ubuntu@<Bob's IP>:/home/ubuntu
 ```
