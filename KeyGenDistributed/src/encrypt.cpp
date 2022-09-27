@@ -30,7 +30,7 @@ std::string getUsage() {
     "\n"
     "--file-type=<binary|bitmap>    Set the input/output file type.\n"
     "                               binary - File data will be used as a big binary blob.\n"
-    "                               bitmap - Bitmap header data will be preserved.\n"
+    "                               bitmap - bmp image file. Bitmap header data will be preserved.\n"
     "\n"
     "--input-filename=<filename>    The input file.\n"
     "\n"
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
     
     std::string operation, keyFilename, inputFilename, outputFilename;
     std::string keyType = "aes";
-    std::string fileType = "bitmap";
+    std::string fileType = "binary";
     std::string setOperationFlag = "--op=";
     std::string setKeyTypeFlag = "--key-type=";
     std::string setKeyFilenameFlag = "--key-filename=";
@@ -119,6 +119,9 @@ int main(int argc, char **argv) {
         displayUsage();
         return 1;
     }
+
+    printf("\n[EncryptTool] operation: %s, fileType: %s, keyType: %s, keyFile: %s, inputFile: %s, outputFile: %s\n",
+           operation.c_str(), fileType.c_str(), keyType.c_str(), keyFilename.c_str(), inputFilename.c_str(), outputFilename.c_str());
 
     BitmapData bitmapData = {};
     std::vector<uint8_t> cipherTextData;

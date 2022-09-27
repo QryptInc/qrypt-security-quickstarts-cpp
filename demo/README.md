@@ -1,4 +1,4 @@
-This demo demonstrates the entire Quickstarts and end to end tests setup in a docker ennvironment. It clones the quickstarts repo from the github, sets up the folder structure, downloads the SDK zipped file, builds the test app codes, and creates Alice's and Bob's containers for end to end tests.
+This demo demonstrates the Quickstarts and end to end tests setup in a docker ennvironment. It clones the quickstarts repo from the github, sets up the folder structure, downloads the SDK zipped file, builds the test codes, and creates Alice's and Bob's containers for end to end tests.
 
 ## Test environment
 The testbed in this demo will be established in Ubuntu containers, so the below commands can be run from any OS with docker installed. They have been tested on MacOS.

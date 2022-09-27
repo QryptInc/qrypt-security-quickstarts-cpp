@@ -12,7 +12,7 @@ Install Openssl and other development and network tools.
 ```
 $ apt-get update
 $ apt-get -y install libssl-dev
-$ apt-get -y installgit cmake gcc g++ xxd libssl-dev libgtest-dev openssh-server ufw sshpass net-tools
+$ apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev openssh-server ufw sshpass net-tools
 ```
 
 Setup SSH server and user - will be used for file transmission.

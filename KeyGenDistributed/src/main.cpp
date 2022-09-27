@@ -113,7 +113,6 @@ int main(int argc, char **argv) {
 
     // Enable QryptSecurity logging
     logging::getLogWriter()->setLogLevel(logging::LogLevel::QRYPTLIB_LOG_LEVEL_INFO);
-    logging::getLogWriter()->enableFileLogging();
 
     try {
         // 1. Create and initialize our keygen client
