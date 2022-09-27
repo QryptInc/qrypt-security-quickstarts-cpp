@@ -7,11 +7,11 @@ Currently we provide Distributed Key Generation.
 ## Quickstarts
 [Quickstart: Distributed Key Generation](https://docs.qrypt.com/sdk/quickstarts/cpp/keygendistributed/) 
 
+## Demo
+[Quickstarts setup and test demo in docker environment](demo/README.md)
+
 ## Gtest
-[gtest tutorial](KeyGenDistributed/gtests/README.md)
+[Gtest tutorial](KeyGenDistributed/gtests/README.md)
 
 ## End to end tests
-[end to end tests tutorial](README_END2END_TEST.md)
-
-## Quickstarts setup and test demo in docker environment
-[demo](demo/README.md)
+[End to end tests tutorial](README_END2END_TEST.md)
