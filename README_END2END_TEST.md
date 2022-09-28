@@ -8,7 +8,7 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
 - A Qrypt Account. [Create an account for free](https://portal.qrypt.com/register)
 
 ## Setup  (on both Alice's and Bob's hosts)
-1. *Optional: If you have docker installed in the system (e.g. MacOS), you could run Alice and Bob in Ubuntu containers instead of Ubuntu desktops.*
+1. *Optional: If you have docker installed on the system (e.g. Mac OS), you could run Alice and Bob in Ubuntu containers instead of Ubuntu desktops.*
     ```
     $ docker run --name {alice/bob}_ubuntu -it --rm ubuntu:20.04 bash
     ```
