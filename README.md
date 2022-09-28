@@ -8,9 +8,9 @@ Currently we provide Distributed Key Generation.
 [Quickstarts setup and end-to-end test demo in docker environment](demo/README.md)
 
 ## Detailed Setup
-[Complete steps to setup Quickstart](KeyGenDistributed/README.md)
+[Complete steps to setup basic Quickstart](KeyGenDistributed/README.md)
 
-[Complete steps to setup Quickstart and end-to-end tests](README_END2END_TEST.md)
+[Complete steps to setup end-to-end tests](README_END2END_TEST.md)
 
 ### Gtest
 [Gtest tutorial](KeyGenDistributed/gtests/README.md)
