@@ -36,6 +36,7 @@ $ ./run_alice_bob.sh
 Alice generates AES key and the metadata, encrypts the image, and then sends the metadata and the encrypted image to Bob.
 ```
 $ docker exec -it alice_container bash
+$ rm -rf /home/ubuntu/*
 $ KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=metadata.bin --key-filename=alice_aes.bin
 $ EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=/workspace/files/tux.bmp --output-filename=aes_encrypted_tux.bmp
 $ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' metadata.bin aes_encrypted_tux.bmp ubuntu@bob:/home/ubuntu
@@ -45,6 +46,7 @@ $ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' metadata.bin aes_encrypt
 Bob recovers the AES key using the metadata, decrypts the image, and compare the decrypted image with the original one.
 ```
 $ docker exec -it bob_container bash
+$ rm -rf /home/ubuntu/*
 $ KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=metadata.bin --key-filename=bob_aes.bin
 $ EncryptTool --op=decrypt --key-type=aes --key-filename=bob_aes.bin --file-type=bitmap --input-filename=aes_encrypted_tux.bmp --output-filename=aes_decrypted_tux.bmp
 $ cmp /workspace/files/tux.bmp aes_decrypted_tux.bmp
