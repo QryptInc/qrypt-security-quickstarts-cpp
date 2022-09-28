@@ -1,36 +1,61 @@
 ## Test environment
 
-The test commands shown in this tutorial should be run on an Ubuntu system.
+The test commands shown in this tutorial should be run on an Ubuntu 20.04 system.
 
 **Remarks:** This tutorial demonstrates the steps to setup and run end-to-end tests manually. However, we note that a [docker version](demo/README.md) that automates these steps in a docker environment is also available.
 
-## Prerequisites (on both Alice's and Bob's hosts)
-- Go through [Quickstarts guide](https://docs.qrypt.com/sdk/quickstarts/cpp/keygendistributed/) to setup SDK and folders.
-- Make sure that the qrypt token is ready.
-```
-$ echo $QRYPT_TOKEN
-```
+## Prerequisites
+- A Qrypt Account. [Create an account for free](https://portal.qrypt.com/register)
 
-Install Openssl and other development and network tools.
-```
-$ apt-get update
-$ apt-get -y install libssl-dev
-$ apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev openssh-server ufw sshpass net-tools
-```
+## Setup  (on both Alice's and Bob's hosts)
+1. *Optional: If you have docker installed in the system (e.g. MacOS), you could run Alice and Bob in Ubuntu containers instead of Ubuntu desktops.*
+    ```
+    $ docker run --name {alice/bob}_ubuntu -it --rm ubuntu:20.04 bash
+    ```
 
-Setup SSH server and user - will be used for file transmission.
-```
-ufw allow ssh
-service ssh start
-useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1000 ubuntu
-echo "ubuntu:ubuntu" | chpasswd
-```
+1. Retrieve a token from the [Qrypt Portal](https://portal.qrypt.com/tokens).
+    
+    Create an environment variable **QRYPT_TOKEN** for the token. 
+    ```
+    $ export QRYPT_TOKEN="eyJhbGciOiJ........." >> ~/.bashrc
+    ```
+1. Install Openssl and other development and network tools.
+    ```
+    $ apt-get update
+    $ apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev curl jq
+    ```
 
-Build the keygen and encryption command line tools.
-```
-$ cd KeyGenDistributed
-$ ./build.sh --build_encrypt_tool
-```
+1. *Optional: Setup SSH server and user - will be used for file transmission.*
+    ```
+    $ apt-get -y install openssh-server ufw sshpass net-tools
+    $ service ssh start
+    $ useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1000 ubuntu
+    $ echo "ubuntu:ubuntu" | chpasswd
+    ```
+1. Clone the [repo](https://github.com/QryptInc/qrypt-security-quickstarts-cpp) containing this quickstart to a local folder.
+    ```
+    $ git clone https://github.com/QryptInc/qrypt-security-quickstarts-cpp.git
+    $ cd qrypt-security-quickstarts-cpp
+    $ git checkout main
+    ```
+1. Download the Qrypt Security SDK from the [Qrypt Portal](https://portal.qrypt.com/downloads/sdk-downloads) for Ubuntu.
+    ```
+    curl -s $(curl -s https://quantumcryptogateway.blob.core.windows.net/sdk/sdk-languages.json | jq -r '.. |."downloadLink"? | select(. != null)') --output qrypt-security-ubuntu.tgz
+    ```
+1. Extract the Qrypt SDK into the /qrypt-security-quickstarts-cpp/KeyGenDistributed/lib/QryptSecurity folder
+    ```
+    $ tar -zxvf qrypt-security-ubuntu.tgz --strip-components=1 -C KeyGenDistributed/lib/QryptSecurity
+    ```
+    At this point you should be able to see the header files and libraries under KeyGenDistributed/lib/QryptSecurity.
+    ```
+    $ ls KeyGenDistributed/lib/QryptSecurity/
+      include  lib  licenses
+    ```
+1. Build the keygen and encryption command line tools.
+    ```
+    $ cd KeyGenDistributed
+    $ ./build.sh --build_encrypt_tool
+    ```
 
 ## Test commands (on Alice's host)
 Alice generates the AES key and metadata.
@@ -53,6 +78,12 @@ $ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' metadata.bin aes_encrypt
 ```
 
 ## Test commands (on Bob's host)
+At this point Bob should have received the metadata and the encrypted image file from Alice.
+```
+$ ls /home/ubuntu/
+aes_encrypted_tux.bmp  metadata.bin
+```
+
 Bob recovers the AES key using the metadata file.
 ```
 $ build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=/home/ubuntu/metadata.bin --key-filename=bob_aes.bin

@@ -11,6 +11,7 @@ RUN echo 'export PS1="\[\033[36m\]\u\[\033[m\]@\[\033[32m\]${PERSONA}:\[\033[33;
 RUN echo 'export CLICOLOR=1' >> /root/.bashrc
 RUN echo 'export LSCOLORS=ExFxBxDxCxegedabagacad' >> /root/.bashrc
 
+# Set timezone to avoid user interaction when installing cmake
 ENV TZ=America/New_York
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
 RUN echo $TZ > /etc/timezone
@@ -19,7 +20,6 @@ RUN apt-get update
 RUN apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev openssh-server ufw sshpass curl jq
 
 # Setup SSH
-RUN ufw allow ssh
 EXPOSE 22
 RUN service ssh start
 RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1000 ubuntu

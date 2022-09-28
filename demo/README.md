@@ -4,7 +4,9 @@ This demo demonstrates the Quickstarts and end to end tests setup in a docker en
 The testbed in this demo will be established in Ubuntu containers, so the below commands can be run from any OS with docker installed. They have been tested on MacOS.
 
 ## Prerequisites
-- Have git and docker installed.
+1. Have git and docker installed.
+1. Retrieve a token from the [Qrypt Portal](https://portal.qrypt.com/tokens).
+1. Create an environment variable **MY_QRYPT_TOKEN** for the token.
 
 ## Bring up the testbed
 Make sure that the qrypt token is ready. 
@@ -36,7 +38,6 @@ $ ./run_alice_bob.sh
 Alice generates AES key and the metadata, encrypts the image, and then sends the metadata and the encrypted image to Bob.
 ```
 $ docker exec -it alice_container bash
-$ rm -rf /home/ubuntu/*
 $ KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=metadata.bin --key-filename=alice_aes.bin
 $ EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=/workspace/files/tux.bmp --output-filename=aes_encrypted_tux.bmp
 $ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' metadata.bin aes_encrypted_tux.bmp ubuntu@bob:/home/ubuntu
@@ -46,7 +47,6 @@ $ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' metadata.bin aes_encrypt
 Bob recovers the AES key using the metadata, decrypts the image, and compare the decrypted image with the original one.
 ```
 $ docker exec -it bob_container bash
-$ rm -rf /home/ubuntu/*
 $ KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=metadata.bin --key-filename=bob_aes.bin
 $ EncryptTool --op=decrypt --key-type=aes --key-filename=bob_aes.bin --file-type=bitmap --input-filename=aes_encrypted_tux.bmp --output-filename=aes_decrypted_tux.bmp
 $ cmp /workspace/files/tux.bmp aes_decrypted_tux.bmp
