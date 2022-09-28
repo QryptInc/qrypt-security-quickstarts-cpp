@@ -7,6 +7,7 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
 
 ## Prerequisites
 - A Qrypt Account. [Create an account for free](https://portal.qrypt.com/register)
+- Open up 2 terminals for Alice and Bob respectively, on either the same or different hosts.
 
 ## Setup  (on both Alice's and Bob's hosts)
 1. *Optional: If you have docker installed on the system (e.g. Mac OS), you could run Alice and Bob in Ubuntu containers instead of Ubuntu desktops.*
