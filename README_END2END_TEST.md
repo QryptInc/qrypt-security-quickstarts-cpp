@@ -19,10 +19,11 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
     ```
     $ export QRYPT_TOKEN="eyJhbGciOiJ........." >> ~/.bashrc
     ```
-1. Install Openssl and other development and network tools.
+1. Install the development and network tools.
     ```
     $ apt-get update
-    $ apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev curl jq
+    $ DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y cmake
+    $ apt-get -y install git gcc g++ xxd libssl-dev libgtest-dev curl jq
     ```
 
 1. *Optional: Setup SSH server and user - will be used for file transmission.*
