@@ -6,7 +6,7 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
 - A Qrypt Account. [Create an account for free](https://portal.qrypt.com/register)
 
 ## Setup (if you haven't setup Qrypt Security SDK on this host)
-1. *Optional: If you have docker installed on the system (e.g. Mac OS), you could run Alice and Bob in Ubuntu containers instead of Ubuntu desktops.*
+1. *Optional: If you have docker installed on the system (e.g. Mac OS), you could run gtest in an Ubuntu container instead of an Ubuntu desktop.*
     ```
     $ docker run --name qrypt_ubuntu -it --rm ubuntu:20.04 bash
     ```
