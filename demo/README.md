@@ -4,7 +4,9 @@ This demo demonstrates the Quickstarts and end to end tests setup in a docker en
 The testbed in this demo will be established in Ubuntu containers, so the below commands can be run from any OS with docker installed. They have been tested on MacOS.
 
 ## Prerequisites
-- Have git and docker installed.
+1. Have git and docker installed.
+1. Retrieve a token from the [Qrypt Portal](https://portal.qrypt.com/tokens).
+1. Create an environment variable **MY_QRYPT_TOKEN** for the token.
 
 ## Bring up the testbed
 Make sure that the qrypt token is ready. 
