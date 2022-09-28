@@ -1,8 +1,9 @@
-## Test environment
+# End-to-End Test Setup
+This tutorial demonstrates the steps to setup and run end-to-end tests manually. However, we note that a [docker version](demo/README.md) that automates these steps in a docker environment is also available.
 
+## Test environment
 The test commands shown in this tutorial should be run on an Ubuntu 20.04 system.
 
-**Remarks:** This tutorial demonstrates the steps to setup and run end-to-end tests manually. However, we note that a [docker version](demo/README.md) that automates these steps in a docker environment is also available.
 
 ## Prerequisites
 - A Qrypt Account. [Create an account for free](https://portal.qrypt.com/register)
