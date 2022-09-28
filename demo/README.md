@@ -3,7 +3,7 @@ This demo demonstrates the Quickstarts and end to end tests setup in a docker en
 ## Test environment
 The testbed in this demo will be established in Ubuntu containers, so the below commands can be run from any OS with docker installed. They have been tested on MacOS.
 
-## Preperation
+## Prerequisites
 - Have git and docker installed.
 
 ## Bring up the testbed
@@ -14,8 +14,9 @@ $ echo $MY_QRYPT_TOKEN
 
 Bring up the testbed.
 ```
-$ git clone https://hard-carbon.visualstudio.com/Qrypt/_git/qrypt-security-demo-cpp
-$ cd qrypt-security-demo-cpp/demo
+$ git clone https://github.com/QryptInc/qrypt-security-quickstarts-cpp.git
+$ cd qrypt-security-quickstarts-cpp
+$ git checkout main
 $ docker-compose down -v --rmi all --remove-orphans
 $ QRYPT_TOKEN=$MY_QRYPT_TOKEN docker-compose up -d
 ```
@@ -51,7 +52,7 @@ $ cmp /workspace/files/tux.bmp aes_decrypted_tux.bmp
 
 
 ## Bonus - gtest
-This is not related to this demo, but it's worth mentiong that you could run gtest in either Alice's or Bob's container easily.
+This is not related to this demo, but it's worth mentioning that you could run gtest in either Alice's or Bob's container easily.
 ```
 $ docker exec -it alice_container bash
 root@alice:/home/ubuntu$ cd /workspace/KeyGenDistributed/gtests/

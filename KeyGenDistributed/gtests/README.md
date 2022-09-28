@@ -2,8 +2,9 @@
 
 The test commands in this tutorial should be run on an Ubuntu system.
 
-## Prerequisite
-Go through [Quickstarts guide](https://docs.qrypt.com/sdk/quickstarts/cpp/keygendistributed/) and make sure that the qrypt token is ready.
+## Prerequisites
+- Go through [Quickstarts guide](https://docs.qrypt.com/sdk/quickstarts/cpp/keygendistributed/) to setup SDK and folders.
+- Make sure that the qrypt token is ready.
 ```
 $ echo $QRYPT_TOKEN
 ```

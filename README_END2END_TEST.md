@@ -4,8 +4,9 @@ The test commands shown in this tutorial should be run on an Ubuntu system.
 
 **Remarks:** This tutorial demonstrates the steps to setup and run end-to-end tests manually. However, we note that a [docker version](demo/README.md) that automates these steps in a docker environment is also available.
 
-## Prerequisite (on both Alice's and Bob's hosts)
-Go through [Quickstarts guide](https://docs.qrypt.com/sdk/quickstarts/cpp/keygendistributed/) and make sure that the qrypt token is ready.
+## Prerequisites (on both Alice's and Bob's hosts)
+- Go through [Quickstarts guide](https://docs.qrypt.com/sdk/quickstarts/cpp/keygendistributed/) to setup SDK and folders.
+- Make sure that the qrypt token is ready.
 ```
 $ echo $QRYPT_TOKEN
 ```
@@ -44,7 +45,7 @@ $ build/EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --f
 
 Alice sends the metadata and the encrypted image file to Bob. 
 
-**Remarks:** To find Bob's IP, run `ifconfig eth0 | grep "inet " | awk '{print $2}'` on Bob's host. 
+**Remarks:** To find Bob's IP, run `ifconfig eth0 | grep "inet " | awk '{print $2}'` on Bob's host.
 
 Below is a sample command that sends the files to Bob's host using scp.
 ```
@@ -64,5 +65,5 @@ $ build/EncryptTool --op=decrypt --key-type=aes --key-filename=bob_aes.bin --fil
 
 Bob verifies that the decrypted image file matches the original file.
 ```
-$ diff ../files/tux.bmp aes_decrypted_tux.bmp
+$ cmp ../files/tux.bmp aes_decrypted_tux.bmp
 ```
