@@ -33,21 +33,40 @@ $ ./run_alice_bob.sh
 - Open up another 2 terminals and follow the below instructions in each terminal.
 
 ##### Terminal - Alice
-Alice generates AES key and the metadata, encrypts the image, and then sends the metadata and the encrypted image to Bob.
+Alice generates AES/OTP keys and metadata files, encrypts the files, and then sends the metadata and encrypted files to Bob.
 ```
-$ docker exec -it alice_container bash
-$ KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=metadata.bin --key-filename=alice_aes.bin
-$ EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=/workspace/files/tux.bmp --output-filename=aes_encrypted_tux.bmp
-$ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' metadata.bin aes_encrypted_tux.bmp ubuntu@bob:/home/ubuntu
+# Enter Alice's container container
+    $ docker exec -it alice_container bash
+
+# AES keygen and encryption
+    $ KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=aes_metadata.bin --key-filename=alice_aes.bin
+    $ EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=/workspace/files/tux.bmp --output-filename=aes_encrypted_tux.bmp
+
+# OTP keygen and encryption
+    $ KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=otp --otp-len=$(stat -c%s /workspace/files/sample.txt) --metadata-filename=otp_metadata.bin --key-filename=alice_otp.bin
+    $ EncryptTool --op=encrypt --key-type=otp --key-filename=alice_otp.bin --file-type=binary --input-filename=/workspace/files/sample.txt --output-filename=otp_encrypted_sample.bin
+
+# Send the metadata and decrypted files
+    $ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' aes_metadata.bin aes_encrypted_tux.bmp otp_metadata.bin otp_encrypted_sample.bin ubuntu@bob:/home/ubuntu
 ```
 
 ##### Terminal - Bob
-Bob recovers the AES key using the metadata, decrypts the image, and compare the decrypted image with the original one.
+Bob recovers the keys using the metadata files, decrypts the files, and compare the decrypted files with the original ones.
 ```
-$ docker exec -it bob_container bash
-$ KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=metadata.bin --key-filename=bob_aes.bin
-$ EncryptTool --op=decrypt --key-type=aes --key-filename=bob_aes.bin --file-type=bitmap --input-filename=aes_encrypted_tux.bmp --output-filename=aes_decrypted_tux.bmp
-$ cmp /workspace/files/tux.bmp aes_decrypted_tux.bmp
+# Enter Bob's container container
+    $ docker exec -it bob_container bash
+
+# AES keygen and decryption
+    $ KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=aes_metadata.bin --key-filename=bob_aes.bin
+    $ EncryptTool --op=decrypt --key-type=aes --key-filename=bob_aes.bin --file-type=bitmap --input-filename=aes_encrypted_tux.bmp --output-filename=aes_decrypted_tux.bmp
+
+# OTP keygen and decryption
+    $ KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=otp_metadata.bin --key-filename=bob_otp.bin
+    $ EncryptTool --op=decrypt --key-type=otp --key-filename=bob_otp.bin --file-type=binary --input-filename=otp_encrypted_sample.bin --output-filename=otp_decrypted_sample.bin
+
+# Verify the decrypted files
+    $ cmp /workspace/files/tux.bmp aes_decrypted_tux.bmp
+    $ cmp /workspace/files/sample.txt otp_decrypted_sample.bin
 ```
 
 
