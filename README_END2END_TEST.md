@@ -56,7 +56,7 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
     ```
     $ tar -zxvf qrypt-security-ubuntu.tgz --strip-components=1 -C KeyGenDistributed/lib/QryptSecurity
     ```
-    At this point you should be able to see the header files and libraries under KeyGenDistributed/lib/QryptSecurity.
+    *Optional: At this point you should be able to see the header files and libraries under KeyGenDistributed/lib/QryptSecurity.*
     ```
     $ ls KeyGenDistributed/lib/QryptSecurity/
       include  lib  licenses
