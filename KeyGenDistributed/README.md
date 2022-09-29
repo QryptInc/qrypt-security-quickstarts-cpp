@@ -68,12 +68,27 @@ The commands shown in this tutorial should be run on an Ubuntu 20.04 system.
     ```
 
 ## Test commands
-Alice generates the AES key and metadata.
+#### Test OTP keygen
+    
+Alice generates the OTP key and metadata file.
+  
 ```
-$ build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=metadata.bin --key-filename=alice_aes.bin
+$ build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=otp --otp-len=32768 --metadata-filename=otp_metadata.bin --key-filename=alice_otp.bin
+```
+    
+Bob recovers the OTP key using the metadata file.
+```
+$ build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=otp_metadata.bin --key-filename=bob_otp.bin
+```
+
+#### Test AES keygen
+Alice generates the AES key and metadata file.
+
+```
+$ build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=aes_metadata.bin --key-filename=alice_aes.bin
 ```
 
 Bob recovers the AES key using the metadata file.
 ```
-$ build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=metadata.bin --key-filename=bob_aes.bin
+$ build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=aes_metadata.bin --key-filename=bob_aes.bin
 ```
