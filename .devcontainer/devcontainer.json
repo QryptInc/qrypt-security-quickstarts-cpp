@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.238.0/containers/cpp
 {
-    "name": "libqrypt",
+    "name": "quickstart",
     "image": "ubuntu:20.04",
     "settings": { 
         "terminal.integrated.defaultProfile.linux": "bash"
