@@ -28,13 +28,6 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
     $ apt-get -y install git gcc g++ xxd libssl-dev libgtest-dev curl jq
     ```
 
-1. *Optional: Setup SSH server and user - will be used for file transmission.*
-    ```
-    $ apt-get -y install openssh-server ufw sshpass net-tools
-    $ service ssh start
-    $ useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1000 ubuntu
-    $ echo "ubuntu:ubuntu" | chpasswd
-    ```
 1. Clone the [repo](https://github.com/QryptInc/qrypt-security-quickstarts-cpp) containing this quickstart to a local folder.
     ```
     $ git clone https://github.com/QryptInc/qrypt-security-quickstarts-cpp.git
@@ -65,6 +58,14 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
     ```
     $ cd KeyGenDistributed
     $ ./build.sh --build_encrypt_tool
+    ```
+
+1. *Optional: Setup SSH server and user - will be used for file transmission between Alice and Bob in the below tests.*
+    ```
+    $ apt-get -y install openssh-server ufw sshpass net-tools
+    $ service ssh start
+    $ useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1000 ubuntu
+    $ echo "ubuntu:ubuntu" | chpasswd
     ```
 
 ## Test commands (on Alice's host)
