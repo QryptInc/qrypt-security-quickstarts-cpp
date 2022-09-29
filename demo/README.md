@@ -35,7 +35,7 @@ $ ./run_alice_bob.sh
 ##### Terminal - Alice
 Alice generates AES/OTP keys and metadata files, encrypts the files, and then sends the metadata and encrypted files to Bob.
 ```
-# Enter Alice's container container
+# Enter Alice's container
     $ docker exec -it alice_container bash
 
 # AES keygen and encryption
@@ -53,7 +53,7 @@ Alice generates AES/OTP keys and metadata files, encrypts the files, and then se
 ##### Terminal - Bob
 Bob recovers the keys using the metadata files, decrypts the files, and compare the decrypted files with the original ones.
 ```
-# Enter Bob's container container
+# Enter Bob's container
     $ docker exec -it bob_container bash
 
 # AES keygen and decryption
