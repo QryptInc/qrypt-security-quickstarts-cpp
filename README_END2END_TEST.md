@@ -19,7 +19,7 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
     
     Create an environment variable **QRYPT_TOKEN** for the token. 
     ```
-    $ export QRYPT_TOKEN="eyJhbGciOiJ........." >> ~/.bashrc
+    $ export QRYPT_TOKEN="eyJhbG......" >> ~/.bashrc
     ```
 1. Install the development and network tools.
     ```
