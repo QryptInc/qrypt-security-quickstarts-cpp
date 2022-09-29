@@ -32,17 +32,22 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
     $ cd qrypt-security-quickstarts-cpp
     $ git checkout main
     ```
-1. Download the Qrypt Security SDK from the [Qrypt Portal](https://portal.qrypt.com/downloads/sdk-downloads) for Ubuntu. And verify the SDK's checksum.
+1. Download the Qrypt Security SDK from the [Qrypt Portal](https://portal.qrypt.com/downloads/sdk-downloads) for Ubuntu.
     ```
     $ curl -s $(curl -s https://quantumcryptogateway.blob.core.windows.net/sdk/sdk-languages.json | jq -r '.. |."downloadLink"? | select(. != null)') --output qrypt-security-ubuntu.tgz
+    ```
+    
+    Verify the SDK's checksum and make sure that it returns OK.
+    ```
     $ echo "$(cat SDK_sha256sum) qrypt-security-ubuntu.tgz" > qrypt-security-ubuntu.tgz.sha256sum
-    $ if ! (sha256sum --check qrypt-security-ubuntu.tgz.sha256sum --status); then echo "Error: unexpected checksum"; exit 1; fi
+    $ sha256sum --check qrypt-security-ubuntu.tgz.sha256sum
+      qrypt-security-ubuntu.tgz: OK
     ```
 1. Extract the Qrypt SDK into the /qrypt-security-quickstarts-cpp/KeyGenDistributed/lib/QryptSecurity folder
     ```
     $ tar -zxvf qrypt-security-ubuntu.tgz --strip-components=1 -C KeyGenDistributed/lib/QryptSecurity
     ```
-    At this point you should be able to see the header files and libraries under KeyGenDistributed/lib/QryptSecurity.
+    *Optional: At this point you should be able to see the header files and libraries under KeyGenDistributed/lib/QryptSecurity.*
     ```
     $ ls KeyGenDistributed/lib/QryptSecurity/
       include  lib  licenses
