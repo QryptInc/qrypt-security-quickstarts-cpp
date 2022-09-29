@@ -69,43 +69,51 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
     ```
 
 ## Test commands (on Alice's host)
-Alice generates the AES key and metadata.
+Alice generates the AES key and metadata, and encrypts the bmp image file using the AES key.
 ```
-$ build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=metadata.bin --key-filename=alice_aes.bin
+$ build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=aes_metadata.bin --key-filename=alice_aes.bin
+$ build/EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=../files/tux.bmp --output-filename=aes_encrypted_tux.bmp
 ```
 
-Alice encrypts the bmp image file using the AES key.
+Alice generates the OTP key and metadata, and encrypts the sample text file using the OTP key.
 ```
-$ build/EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=../files/tux.bmp --output-filename=aes_encrypted_tux.bmp
+$ build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=otp --otp-len=$(stat -c%s ../files/sample.txt) --metadata-filename=otp_metadata.bin --key-filename=alice_otp.bin
+$ build/EncryptTool --op=encrypt --key-type=otp --key-filename=alice_otp.bin --file-type=binary --input-filename=../files/sample.txt --output-filename=otp_encrypted_sample.bin
 ```
 
 Alice sends the metadata and the encrypted image file to Bob. 
 
+Below is a sample command that sends the files to Bob's host using scp.
+
 **Remarks:** To find Bob's IP, run `ifconfig eth0 | grep "inet " | awk '{print $2}'` on Bob's host.
 
-Below is a sample command that sends the files to Bob's host using scp.
 ```
-$ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' metadata.bin aes_encrypted_tux.bmp ubuntu@<Bob's IP>:/home/ubuntu
+$ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' aes_metadata.bin aes_encrypted_tux.bmp otp_metadata.bin otp_encrypted_sample.bin ubuntu@<Bob's IP>:/home/ubuntu
 ```
 
 ## Test commands (on Bob's host)
 At this point Bob should have received the metadata and the encrypted image file from Alice.
 ```
 $ ls /home/ubuntu/
-aes_encrypted_tux.bmp  metadata.bin
+aes_encrypted_tux.bmp  aes_metadata.bin  otp_encrypted_sample.bin  otp_metadata.bin
 ```
 
-Bob recovers the AES key using the metadata file.
+Bob recovers the AES key using the metadata, and decrypts the bmp image file using the AES key.
 ```
-$ build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=/home/ubuntu/metadata.bin --key-filename=bob_aes.bin
-```
-
-Bob decrypts the bmp image file using the AES key.
-```
+$ build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=/home/ubuntu/aes_metadata.bin --key-filename=bob_aes.bin
 $ build/EncryptTool --op=decrypt --key-type=aes --key-filename=bob_aes.bin --file-type=bitmap --input-filename=/home/ubuntu/aes_encrypted_tux.bmp --output-filename=aes_decrypted_tux.bmp
+```
+
+Bob recovers the OTP key using the metadata, and decrypts the sample text file using the OTP key.
+```
+$ build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=/home/ubuntu/otp_metadata.bin --key-filename=bob_otp.bin
+$ build/EncryptTool --op=decrypt --key-type=otp --key-filename=bob_otp.bin --file-type=binary --input-filename=/home/ubuntu/otp_encrypted_sample.bin --output-filename=otp_decrypted_sample.bin
 ```
 
 Bob verifies that the decrypted image file matches the original file.
 ```
 $ cmp ../files/tux.bmp aes_decrypted_tux.bmp
+$ cmp ../files/sample.txt otp_decrypted_sample.bin
 ```
+
+
