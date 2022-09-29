@@ -7,21 +7,18 @@ The testbed in this demo will be established in Ubuntu containers, so the below 
 ## Prerequisites
 1. Have git and docker installed.
 1. Retrieve a token from the [Qrypt Portal](https://portal.qrypt.com/tokens).
-1. Create an environment variable **MY_QRYPT_TOKEN** for the token.
+1. Create an environment variable **QRYPT_TOKEN** for the token.
+    ```
+    $ export QRYPT_TOKEN="eyJhbGciOiJ........." >> ~/.bashrc
+    ```
 
 ## Bring up the testbed
-Make sure that the qrypt token is ready. 
-```
-$ echo $MY_QRYPT_TOKEN
-```
-
-Bring up the testbed.
 ```
 $ git clone https://github.com/QryptInc/qrypt-security-quickstarts-cpp.git
 $ cd qrypt-security-quickstarts-cpp
 $ git checkout main
 $ docker-compose down -v --rmi all --remove-orphans
-$ QRYPT_TOKEN=$MY_QRYPT_TOKEN docker-compose up -d
+$ QRYPT_TOKEN=$QRYPT_TOKEN docker-compose up -d
 ```
 
 ## Run Alice and Bob tests (2 options: automatically and manually)
