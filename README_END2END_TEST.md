@@ -12,73 +12,82 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
 ## Setup  (on both Alice's and Bob's hosts)
 1. *Optional: If you have docker installed on the system (e.g. Mac OS), you could run Alice and Bob in Ubuntu containers instead of Ubuntu desktops.*
     ```
-    $ docker run --name {alice/bob}_ubuntu -it --rm ubuntu:20.04 bash
+    docker run --name {alice/bob}_ubuntu -it --rm ubuntu:20.04 bash
     ```
 
 1. Retrieve a token from the [Qrypt Portal](https://portal.qrypt.com/tokens).
     
     Create an environment variable **QRYPT_TOKEN** for the token. 
     ```
-    $ export QRYPT_TOKEN="eyJhbG......" >> ~/.bashrc
+    export QRYPT_TOKEN="eyJhbG......" >> ~/.bashrc
     ```
 1. Install the development and network tools.
     ```
-    $ apt-get update
-    $ DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y cmake
-    $ apt-get -y install git gcc g++ xxd libssl-dev libgtest-dev curl jq
+    apt-get update
+    DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y cmake git gcc g++ xxd libssl-dev libgtest-dev curl jq
     ```
 
 1. Clone the [repo](https://github.com/QryptInc/qrypt-security-quickstarts-cpp) containing this quickstart to a local folder.
     ```
-    $ git clone https://github.com/QryptInc/qrypt-security-quickstarts-cpp.git
-    $ cd qrypt-security-quickstarts-cpp
-    $ git checkout main
+    git clone https://github.com/QryptInc/qrypt-security-quickstarts-cpp.git
+    cd qrypt-security-quickstarts-cpp
+    git checkout main
     ```
 1. Download the Qrypt Security SDK from the [Qrypt Portal](https://portal.qrypt.com/downloads/sdk-downloads) for Ubuntu.
     ```
-    $ curl -s $(curl -s https://quantumcryptogateway.blob.core.windows.net/sdk/sdk-languages.json | jq -r '.. |."downloadLink"? | select(. != null)') --output qrypt-security-ubuntu.tgz
+    sdk_url=$(curl -s https://quantumcryptogateway.blob.core.windows.net/sdk/sdk-languages.json | jq -r '.. |."downloadLink"? | select(. != null)')
+    sdk_file='qrypt-security-ubuntu.tgz'
+    curl -s $sdk_url --output $sdk_file
     ```
     
     Verify the SDK's checksum and make sure that it returns OK.
     ```
-    $ echo "$(cat SDK_sha256sum) qrypt-security-ubuntu.tgz" > qrypt-security-ubuntu.tgz.sha256sum
-    $ sha256sum --check qrypt-security-ubuntu.tgz.sha256sum
-      qrypt-security-ubuntu.tgz: OK
+    echo "$(cat SDK_sha256sum) $sdk_file" > $sdk_file.sha256sum
+    sha256sum --check $sdk_file.sha256sum
     ```
+
 1. Extract the Qrypt SDK into the /qrypt-security-quickstarts-cpp/KeyGenDistributed/lib/QryptSecurity folder
     ```
-    $ tar -zxvf qrypt-security-ubuntu.tgz --strip-components=1 -C KeyGenDistributed/lib/QryptSecurity
+    tar -zxvf qrypt-security-ubuntu.tgz --strip-components=1 -C KeyGenDistributed/lib/QryptSecurity
     ```
     *Optional: At this point you should be able to see the header files and libraries under KeyGenDistributed/lib/QryptSecurity.*
     ```
-    $ ls KeyGenDistributed/lib/QryptSecurity/
-      include  lib  licenses
+    # Expected output:  include  lib  licenses
+    ls KeyGenDistributed/lib/QryptSecurity/ 
     ```
+
 1. Build the keygen and encryption command line tools.
     ```
-    $ cd KeyGenDistributed
-    $ ./build.sh --build_encrypt_tool
+    cd KeyGenDistributed
+    ./build.sh --build_encrypt_tool
+    ```
+    
+    *Optional: to make a debug build*
+    ```
+    ./build.sh --build_encrypt_tool --build_type=Debug
     ```
 
 1. *Optional: Setup SSH server and user - will be used for file transmission between Alice and Bob in the below tests.*
     ```
-    $ apt-get -y install openssh-server ufw sshpass net-tools
-    $ service ssh start
-    $ useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1000 ubuntu
-    $ echo "ubuntu:ubuntu" | chpasswd
+    apt-get -y install openssh-server ufw sshpass net-tools
+    ```
+    ```
+    service ssh start
+    useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1000 ubuntu
+    echo "ubuntu:ubuntu" | chpasswd
     ```
 
 ## Test commands (on Alice's host)
 Alice generates the AES key and metadata, and encrypts the bmp image file using the AES key.
 ```
-$ build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=aes_metadata.bin --key-filename=alice_aes.bin
-$ build/EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=../files/tux.bmp --output-filename=aes_encrypted_tux.bmp
+build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=aes_metadata.bin --key-filename=alice_aes.bin
+build/EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=../files/tux.bmp --output-filename=aes_encrypted_tux.bmp
 ```
 
 Alice generates the OTP key and metadata, and encrypts the sample text file using the OTP key.
 ```
-$ build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=otp --otp-len=$(stat -c%s ../files/sample.txt) --metadata-filename=otp_metadata.bin --key-filename=alice_otp.bin
-$ build/EncryptTool --op=encrypt --key-type=otp --key-filename=alice_otp.bin --file-type=binary --input-filename=../files/sample.txt --output-filename=otp_encrypted_sample.bin
+build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=otp --otp-len=$(stat -c%s ../files/sample.txt) --metadata-filename=otp_metadata.bin --key-filename=alice_otp.bin
+build/EncryptTool --op=encrypt --key-type=otp --key-filename=alice_otp.bin --file-type=binary --input-filename=../files/sample.txt --output-filename=otp_encrypted_sample.bin
 ```
 
 Alice sends the metadata and the encrypted image file to Bob. 
@@ -88,32 +97,30 @@ Below is a sample command that sends the files to Bob's host using scp.
 **Remarks:** To find Bob's IP, run `ifconfig eth0 | grep "inet " | awk '{print $2}'` on Bob's host.
 
 ```
-$ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' aes_metadata.bin aes_encrypted_tux.bmp otp_metadata.bin otp_encrypted_sample.bin ubuntu@<Bob's IP>:/home/ubuntu
+sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' aes_metadata.bin aes_encrypted_tux.bmp otp_metadata.bin otp_encrypted_sample.bin ubuntu@<Bob's IP>:/home/ubuntu
 ```
 
 ## Test commands (on Bob's host)
-At this point Bob should have received the metadata and the encrypted image file from Alice.
+*Optional: At this point Bob should have received the metadata and the encrypted image file from Alice.*
 ```
-$ ls /home/ubuntu/
-aes_encrypted_tux.bmp  aes_metadata.bin  otp_encrypted_sample.bin  otp_metadata.bin
+# Expected output:  aes_encrypted_tux.bmp  aes_metadata.bin  otp_encrypted_sample.bin  otp_metadata.bin
+ls /home/ubuntu/
 ```
 
 Bob recovers the AES key using the metadata, and decrypts the bmp image file using the AES key.
 ```
-$ build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=/home/ubuntu/aes_metadata.bin --key-filename=bob_aes.bin
-$ build/EncryptTool --op=decrypt --key-type=aes --key-filename=bob_aes.bin --file-type=bitmap --input-filename=/home/ubuntu/aes_encrypted_tux.bmp --output-filename=aes_decrypted_tux.bmp
+build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=/home/ubuntu/aes_metadata.bin --key-filename=bob_aes.bin
+build/EncryptTool --op=decrypt --key-type=aes --key-filename=bob_aes.bin --file-type=bitmap --input-filename=/home/ubuntu/aes_encrypted_tux.bmp --output-filename=aes_decrypted_tux.bmp
 ```
 
 Bob recovers the OTP key using the metadata, and decrypts the sample text file using the OTP key.
 ```
-$ build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=/home/ubuntu/otp_metadata.bin --key-filename=bob_otp.bin
-$ build/EncryptTool --op=decrypt --key-type=otp --key-filename=bob_otp.bin --file-type=binary --input-filename=/home/ubuntu/otp_encrypted_sample.bin --output-filename=otp_decrypted_sample.bin
+build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=/home/ubuntu/otp_metadata.bin --key-filename=bob_otp.bin
+build/EncryptTool --op=decrypt --key-type=otp --key-filename=bob_otp.bin --file-type=binary --input-filename=/home/ubuntu/otp_encrypted_sample.bin --output-filename=otp_decrypted_sample.bin
 ```
 
 Bob verifies that the decrypted image file matches the original file.
 ```
-$ cmp ../files/tux.bmp aes_decrypted_tux.bmp
-$ cmp ../files/sample.txt otp_decrypted_sample.bin
+cmp ../files/tux.bmp aes_decrypted_tux.bmp
+cmp ../files/sample.txt otp_decrypted_sample.bin
 ```
-
-
