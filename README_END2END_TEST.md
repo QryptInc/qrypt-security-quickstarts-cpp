@@ -17,9 +17,13 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
 
 1. Retrieve a token from the [Qrypt Portal](https://portal.qrypt.com/tokens).
     
-    Create an environment variable **QRYPT_TOKEN** for the token. 
+    Create an environment variable **QRYPT_TOKEN** for the token.
     ```
-    export QRYPT_TOKEN="eyJhbG......" >> ~/.bashrc
+    export QRYPT_TOKEN="eyJhbGciOiJ......"
+    ```
+    *Optional: to set QRYPT_TOKEN permanently for all future bash sessions, put it in ~/.bashrc*
+    ```
+    export QRYPT_TOKEN="eyJhbGciOiJ......" >> ~/.bashrc
     ```
 1. Install the development and network tools.
     ```
@@ -67,7 +71,7 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
     ./build.sh --build_encrypt_tool --build_type=Debug
     ```
 
-1. *Optional: Setup SSH server and user - will be used for file transmission between Alice and Bob in the below tests.*
+1. Setup SSH server and user - will be used for file transmission between Alice and Bob in the below tests.
     ```
     apt-get -y install openssh-server ufw sshpass net-tools
     ```
