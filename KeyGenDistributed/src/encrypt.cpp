@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    printf("Calling up EncryptTool to %s %s in %s format using the %s key file %s and generate %s.\n",
+    printf("\nCalling up EncryptTool to %s %s in %s format using the %s key file %s and generate %s.\n",
             operation.c_str(), inputFilename.c_str(), fileType.c_str(), toUpper(keyType).c_str(), keyFilename.c_str(), outputFilename.c_str());
 
     BitmapData bitmapData = {};

@@ -72,5 +72,5 @@ TEST_F(MetadataValidityTest, MetadataExpired) {
     } catch (...) {
     }
 
-    printf("Verified that the metadata is no longer valid\n");
+    printf("\nVerified that the metadata is no longer valid\n");
 }

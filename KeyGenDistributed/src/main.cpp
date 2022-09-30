@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
 
             // Display the shared key
             std::string key = convertByteVecToHexStr(keyInit.key);
-            printf("\nAlice - Key: %s\n", key.c_str());
+            printf("\nAlice - Key: %s\n\n", key.c_str());
 
             // 3. Write out metadata for bob and key for encryption
             writeToFile(metadataFilename, keyInit.metadata);
@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
 
             // Display our shared key
             std::string key = convertByteVecToHexStr(keySync);
-            printf("\nBob - Key: %s\n", key.c_str());
+            printf("\nBob - Key: %s\n\n", key.c_str());
 
             // 4. Write out key for decryption
             writeToFile(keyFilename, keySync);
