@@ -89,6 +89,7 @@ docker exec -it alice_container bash
 ```
 
 ```
+# Run the gtests
 cd /workspace/KeyGenDistributed/gtests/
 ./build.sh
 build/KeyGenDistributedTests
