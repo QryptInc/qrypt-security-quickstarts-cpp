@@ -1,7 +1,7 @@
 # End-to-End Test Setup
 This tutorial demonstrates the steps to setup and run end-to-end tests manually on 2 devices (Alice and Bob). However, we note that a [docker version](demo/README.md) that automates these steps in a docker environment is also available.
 
-*Optional - 3 devices scenario (Alice, Bob1, and Carol) - to test the 3rd device (Carol as another Bob), repeat Bob's setup and steps on Carol's host.
+*Optional - 3 devices scenario (Alice, Bob, and Carol) - to test the 3rd device (Carol as another Bob), repeat Bob's setup and steps on Carol's host.
 
 ## Test environment
 The test commands shown in this tutorial should be run on an Ubuntu 20.04 system.
