@@ -1,5 +1,7 @@
 # End-to-End Test Setup
-This tutorial demonstrates the steps to setup and run end-to-end tests manually. However, we note that a [docker version](demo/README.md) that automates these steps in a docker environment is also available.
+This tutorial demonstrates the steps to setup and run end-to-end tests manually on 2 devices (Alice and Bob). However, we note that a [docker version](demo/README.md) that automates these steps in a docker environment is also available.
+
+*Optional: To test 3 devices (Alice, Bob1, and Carol), repeat Bob's setup and steps on Carol's host. In other words, Carol's role is another Bob.*
 
 ## Test environment
 The test commands shown in this tutorial should be run on an Ubuntu 20.04 system.
@@ -8,6 +10,7 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
 ## Prerequisites
 - A Qrypt Account. [Create an account for free](https://portal.qrypt.com/register)
 - Open up 2 terminals for Alice and Bob respectively, on either the same or different hosts.
+- *Optional: To test 3 devices, open up the 3rd terminal for Carol.*
 
 ## Setup  (on both Alice's and Bob's hosts)
 1. *Optional: If you have docker installed on the system (e.g. Mac OS), you could run Alice and Bob in Ubuntu containers instead of Ubuntu desktops.*
