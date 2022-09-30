@@ -21,6 +21,7 @@ The testbed in this demo will be established in Ubuntu containers, so the below 
 git clone https://github.com/QryptInc/qrypt-security-quickstarts-cpp.git
 cd qrypt-security-quickstarts-cpp
 git checkout main
+cd demo
 docker-compose down -v --rmi all --remove-orphans
 QRYPT_TOKEN=$QRYPT_TOKEN docker-compose up -d
 ```
