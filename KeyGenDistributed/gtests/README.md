@@ -15,9 +15,13 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
 
 1. Retrieve a token from the [Qrypt Portal](https://portal.qrypt.com/tokens).
     
-    Create an environment variable **QRYPT_TOKEN** for the token. 
+    Create an environment variable **QRYPT_TOKEN** for the token.
     ```
-    export QRYPT_TOKEN="eyJhbGcJ......" >> ~/.bashrc
+    export QRYPT_TOKEN="eyJhbGciOiJ......"
+    ```
+    *Optional: to set QRYPT_TOKEN permanently for all future bash sessions, put it in ~/.bashrc*
+    ```
+    export QRYPT_TOKEN="eyJhbGciOiJ......" >> ~/.bashrc
     ```
 1. Install the development and network tools.
     ```
