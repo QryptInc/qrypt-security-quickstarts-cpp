@@ -11,7 +11,7 @@ The commands shown in this tutorial should be run on an Ubuntu 20.04 system.
 ## Setup
 1. *Optional: If you have docker installed on the system (e.g. Mac OS), you could run Alice and Bob in Ubuntu containers instead of Ubuntu desktops.*
     ```
-    docker run --name qrypt_ubuntu -it --rm ubuntu:20.04 bash     
+    docker run --name qrypt_ubuntu -it --rm ubuntu:20.04 bash
     ```
 
 1. Retrieve a token from the [Qrypt Portal](https://portal.qrypt.com/tokens).
@@ -48,7 +48,7 @@ The commands shown in this tutorial should be run on an Ubuntu 20.04 system.
 
 1. Extract the Qrypt SDK into the /qrypt-security-quickstarts-cpp/KeyGenDistributed/lib/QryptSecurity folder
     ```
-    tar -zxvf qrypt-security-ubuntu.tgz --strip-components=1 -C KeyGenDistributed/lib/QryptSecurity
+    tar -zxvf $sdk_file --strip-components=1 -C KeyGenDistributed/lib/QryptSecurity
     ```
     *Optional: At this point you should be able to see the header files and libraries under KeyGenDistributed/lib/QryptSecurity.*
     ```
