@@ -46,15 +46,14 @@ eval 'EncryptTool --op=decrypt --key-type=aes --key-filename=$AES_KEY --file-typ
 printf "\n$prefix Bob decrypts $AES_BMP_ENCRYPTED_IMAGE_FILE using the AES key ($AES_KEY).\n"
 eval 'EncryptTool --op=decrypt --key-type=aes --key-filename=$AES_KEY --file-type=bitmap --input-filename=$AES_BMP_ENCRYPTED_IMAGE_FILE --output-filename=$AES_BMP_DECRYPTED_IMAGE_FILE'
 
-compare $ORIGINAL_IMAGE_FILE $AES_BMP_DECRYPTED_IMAGE_FILE
-compare $ORIGINAL_IMAGE_FILE $AES_BIN_DECRYPTED_IMAGE_FILE
-
 printf "\n$prefix Bob recovers the OTP key using the metadata ($OTP_METADATA).\n"
 eval 'KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=$OTP_METADATA --key-filename=$OTP_KEY'
 
 printf "\n$prefix Bob decrypts $OTP_ENCRYPTED_TEXT_FILE using the OTP key ($OTP_KEY).\n"
 eval 'EncryptTool --op=decrypt --key-type=otp --key-filename=$OTP_KEY --file-type=binary --input-filename=$OTP_ENCRYPTED_TEXT_FILE --output-filename=$OTP_DECRYPTED_TEXT_FILE'
 
+compare $ORIGINAL_IMAGE_FILE $AES_BMP_DECRYPTED_IMAGE_FILE
+compare $ORIGINAL_IMAGE_FILE $AES_BIN_DECRYPTED_IMAGE_FILE
 compare $ORIGINAL_TEXT_FILE $OTP_DECRYPTED_TEXT_FILE
 
 printf "\n"
