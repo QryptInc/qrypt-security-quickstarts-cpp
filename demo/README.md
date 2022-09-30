@@ -54,7 +54,7 @@ EncryptTool --op=encrypt --key-type=otp --key-filename=alice_otp.bin --file-type
 ```
 
 ```
-# Send the metadata and decrypted files
+# Send the metadata and encrypted files
 sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' aes_metadata.bin aes_encrypted_tux.bmp otp_metadata.bin otp_encrypted_sample.bin ubuntu@bob:/home/ubuntu
 ```
 
