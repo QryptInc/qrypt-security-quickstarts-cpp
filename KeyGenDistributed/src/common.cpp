@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <algorithm>
 
 std::vector<uint8_t> readFromFile(const std::string filename) {
     std::ifstream input(filename, std::ios::binary);
@@ -52,4 +53,9 @@ std::string convertByteVecToHexStr(std::vector<uint8_t> bytes) {
     }
     std::string result = oss.str();
     return result;
+}
+
+std::string toUpper(std::string str) {
+    std::transform(str.begin(), str.end(),str.begin(), ::toupper);
+    return str;
 }

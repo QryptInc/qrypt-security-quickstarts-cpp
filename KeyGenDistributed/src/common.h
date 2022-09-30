@@ -28,4 +28,6 @@ std::vector<uint8_t> xorVectors(const std::vector<uint8_t> otp, const std::vecto
 
 std::string convertByteVecToHexStr(std::vector<uint8_t> bytes);
 
+std::string toUpper(std::string str);
+
 #endif

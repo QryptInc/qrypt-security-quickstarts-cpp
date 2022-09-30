@@ -3,10 +3,6 @@
 # exit when any command fails
 set -e
 
-BOLD=$(tput bold) # bold 
-NB=$(tput sgr0)   # not bold
-prefix="${BOLD}*****${NB}"
-
 ORIGINAL_TEXT_FILE="/workspace/files/sample.txt"
 ORIGINAL_IMAGE_FILE="/workspace/files/tux.bmp"
 
@@ -22,12 +18,20 @@ OTP_METADATA="otp_metadata.bin"
 OTP_ENCRYPTED_TEXT_FILE="otp_encrypted_sample.bin"
 OTP_DECRYPTED_TEXT_FILE="otp_decrypted_sample.bin"
 
+function print_header {
+    TEXT=$1
+    prefix="\n##################################################\n#"
+    suffix="\n##################################################\n\n"
+
+    printf "$prefix $TEXT $suffix"
+}
+
 # Compare the decrypted files with the original file
 function compare {
    ORIGINAL=$1
    DECRYPTED=$2
 
-   printf "\n$prefix Verifying the decrypted file ($DECRYPTED).\n"
+   print_header "Verifying the decrypted file ($DECRYPTED)."
 
    if eval 'cmp -s $ORIGINAL $DECRYPTED' ; then
       printf "[Verified] the decrypted file ($DECRYPTED) matches the original one ($ORIGINAL).\n"
@@ -37,29 +41,29 @@ function compare {
    fi
 }
 
-printf "\n================================================"
-printf "\n========== Bob's Keygen and Decryption ========="
-printf "\n================================================\n"
+printf "\n=================================================="
+printf "\n=========== Bob's Keygen and Decryption =========="
+printf "\n==================================================\n"
 
-printf "\n$prefix Bob recovers the AES key using the metadata ($AES_METADATA).\n"
+print_header "Bob recovers the AES key using the metadata ($AES_METADATA)."
 eval 'KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=$AES_METADATA --key-filename=$AES_KEY'
 
-printf "\n$prefix Bob decrypts $AES_BIN_ENCRYPTED_IMAGE_FILE using the AES key ($AES_KEY).\n"
+print_header "Bob decrypts $AES_BIN_ENCRYPTED_IMAGE_FILE using the AES key ($AES_KEY)."
 eval 'EncryptTool --op=decrypt --key-type=aes --key-filename=$AES_KEY --file-type=binary --input-filename=$AES_BIN_ENCRYPTED_IMAGE_FILE --output-filename=$AES_BIN_DECRYPTED_IMAGE_FILE'
 
-printf "\n$prefix Bob decrypts $AES_BMP_ENCRYPTED_IMAGE_FILE using the AES key ($AES_KEY).\n"
+print_header "Bob decrypts $AES_BMP_ENCRYPTED_IMAGE_FILE using the AES key ($AES_KEY)."
 eval 'EncryptTool --op=decrypt --key-type=aes --key-filename=$AES_KEY --file-type=bitmap --input-filename=$AES_BMP_ENCRYPTED_IMAGE_FILE --output-filename=$AES_BMP_DECRYPTED_IMAGE_FILE'
 
-printf "\n$prefix Bob recovers the OTP key using the metadata ($OTP_METADATA).\n"
+print_header "Bob recovers the OTP key using the metadata ($OTP_METADATA)."
 eval 'KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=$OTP_METADATA --key-filename=$OTP_KEY'
 
-printf "\n$prefix Bob decrypts $OTP_ENCRYPTED_TEXT_FILE using the OTP key ($OTP_KEY).\n"
+print_header "Bob decrypts $OTP_ENCRYPTED_TEXT_FILE using the OTP key ($OTP_KEY)."
 eval 'EncryptTool --op=decrypt --key-type=otp --key-filename=$OTP_KEY --file-type=binary --input-filename=$OTP_ENCRYPTED_TEXT_FILE --output-filename=$OTP_DECRYPTED_TEXT_FILE'
 
 
-printf "\n======================================================="
-printf "\n========== Verify Bob's Keygen and Decryption ========="
-printf "\n=======================================================\n"
+printf "\n=================================================="
+printf "\n======= Verify Bob's Keygen and Decryption ======="
+printf "\n==================================================\n"
 
 compare $ORIGINAL_IMAGE_FILE $AES_BMP_DECRYPTED_IMAGE_FILE
 compare $ORIGINAL_IMAGE_FILE $AES_BIN_DECRYPTED_IMAGE_FILE

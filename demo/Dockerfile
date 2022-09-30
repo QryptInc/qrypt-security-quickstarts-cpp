@@ -33,11 +33,13 @@ COPY KeyGenDistributed/ /workspace/KeyGenDistributed/
 WORKDIR /workspace/KeyGenDistributed
 
 # Download and build SDK
-RUN curl -s $(curl -s https://quantumcryptogateway.blob.core.windows.net/sdk/sdk-languages.json | jq -r '.. |."downloadLink"? | select(. != null)') --output qrypt-security-ubuntu.tgz
-RUN echo "$(cat /workspace/files/SDK_sha256sum) qrypt-security-ubuntu.tgz" > qrypt-security-ubuntu.tgz.sha256sum
-RUN if ! (sha256sum --check qrypt-security-ubuntu.tgz.sha256sum --status); then echo "Error: unexpected checksum"; exit 1; fi
-RUN tar -zxvf qrypt-security-ubuntu.tgz --strip-components=1 -C lib/QryptSecurity
-RUN rm -rf qrypt-security-ubuntu.tgz
+RUN sdk_url=$(curl -s https://quantumcryptogateway.blob.core.windows.net/sdk/sdk-languages.json | jq -r '.. |."downloadLink"? | select(. != null)') && \
+	sdk_file='qrypt-security-ubuntu.tgz' && \
+	curl -s $sdk_url --output $sdk_file && \
+	echo "$(cat /workspace/files/SDK_sha256sum) $sdk_file" > $sdk_file.sha256sum && \
+	if ! (sha256sum --check $sdk_file.sha256sum --status); then echo "Error: unexpected checksum"; exit 1; fi && \
+	tar -zxvf $sdk_file --strip-components=1 -C lib/QryptSecurity && \
+	rm -rf $sdk_file
 RUN ./build.sh --build_encrypt_tool
 ENV PATH="${PATH}:/workspace/KeyGenDistributed/build"
 
