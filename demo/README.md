@@ -9,7 +9,11 @@ The testbed in this demo will be established in Ubuntu containers, so the below 
 1. Retrieve a token from the [Qrypt Portal](https://portal.qrypt.com/tokens).
 1. Create an environment variable **QRYPT_TOKEN** for the token.
     ```
-    export QRYPT_TOKEN="eyJhbGciOiJ........." >> ~/.bashrc
+    export QRYPT_TOKEN="eyJhbGciOiJ......"
+    ```
+    *Optional: to set QRYPT_TOKEN permanently for all future bash sessions, put it in ~/.bashrc*
+    ```
+    export QRYPT_TOKEN="eyJhbGciOiJ......" >> ~/.bashrc
     ```
 
 ## Bring up the testbed
@@ -23,12 +27,12 @@ QRYPT_TOKEN=$QRYPT_TOKEN docker-compose up -d
 
 ## Run Alice and Bob tests (2 options: automatically and manually)
 
-### [Automatically] run Alice and Bob tests from the host
+### [Option 1 - Automatically] run Alice and Bob tests from the host
 ```
 ./run_alice_bob.sh
 ```
 
-### [Manually] run Alice and Bob tests from their containers
+### [Option 2 - Manually] run Alice and Bob tests from their containers
 
 - Open up another 2 terminals and follow the below instructions in each terminal.
 
