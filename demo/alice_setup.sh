@@ -19,6 +19,10 @@ OTP_KEY="alice_otp.bin"
 OTP_METADATA="otp_metadata.bin"
 OTP_ENCRYPTED_TEXT_FILE="otp_encrypted_sample.bin"
 
+printf "\n================================================="
+printf "\n========== Alice's Keygen and Encryption ========"
+printf "\n=================================================\n"
+
 printf "\n$prefix Alice generates an AES key ($AES_KEY) and metadata ($AES_METADATA).\n"
 eval 'KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=$AES_METADATA --key-filename=$AES_KEY'
 
@@ -33,7 +37,6 @@ eval 'KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=otp --otp-l
 
 printf "\n$prefix Alice encrypts $ORIGINAL_TEXT_FILE in binary format using the OTP key ($OTP_KEY).\n"
 eval 'EncryptTool --op=encrypt --key-type=otp --key-filename=$OTP_KEY --file-type=binary --input-filename=$ORIGINAL_TEXT_FILE --output-filename=$OTP_ENCRYPTED_TEXT_FILE'
-
 
 printf "\n$prefix Alice sends the metadata and encrypted files to Bob.\n"
 eval 'sshpass -p "ubuntu" scp -o "StrictHostKeyChecking no" $OTP_METADATA $AES_METADATA $OTP_ENCRYPTED_TEXT_FILE $AES_BIN_ENCRYPTED_IMAGE_FILE $AES_BMP_ENCRYPTED_IMAGE_FILE ubuntu@bob:/home/ubuntu'

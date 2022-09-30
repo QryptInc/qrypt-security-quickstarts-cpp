@@ -37,6 +37,10 @@ function compare {
    fi
 }
 
+printf "\n================================================"
+printf "\n========== Bob's Keygen and Decryption ========="
+printf "\n================================================\n"
+
 printf "\n$prefix Bob recovers the AES key using the metadata ($AES_METADATA).\n"
 eval 'KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=$AES_METADATA --key-filename=$AES_KEY'
 
@@ -51,6 +55,11 @@ eval 'KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=$OTP
 
 printf "\n$prefix Bob decrypts $OTP_ENCRYPTED_TEXT_FILE using the OTP key ($OTP_KEY).\n"
 eval 'EncryptTool --op=decrypt --key-type=otp --key-filename=$OTP_KEY --file-type=binary --input-filename=$OTP_ENCRYPTED_TEXT_FILE --output-filename=$OTP_DECRYPTED_TEXT_FILE'
+
+
+printf "\n======================================================="
+printf "\n========== Verify Bob's Keygen and Decryption ========="
+printf "\n=======================================================\n"
 
 compare $ORIGINAL_IMAGE_FILE $AES_BMP_DECRYPTED_IMAGE_FILE
 compare $ORIGINAL_IMAGE_FILE $AES_BIN_DECRYPTED_IMAGE_FILE
