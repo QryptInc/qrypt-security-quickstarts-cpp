@@ -5,7 +5,7 @@ The Qrypt Security C++ SDK enables developers to add post-quantum security to th
 Currently we provide Distributed Key Generation.
 
 ## Container Demo (Recommended)
-[Quickstarts setup and end-to-end test demo in docker environment](demo/README.md)
+[Quickstarts setup and end-to-end tests demo in docker environment](demo/README.md)
 
 ## Detailed Setup
 [Complete steps to setup basic Quickstart](KeyGenDistributed/README.md)
