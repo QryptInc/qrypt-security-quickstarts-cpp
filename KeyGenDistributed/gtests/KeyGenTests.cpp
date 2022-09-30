@@ -75,37 +75,12 @@ TEST_F(KeyGenDistributedTest, GenerateOTP1KB) {
     EXPECT_EQ(aliceKey.key, bobKey);
 }
 
-/*
-Larger key size tests - these tests consume more random bytes
-
 TEST_F(KeyGenDistributedTest, GenerateOTP32KB) {
     initialize();
     SymmetricKeyData aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 32 * KB);
     std::vector<uint8_t> bobKey = _BobClient->genSync(aliceKey.metadata);
     EXPECT_EQ(aliceKey.key, bobKey);
 }
-
-TEST_F(KeyGenDistributedTest, ChunkingNoRemainder) {
-    initialize();
-    SymmetricKeyData aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 64 * KB);
-    std::vector<uint8_t> bobKey = _BobClient->genSync(aliceKey.metadata);
-    EXPECT_EQ(aliceKey.key, bobKey);
-}
-
-TEST_F(KeyGenDistributedTest, ChunkingRemainderLessThan16) {
-    initialize();
-    SymmetricKeyData aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 64 * KB+1);
-    std::vector<uint8_t> bobKey = _BobClient->genSync(aliceKey.metadata);
-    EXPECT_EQ(aliceKey.key, bobKey);
-}
-
-TEST_F(KeyGenDistributedTest, ChunkingRemainderGreaterThan16) {
-    initialize();
-    SymmetricKeyData aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 64 * KB+17);
-    std::vector<uint8_t> bobKey = _BobClient->genSync(aliceKey.metadata);
-    EXPECT_EQ(aliceKey.key, bobKey);
-}
-*/
 
 TEST_F(KeyGenDistributedTest, KeySizeLowerLimit) {
     initialize();
