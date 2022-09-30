@@ -34,7 +34,6 @@ The commands shown in this tutorial should be run on an Ubuntu 20.04 system.
     ```
     git clone https://github.com/QryptInc/qrypt-security-quickstarts-cpp.git
     cd qrypt-security-quickstarts-cpp
-    git checkout main
     ```
 
 1. Download the Qrypt Security SDK from the [Qrypt Portal](https://portal.qrypt.com/downloads/sdk-downloads) for Ubuntu.
