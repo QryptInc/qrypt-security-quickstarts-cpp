@@ -23,10 +23,7 @@ The commands shown in this tutorial should be run on an Ubuntu 20.04 system.
 1. Install the development and network tools.
     ```
     apt-get update
-    ```
-    ```
-    DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y cmake    
-    apt-get -y install git gcc g++ libgtest-dev curl jq            
+    DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y cmake git gcc g++ libgtest-dev curl jq           
     ```
 
 1. Clone the [repo](https://github.com/QryptInc/qrypt-security-quickstarts-cpp) containing this quickstart to a local folder.
@@ -39,14 +36,14 @@ The commands shown in this tutorial should be run on an Ubuntu 20.04 system.
 1. Download the Qrypt Security SDK from the [Qrypt Portal](https://portal.qrypt.com/downloads/sdk-downloads) for Ubuntu.
     ```
     sdk_url=$(curl -s https://quantumcryptogateway.blob.core.windows.net/sdk/sdk-languages.json | jq -r '.. |."downloadLink"? | select(. != null)')
-    downloaded_sdk='qrypt-security-ubuntu.tgz'
-    curl -s $sdk_url --output $downloaded_sdk
+    sdk_file='qrypt-security-ubuntu.tgz'
+    curl -s $sdk_url --output $sdk_file
     ```
     
     Verify the SDK's checksum and make sure that it returns OK.
     ```
-    echo "$(cat SDK_sha256sum) $downloaded_sdk" > $downloaded_sdk.sha256sum
-    sha256sum --check $downloaded_sdk.sha256sum
+    echo "$(cat SDK_sha256sum) $sdk_file" > $sdk_file.sha256sum
+    sha256sum --check $sdk_file.sha256sum
     ```
 
 1. Extract the Qrypt SDK into the /qrypt-security-quickstarts-cpp/KeyGenDistributed/lib/QryptSecurity folder
