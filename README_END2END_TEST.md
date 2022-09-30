@@ -48,7 +48,7 @@ The test commands shown in this tutorial should be run on an Ubuntu 20.04 system
 
 1. Extract the Qrypt SDK into the /qrypt-security-quickstarts-cpp/KeyGenDistributed/lib/QryptSecurity folder
     ```
-    tar -zxvf qrypt-security-ubuntu.tgz --strip-components=1 -C KeyGenDistributed/lib/QryptSecurity
+    tar -zxvf $sdk_file --strip-components=1 -C KeyGenDistributed/lib/QryptSecurity
     ```
     *Optional: At this point you should be able to see the header files and libraries under KeyGenDistributed/lib/QryptSecurity.*
     ```
