@@ -100,6 +100,7 @@ build/EncryptTool --op=encrypt --key-type=otp --key-filename=alice_otp.bin --fil
 
 **Remarks:** To find Bob's IP, run `ifconfig eth0 | grep "inet " | awk '{print $2}'` on Bob's host.
 
+*Optional: if you are testing 3 devices, you'll need to obtain Carol's IP and send these files to Carol's IP too.*
 ```
 # Send the metadata and encrypted files
 sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' aes_metadata.bin aes_encrypted_tux.bmp otp_metadata.bin otp_encrypted_sample.bin ubuntu@<Bob's IP>:/home/ubuntu
