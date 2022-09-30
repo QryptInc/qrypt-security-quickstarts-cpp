@@ -130,3 +130,4 @@ build/EncryptTool --op=decrypt --key-type=otp --key-filename=bob_otp.bin --file-
 cmp ../files/tux.bmp aes_decrypted_tux.bmp
 cmp ../files/sample.txt otp_decrypted_sample.bin
 ```
+The decrypted files should be identical to the original ones.
