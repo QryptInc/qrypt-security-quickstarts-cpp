@@ -19,7 +19,23 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
 endif()
 
-add_executable(KeyGenDistributed src/main.cpp)
+# Specify whether to build EncryptTool
+option(BUILD_ENCRYPT_TOOL "Build encryption tool" OFF)
+
+if(BUILD_ENCRYPT_TOOL)
+add_executable(EncryptTool
+    src/encrypt.cpp
+    src/common.cpp
+)
+target_link_libraries(EncryptTool
+    crypto
+)
+endif()
+
+add_executable(KeyGenDistributed
+    src/main.cpp
+    src/common.cpp
+)
 
 # Pull in Qrypt Security header files
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
