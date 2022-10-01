@@ -18,12 +18,15 @@ OTP_METADATA="otp_metadata.bin"
 OTP_ENCRYPTED_TEXT_FILE="otp_encrypted_sample.bin"
 OTP_DECRYPTED_TEXT_FILE="otp_decrypted_sample.bin"
 
+TEST_TOTAL_COUNT=0
+TEST_PASS_COUNT=0
+
 function print_header {
     TEXT=$1
-    prefix="\n##################################################\n#"
-    suffix="\n##################################################\n\n"
 
-    printf "$prefix $TEXT $suffix"
+    printf "\n##################################################"
+    printf "\n# $TEXT"
+    printf "\n##################################################\n\n"
 }
 
 # Compare the decrypted files with the original file
@@ -31,13 +34,15 @@ function compare {
    ORIGINAL=$1
    DECRYPTED=$2
 
+   TEST_TOTAL_COUNT=$((TEST_TOTAL_COUNT+1))
+
    print_header "Verifying the decrypted file ($DECRYPTED)."
 
    if eval 'cmp -s $ORIGINAL $DECRYPTED' ; then
-      printf "[Verified] the decrypted file ($DECRYPTED) matches the original one ($ORIGINAL).\n"
+      printf "[Passed] The decrypted file ($DECRYPTED) matches the original one ($ORIGINAL).\n"
+      TEST_PASS_COUNT=$((TEST_PASS_COUNT+1))
    else
-      printf "[Error] the decrypted file ($DECRYPTED) is different from the original one ($ORIGINAL).\n"
-      exit 1
+      printf "[Failed] The decrypted file ($DECRYPTED) is different from the original one ($ORIGINAL).\n"
    fi
 }
 
@@ -67,6 +72,13 @@ printf "\n==================================================\n"
 
 compare $ORIGINAL_IMAGE_FILE $AES_BMP_DECRYPTED_IMAGE_FILE
 compare $ORIGINAL_IMAGE_FILE $AES_BIN_DECRYPTED_IMAGE_FILE
-compare $ORIGINAL_TEXT_FILE $OTP_DECRYPTED_TEXT_FILE
+compare $ORIGINAL_TEXT_FILE  $OTP_DECRYPTED_TEXT_FILE
+
+printf "\n=================================================="
+printf "\n======== Summary of Verification Results ========="
+printf "\n==================================================\n"
+printf "Total of comparison tests: $TEST_TOTAL_COUNT\n"
+printf "Number of tests passed:    $TEST_PASS_COUNT\n"
+printf "Number of tests failed:    $(($TEST_TOTAL_COUNT-$TEST_PASS_COUNT))\n"
 
 printf "\n"
