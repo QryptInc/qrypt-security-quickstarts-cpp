@@ -27,7 +27,7 @@ The commands shown in this tutorial should be run on an Ubuntu 20.04 system.
 1. Install the development and network tools.
     ```
     apt-get update
-    DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y cmake git gcc g++ libgtest-dev curl jq           
+    DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y cmake git gcc g++ libgtest-dev curl jq
     ```
 
 1. Clone the [repo](https://github.com/QryptInc/qrypt-security-quickstarts-cpp) containing this quickstart to a local folder.
@@ -79,10 +79,12 @@ Alice generates the OTP key and metadata file.
 build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=otp --otp-len=32768 --metadata-filename=otp_metadata.bin --key-filename=alice_otp.bin
 ```
     
-Bob recovers the OTP key using the metadata file. This key should be identical to Alice's OTP key.
+Bob recovers the OTP key using the metadata file.
 ```
 build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=otp_metadata.bin --key-filename=bob_otp.bin
 ```
+
+Alice's and Bob's OTP keys should be identical.
 
 #### Test AES keygen
 Alice generates the AES key and metadata file.
@@ -91,7 +93,9 @@ Alice generates the AES key and metadata file.
 build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=aes_metadata.bin --key-filename=alice_aes.bin
 ```
 
-Bob recovers the AES key using the metadata file. This key should be identical to Alice's AES key.
+Bob recovers the AES key using the metadata file.
 ```
 build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=aes_metadata.bin --key-filename=bob_aes.bin
 ```
+
+Alice's and Bob's AES keys should be identical.

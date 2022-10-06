@@ -32,14 +32,19 @@ COPY SDK_sha256sum /workspace/files/
 COPY KeyGenDistributed/ /workspace/KeyGenDistributed/
 WORKDIR /workspace/KeyGenDistributed
 
-# Download and build SDK
+# Fix the line break formats for Linux by removing carriage return (CR, or '\r')
+RUN sed -i -e 's/\r$//' /workspace/KeyGenDistributed/*.sh /workspace/files/*.sh
+
+# Download SDK
 RUN sdk_url=$(curl -s https://quantumcryptogateway.blob.core.windows.net/sdk/sdk-languages.json | jq -r '.. |."downloadLink"? | select(. != null)') && \
     sdk_file='qrypt-security-ubuntu.tgz' && \
     curl -s $sdk_url --output $sdk_file && \
-    echo "$(cat /workspace/files/SDK_sha256sum) $sdk_file" > $sdk_file.sha256sum && \
+    echo "$(cat /workspace/files/SDK_sha256sum | tr -d '\040\011\012\015' ) $sdk_file" > $sdk_file.sha256sum && \
     if ! (sha256sum --check $sdk_file.sha256sum --status); then echo "Error: unexpected checksum"; exit 1; fi && \
     tar -zxvf $sdk_file --strip-components=1 -C lib/QryptSecurity && \
     rm -rf $sdk_file
+
+# Build SDK
 RUN ./build.sh --build_encrypt_tool
 ENV PATH="${PATH}:/workspace/KeyGenDistributed/build"
 
