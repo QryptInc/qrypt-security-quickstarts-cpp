@@ -79,7 +79,7 @@ Alice generates the OTP key and metadata file.
 build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=otp --otp-len=32768 --metadata-filename=otp_metadata.bin --key-filename=alice_otp.bin
 ```
     
-Bob recovers the OTP key using the metadata file.
+Bob recovers the OTP key using the metadata file. This key should be identical to Alice's OTP key.
 ```
 build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=otp_metadata.bin --key-filename=bob_otp.bin
 ```
@@ -93,9 +93,7 @@ Alice generates the AES key and metadata file.
 build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=aes_metadata.bin --key-filename=alice_aes.bin
 ```
 
-Bob recovers the AES key using the metadata file.
+Bob recovers the AES key using the metadata file. This key should be identical to Alice's AES key.
 ```
 build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=aes_metadata.bin --key-filename=bob_aes.bin
 ```
-
-Alice's and Bob's AES keys should be identical.

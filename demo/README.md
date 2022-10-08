@@ -41,6 +41,7 @@ Alice generates AES/OTP keys and metadata files, encrypts the files, and sends t
 
 ```
 # Enter Alice's container
+# If running on Windows Git Bash, replace "docker" with "winpty docker"
 docker exec -it alice_container bash
 ```
 
@@ -65,6 +66,7 @@ sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' aes_metadata.bin aes_encry
 Bob recovers the keys using the metadata files, decrypts the files, and compares the decrypted files with the original ones.
 ```
 # Enter Bob's container
+# If running on Windows Git Bash, replace "docker" with "winpty docker"
 docker exec -it bob_container bash
 ```
 ```
@@ -88,6 +90,7 @@ The decrypted files should be identical to the original ones.
 This is not related to this demo, but it's worth mentioning that you could run gtest in either Alice's or Bob's container easily.
 ```
 # Enter Alice's container - if you haven't done so
+# If running on Windows Git Bash, replace "docker" with "winpty docker"
 docker exec -it alice_container bash
 ```
 

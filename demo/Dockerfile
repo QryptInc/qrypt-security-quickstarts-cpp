@@ -33,7 +33,7 @@ COPY KeyGenDistributed/ /workspace/KeyGenDistributed/
 WORKDIR /workspace/KeyGenDistributed
 
 # Fix the line break formats for Linux by removing carriage return (CR, or '\r')
-RUN sed -i -e 's/\r$//' /workspace/KeyGenDistributed/*.sh /workspace/files/*.sh
+RUN sed -i -e 's/\r$//' /workspace/*/*.sh /workspace/*/*/*.sh
 
 # Download SDK
 RUN sdk_url=$(curl -s https://quantumcryptogateway.blob.core.windows.net/sdk/sdk-languages.json | jq -r '.. |."downloadLink"? | select(. != null)') && \
