@@ -84,7 +84,6 @@ Bob recovers the OTP key using the metadata file. This key should be identical t
 build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=otp_metadata.bin --key-filename=bob_otp.bin
 ```
 
-Alice's and Bob's OTP keys should be identical.
 
 #### Test AES keygen
 Alice generates the AES key and metadata file.
