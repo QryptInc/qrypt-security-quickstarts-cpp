@@ -41,6 +41,7 @@ Alice generates AES/OTP keys and metadata files, encrypts the files, and sends t
 
 ```
 # Enter Alice's container
+# If running on Windows Git Bash, replace "docker" with "winpty docker"
 docker exec -it alice_container bash
 ```
 
@@ -48,38 +49,41 @@ docker exec -it alice_container bash
 # AES keygen and encryption
 KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=aes_metadata.bin --key-filename=alice_aes.bin
 EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=/workspace/files/tux.bmp --output-filename=aes_encrypted_tux.bmp
+
+# Send the AES metadata and encrypted files to Bob
+sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' aes_metadata.bin aes_encrypted_tux.bmp ubuntu@bob:/home/ubuntu
 ```
 
 ```
 # OTP keygen and encryption
 KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=otp --otp-len=$(stat -c%s /workspace/files/sample.txt) --metadata-filename=otp_metadata.bin --key-filename=alice_otp.bin
 EncryptTool --op=encrypt --key-type=otp --key-filename=alice_otp.bin --file-type=binary --input-filename=/workspace/files/sample.txt --output-filename=otp_encrypted_sample.bin
-```
 
-```
-# Send the metadata and encrypted files
-sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' aes_metadata.bin aes_encrypted_tux.bmp otp_metadata.bin otp_encrypted_sample.bin ubuntu@bob:/home/ubuntu
+# Send the OTP metadata and encrypted files to Bob
+sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' otp_metadata.bin otp_encrypted_sample.bin ubuntu@bob:/home/ubuntu
 ```
 
 #### Terminal - Bob
 Bob recovers the keys using the metadata files, decrypts the files, and compares the decrypted files with the original ones.
 ```
 # Enter Bob's container
+# If running on Windows Git Bash, replace "docker" with "winpty docker"
 docker exec -it bob_container bash
 ```
 ```
 # AES keygen and decryption
 KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=aes_metadata.bin --key-filename=bob_aes.bin
 EncryptTool --op=decrypt --key-type=aes --key-filename=bob_aes.bin --file-type=bitmap --input-filename=aes_encrypted_tux.bmp --output-filename=aes_decrypted_tux.bmp
+
+# Verify the AES decrypted files
+cmp /workspace/files/tux.bmp aes_decrypted_tux.bmp
 ```
 ```
 # OTP keygen and decryption
 KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=otp_metadata.bin --key-filename=bob_otp.bin
 EncryptTool --op=decrypt --key-type=otp --key-filename=bob_otp.bin --file-type=binary --input-filename=otp_encrypted_sample.bin --output-filename=otp_decrypted_sample.bin
-```
-```
-# Verify the decrypted files
-cmp /workspace/files/tux.bmp aes_decrypted_tux.bmp
+
+# Verify the OTP decrypted files
 cmp /workspace/files/sample.txt otp_decrypted_sample.bin
 ```
 The decrypted files should be identical to the original ones.
@@ -88,6 +92,7 @@ The decrypted files should be identical to the original ones.
 This is not related to this demo, but it's worth mentioning that you could run gtest in either Alice's or Bob's container easily.
 ```
 # Enter Alice's container - if you haven't done so
+# If running on Windows Git Bash, replace "docker" with "winpty docker"
 docker exec -it alice_container bash
 ```
 

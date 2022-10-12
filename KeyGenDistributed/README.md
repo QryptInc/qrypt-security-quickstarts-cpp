@@ -27,7 +27,7 @@ The commands shown in this tutorial should be run on an Ubuntu 20.04 system.
 1. Install the development and network tools.
     ```
     apt-get update
-    DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y cmake git gcc g++ libgtest-dev curl jq           
+    DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y cmake git gcc g++ libgtest-dev curl jq
     ```
 
 1. Clone the [repo](https://github.com/QryptInc/qrypt-security-quickstarts-cpp) containing this quickstart to a local folder.
@@ -83,6 +83,7 @@ Bob recovers the OTP key using the metadata file. This key should be identical t
 ```
 build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=otp_metadata.bin --key-filename=bob_otp.bin
 ```
+
 
 #### Test AES keygen
 Alice generates the AES key and metadata file.
