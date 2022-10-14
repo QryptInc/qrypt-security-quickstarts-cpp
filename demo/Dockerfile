@@ -28,7 +28,6 @@ RUN echo "ubuntu:ubuntu" | chpasswd
 # Copy the sample files and quickstarts codes for testing
 COPY files/ /workspace/files/
 COPY demo/${PERSONA}_setup.sh /workspace/files/
-COPY SDK_sha256sum /workspace/files/
 COPY KeyGenDistributed/ /workspace/KeyGenDistributed/
 WORKDIR /workspace/KeyGenDistributed
 
@@ -36,11 +35,8 @@ WORKDIR /workspace/KeyGenDistributed
 RUN sed -i -e 's/\r$//' /workspace/*/*.sh /workspace/*/*/*.sh
 
 # Download SDK
-RUN sdk_url=$(curl -s https://quantumcryptogateway.blob.core.windows.net/sdk/sdk-languages.json | jq -r '.. |."downloadLink"? | select(. != null)') && \
-    sdk_file='qrypt-security-ubuntu.tgz' && \
-    curl -s $sdk_url --output $sdk_file && \
-    echo "$(cat /workspace/files/SDK_sha256sum | tr -d '\040\011\012\015' ) $sdk_file" > $sdk_file.sha256sum && \
-    if ! (sha256sum --check $sdk_file.sha256sum --status); then echo "Error: unexpected checksum"; exit 1; fi && \
+RUN sdk_file='qrypt-security-ubuntu.tgz' && \
+    curl -s https://qrypt.azureedge.net/sdk/cpp/v0.6.4/qrypt-security-0.6.4-ubuntu.tgz --output $sdk_file && \
     tar -zxvf $sdk_file --strip-components=1 -C lib/QryptSecurity && \
     rm -rf $sdk_file
 
