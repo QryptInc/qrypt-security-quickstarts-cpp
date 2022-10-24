@@ -119,75 +119,50 @@ int main(int argc, char **argv) {
         displayUsage();
         return 1;
     }
+    if (operation != "encrypt" && operation != "decrypt") {
+        printf("Invalid operation.\n");
+        displayUsage();
+        return 1;
+    }
 
     printf("\nCalling up EncryptTool to %s %s in %s format using the %s key file %s and generate %s.\n",
             operation.c_str(), inputFilename.c_str(), fileType.c_str(), toUpper(keyType).c_str(), keyFilename.c_str(), outputFilename.c_str());
 
     BitmapData bitmapData = {};
-    std::vector<uint8_t> cipherTextData;
-    std::vector<uint8_t> plainTextData;
+    std::vector<uint8_t> inputTextData;
+    std::vector<uint8_t> outputTextData;
 
     // 1. Read key
     std::vector<uint8_t> key = readFromFile(keyFilename);
 
-    if (operation == "encrypt") {
-        // 2. Read input file to encrypt
-        if (fileType == "bitmap") {
-            bitmapData = readBitmap(inputFilename);
-            plainTextData = bitmapData.body;
-        }
-        else if (fileType == "binary") {
-            plainTextData = readFromFile(inputFilename);
-        }
+    // 2. Read input file
+    if (fileType == "bitmap") {
+        bitmapData = readBitmap(inputFilename);
+        inputTextData = bitmapData.body;
+    }
+    else if (fileType == "binary") {
+        inputTextData = readFromFile(inputFilename);
+    }
 
-        // 3. Encrypt file
-        if (keyType == "aes") {
-            cipherTextData = encryptAES256(key, plainTextData);
-        }
-        else if (keyType == "otp") {
-            cipherTextData = xorVectors(key, plainTextData);
-        }
-
-        // 4. Write out encrypted file
-        if (fileType == "bitmap") {
-            bitmapData.body = cipherTextData;
-            writeBitmap(outputFilename, bitmapData);            
-        }
-        else if (fileType == "binary") {
-            writeToFile(outputFilename, cipherTextData);
+    // 3. Encrypt or decrypt file
+    if (keyType == "aes") {
+        if (operation == "encrypt") {
+            outputTextData = encryptAES256(key, inputTextData);
+        } else {
+            outputTextData = decryptAES256(key, inputTextData);
         }
     }
-    else if (operation == "decrypt") {
-        // 2. Read in encrypted file      
-        if (fileType == "bitmap") {
-            bitmapData = readBitmap(inputFilename);
-            cipherTextData = bitmapData.body;
-        }
-        else if (fileType == "binary") {
-            cipherTextData = readFromFile(inputFilename);
-        }
-
-        // 3. Decrypt file
-        std::vector<uint8_t> plainTextData;
-        if (keyType == "aes") {        
-            plainTextData = decryptAES256(key, cipherTextData);
-        }
-        else if (keyType == "otp") {
-            plainTextData = xorVectors(key, cipherTextData);
-        }
-
-        // 4. Write out decrypted file
-        if (fileType == "bitmap") {
-            bitmapData.body = plainTextData;
-            writeBitmap(outputFilename, bitmapData);
-        }
-        else if (fileType == "binary") {
-            writeToFile(outputFilename, plainTextData);
-        }
+    else if (keyType == "otp") {
+        outputTextData = xorVectors(key, inputTextData);
     }
-    else {
-        displayUsage();
-        return 1;
+
+    // 4. Write output file
+    if (fileType == "bitmap") {
+        bitmapData.body = outputTextData;
+        writeBitmap(outputFilename, bitmapData);            
+    }
+    else if (fileType == "binary") {
+        writeToFile(outputFilename, outputTextData);
     }
 }
 
