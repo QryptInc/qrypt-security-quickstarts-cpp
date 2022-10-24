@@ -19,7 +19,7 @@ std::string getUsage() {
     "-------\n"
     "--user=<alice|bob>             Set the user to either alice or bob.\n"
     "\n"
-    "--token=<token>                Qrypt token retrieved from Qrypt portal (http://portal.qrypt.com).\n"
+    "--token=<token>                Qrypt token retrieved from Qrypt portal (https://portal.qrypt.com).\n"
     "                               Make sure the token has the BLAST scope.\n"
     "\n"
     "--key-type=<aes|otp>           Set to the type of key you would like to produce.\n"
@@ -31,6 +31,11 @@ std::string getUsage() {
     "--metadata-filename=<filename> The filename for the metadata file to be created or consumed.\n"
     "\n"
     "--key-filename=<filename>      The filename to save the generated key.\n"
+    "\n"
+    "--ca-cert=<path>               Full or relative path to a public root ca-certificate (such as the one available\n"
+    "                               at https://curl.se/docs/caextract.html) for TLS traffic with the Qrypt servers.\n"
+    "                               Use this option if the system does not have accessible root certificates or\n"
+    "                               if key generation persistently returns curl error 60 (ssl certificate problem).\n"
     "\n"
     "--help                         Display help.\n"
     "\n"
@@ -46,7 +51,7 @@ void displayUsage() {
 
 
 int main(int argc, char **argv) {
-    std::string user, token, metadataFilename, keyFilename;
+    std::string user, token, metadataFilename, keyFilename, cacertPath;
     std::string keyType = "aes";
     int otpLen = 0;
     std::string setUserFlag = "--user=";
@@ -55,6 +60,7 @@ int main(int argc, char **argv) {
     std::string setOTPLenFlag = "--otp-len=";
     std::string setMetadataFilenameFlag = "--metadata-filename=";
     std::string setKeyFilenameFlag = "--key-filename=";
+    std::string setCaCertFlag = "--ca-cert=";
 
     // Parse command line parameters
     while(*++argv) {
@@ -78,6 +84,9 @@ int main(int argc, char **argv) {
         else if (argument.find(setKeyFilenameFlag) == 0) {
             keyFilename = argument.substr(setKeyFilenameFlag.size());
         }
+        else if (argument.find(setCaCertFlag) == 0) {
+            cacertPath = argument.substr(setCaCertFlag.size());
+        }
         else if ((argument == "-h") || (argument == "--help")) {
             displayUsage();
             return 0;
@@ -98,17 +107,17 @@ int main(int argc, char **argv) {
     if (metadataFilename.empty()) {
         printf("Missing metadata filename.\n");
         displayUsage();
-        return 1;        
+        return 1;
     }
     if (keyFilename.empty()) {
         printf("Missing key filename.\n");
         displayUsage();
-        return 1;        
+        return 1;
     }
     if (keyType == "otp" && otpLen == 0) {
         printf("Invalid OTP length.\n");
         displayUsage();
-        return 1;        
+        return 1;
     }
 
     // Enable QryptSecurity logging
@@ -117,7 +126,12 @@ int main(int argc, char **argv) {
     try {
         // 1. Create and initialize our keygen client
         auto keyGenClient = IKeyGenDistributedClient::create();
-        keyGenClient->initialize(token);
+        if (cacertPath.empty()) {
+            keyGenClient->initialize(token);
+        }
+        else {
+            keyGenClient->initialize(token, cacertPath);
+        }
         
         // Alice is the sender
         if (user == "alice") {
