@@ -112,6 +112,14 @@ curl --etag-compare etag.txt --etag-save etag.txt --remote-name https://curl.se/
 ### Download and install adb tools
 The `adb` Android CLI utility is required to run the quickstart on Android architectures: https://developer.android.com/studio/releases/platform-tools#downloads
 
+### Push KeyGenDistributed to android device using adb
+
+1. Verify your device is connected: `adb devices`
+1. Push the entire KeyGenDistributed directory (and any additional files such as cacert.pem) to the device's `/data/local/tmp` directory: `adb push <file-or-directory> /data/local/tmp`
+    - NOTE: `/data/local/tmp` is the preferred destination, as it has broader permissions than most other locations on an Android device.
+1. Open a shell on your device: `adb shell`
+1. Navigate to the tmp directory: `cd /data/local/tmp`
+
 ### Run
 Two additional CLI arguments are required to successfully run the quickstart on Android:
 1. Prepend `LD_LIBRARY_PATH=lib/QryptSecurity/lib` to the command.
