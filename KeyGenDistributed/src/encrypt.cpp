@@ -28,6 +28,11 @@ std::string getUsage() {
     "\n"
     "--key-filename=<filename>      Key to use for encryption or decryption.\n"
     "\n"
+    "--key-format=<bin|hex>         Set the input format of the key.\n"
+    "                               bin - key will be in binary format.\n"
+    "                               hex - key will be in hex format.\n"
+    "                               Defaults to binary format.\n"
+    "\n"
     "--file-type=<binary|bitmap>    Set the input/output file type.\n"
     "                               binary - File data will be used as a big binary blob.\n"
     "                               bitmap - bmp image file. Bitmap header data will be preserved.\n"
@@ -52,10 +57,12 @@ int main(int argc, char **argv) {
     
     std::string operation, keyFilename, inputFilename, outputFilename;
     std::string keyType = "aes";
+    std::string keyFormat = "bin";
     std::string fileType = "binary";
     std::string setOperationFlag = "--op=";
     std::string setKeyTypeFlag = "--key-type=";
     std::string setKeyFilenameFlag = "--key-filename=";
+    std::string setKeyFormatFlag = "--key-format=";
     std::string setFileTypeFlag = "--file-type=";
     std::string setInputFilenameFlag = "--input-filename=";
     std::string setOutputFilenameFlag = "--output-filename=";
@@ -69,6 +76,9 @@ int main(int argc, char **argv) {
         }
         else if (argument.find(setKeyTypeFlag) == 0) {
             keyType = argument.substr(setKeyTypeFlag.size());
+        }
+        else if (argument.find(setKeyFormatFlag) == 0) {
+            keyFormat = argument.substr(setKeyFormatFlag.size());
         }
         else if (argument.find(setKeyFilenameFlag) == 0) {
             keyFilename = argument.substr(setKeyFilenameFlag.size());
@@ -119,7 +129,12 @@ int main(int argc, char **argv) {
         displayUsage();
         return 1;
     }
-
+    if (keyFormat != "bin" && keyFormat != "hex") {
+        printf("Invalid key format.\n");
+        displayUsage();
+        return 1;
+    }
+    
     printf("\nCalling up EncryptTool to %s %s in %s format using the %s key file %s and generate %s.\n",
             operation.c_str(), inputFilename.c_str(), fileType.c_str(), toUpper(keyType).c_str(), keyFilename.c_str(), outputFilename.c_str());
 
@@ -128,7 +143,13 @@ int main(int argc, char **argv) {
     std::vector<uint8_t> plainTextData;
 
     // 1. Read key
-    std::vector<uint8_t> key = readFromFile(keyFilename);
+    std::vector<uint8_t> key;
+    if (keyFormat == "bin") {
+        key = readFromFile(keyFilename);
+    }
+    else {
+        key = readFromHexFile(keyFilename);
+    }
 
     if (operation == "encrypt") {
         // 2. Read input file to encrypt

@@ -18,7 +18,11 @@ struct BitmapData {
 
 std::vector<uint8_t> readFromFile(const std::string filename);
 
+std::vector<uint8_t> readFromHexFile(const std::string filename);
+
 void writeToFile(const std::string filename, std::vector<uint8_t>& buffer);
+
+void writeToFile(const std::string filename, std::string &buffer);
 
 BitmapData readBitmap(const std::string filename);
 
@@ -27,6 +31,10 @@ void writeBitmap(const std::string filename, const BitmapData& bitmapData);
 std::vector<uint8_t> xorVectors(const std::vector<uint8_t> otp, const std::vector<uint8_t> &data);
 
 std::string convertByteVecToHexStr(std::vector<uint8_t> bytes);
+
+size_t hexCharToInt(char input);
+
+std::vector<uint8_t> hexStrToByteVec(std::string str);
 
 std::string toUpper(std::string str);
 

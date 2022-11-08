@@ -33,6 +33,11 @@ std::string getUsage() {
     "\n"
     "--key-filename=<filename>      The filename to save the generated key.\n"
     "\n"
+    "--key-format=<bin|hex>         Set the output format of the key you would like to produce.\n"
+    "                               bin - key will be ouput in binary format.\n"
+    "                               hex - key will be output in hex format.\n"
+    "                               Defaults to binary format.\n"
+    "\n"
     "--ca-cert=<path>               Full or relative path to a public root ca-certificate (such as the one available\n"
     "                               at https://curl.se/docs/caextract.html) for TLS traffic with the Qrypt servers.\n"
     "                               Use this option if the system does not have accessible root certificates or\n"
@@ -60,6 +65,7 @@ void displayUsage() {
 int main(int argc, char **argv) {
     std::string user, token, metadataFilename, keyFilename, cacertPath;
     std::string keyType = "aes";
+    std::string keyFormat = "bin";
     int otpLen = 0;
     std::string setUserFlag = "--user=";
     std::string setTokenFlag = "--token=";
@@ -67,6 +73,7 @@ int main(int argc, char **argv) {
     std::string setOTPLenFlag = "--otp-len=";
     std::string setMetadataFilenameFlag = "--metadata-filename=";
     std::string setKeyFilenameFlag = "--key-filename=";
+    std::string setKeyFormatFlag = "--key-format=";
     std::string setCaCertFlag = "--ca-cert=";
 
     // Set default log level
@@ -93,6 +100,9 @@ int main(int argc, char **argv) {
         }
         else if (argument.find(setKeyFilenameFlag) == 0) {
             keyFilename = argument.substr(setKeyFilenameFlag.size());
+        }
+        else if (argument.find(setKeyFormatFlag) == 0) {
+            keyFormat = argument.substr(setKeyFormatFlag.size());
         }
         else if (argument.find(setCaCertFlag) == 0) {
             cacertPath = argument.substr(setCaCertFlag.size());
@@ -150,7 +160,12 @@ int main(int argc, char **argv) {
         displayUsage();
         return 1;
     }
-
+    if (keyFormat != "bin" && keyFormat != "hex") {
+        printf("Invalid key format.\n");
+        displayUsage();
+        return 1;
+    }
+    
     try {
         // 1. Create and initialize our keygen client
         auto keyGenClient = IKeyGenDistributedClient::create();
@@ -178,7 +193,12 @@ int main(int argc, char **argv) {
 
             // 3. Write out metadata for bob and key for encryption
             writeToFile(metadataFilename, keyInit.metadata);
-            writeToFile(keyFilename, keyInit.key);
+            if (keyFormat == "bin") {
+                writeToFile(keyFilename, keyInit.key);
+            }
+            else {
+                writeToFile(keyFilename, key);
+            }
         }
         // Bob is the receiver
         else if (user == "bob") {
@@ -193,7 +213,12 @@ int main(int argc, char **argv) {
             printf("\nBob - Key: %s\n\n", key.c_str());
 
             // 4. Write out key for decryption
-            writeToFile(keyFilename, keySync);
+            if (keyFormat == "bin") {
+                writeToFile(keyFilename, keySync);
+            }
+            else {
+                writeToFile(keyFilename, key);
+            }
         }
         else {
             displayUsage();
