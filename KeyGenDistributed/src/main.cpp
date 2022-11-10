@@ -18,38 +18,38 @@ std::string getUsage() {
     "\n"
     "Options\n"
     "-------\n"
-    "--user=<alice|bob>             Set the user to either alice or bob.\n"
+    "--user=<alice|bob>              Set the user to either alice or bob.\n"
     "\n"
-    "--token=<token>                Qrypt token retrieved from Qrypt portal (https://portal.qrypt.com).\n"
-    "                               Make sure the token has the BLAST scope.\n"
+    "--token=<token>                 Qrypt token retrieved from Qrypt portal (https://portal.qrypt.com).\n"
+    "                                Make sure the token has the BLAST scope.\n"
     "\n"
-    "--key-type=<aes|otp>           Set to the type of key you would like to produce.\n"
-    "                               aes - AES-256 key with length 32 bytes.\n"
-    "                               otp - One time pad with length provided by the otp-len parameter.\n"
+    "--key-type=<aes|otp>            Set to the type of key you would like to produce.\n"
+    "                                aes - AES-256 key with length 32 bytes.\n"
+    "                                otp - One time pad with length provided by the otp-len parameter.\n"
     "\n"
-    "--otp-len=<length>             The length of the one time pad (in bytes) if key type is otp.\n"
+    "--otp-len=<length>              The length of the one time pad (in bytes) if key type is otp.\n"
     "\n"
-    "--metadata-filename=<filename> The filename for the metadata file to be created or consumed.\n"
+    "--metadata-filename=<filename>  The filename for the metadata file to be created or consumed.\n"
     "\n"
-    "--key-filename=<filename>      The filename to save the generated key.\n"
+    "--key-filename=<filename>       The filename to save the generated key.\n"
     "\n"
-    "--key-format=<bin|hex>         Set the output format of the key you would like to produce.\n"
-    "                               bin - key will be ouput in binary format.\n"
-    "                               hex - key will be output in hex format.\n"
-    "                               Defaults to binary format.\n"
+    "--random-format=<hexstr|vector> Set the output format of the key you would like to produce.\n"
+    "                                hexstr - key will be output in hex format.\n"
+    "                                vector - key will be ouput in binary format.\n"
+    "                                Defaults to hexstr format.\n"
     "\n"
-    "--ca-cert=<path>               Full or relative path to a public root ca-certificate (such as the one available\n"
-    "                               at https://curl.se/docs/caextract.html) for TLS traffic with the Qrypt servers.\n"
-    "                               Use this option if the system does not have accessible root certificates or\n"
-    "                               if key generation persistently returns curl error 60 (ssl certificate problem).\n"
+    "--ca-cert=<path>                Full or relative path to a public root ca-certificate (such as the one available\n"
+    "                                at https://curl.se/docs/caextract.html) for TLS traffic with the Qrypt servers.\n"
+    "                                Use this option if the system does not have accessible root certificates or\n"
+    "                                if key generation persistently returns curl error 60 (ssl certificate problem).\n"
     "\n"
-    "--enable_file_logging          Enable file logging. This will disable console logging.\n"
-    "                               Defaults to file logging disabled.\n"
+    "--enable_file_logging           Enable file logging. This will disable console logging.\n"
+    "                                Defaults to file logging disabled.\n"
     "\n"
-    "--log_level_<level>            Set logging level.\n" 
-    "                               Defaults to --log_level_disable\n"
+    "--log_level_<level>             Set logging level.\n" 
+    "                                Defaults to --log_level_disable\n"
     "\n"
-    "--help                         Display help.\n"
+    "--help                          Display help.\n"
     "\n"
     "";
 
@@ -65,7 +65,7 @@ void displayUsage() {
 int main(int argc, char **argv) {
     std::string user, token, metadataFilename, keyFilename, cacertPath;
     std::string keyType = "aes";
-    std::string keyFormat = "bin";
+    std::string randomFormat = "hexstr";
     int otpLen = 0;
     std::string setUserFlag = "--user=";
     std::string setTokenFlag = "--token=";
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
     std::string setOTPLenFlag = "--otp-len=";
     std::string setMetadataFilenameFlag = "--metadata-filename=";
     std::string setKeyFilenameFlag = "--key-filename=";
-    std::string setKeyFormatFlag = "--key-format=";
+    std::string setRandomFormatFlag = "--random-format=";
     std::string setCaCertFlag = "--ca-cert=";
 
     // Set default log level
@@ -101,8 +101,8 @@ int main(int argc, char **argv) {
         else if (argument.find(setKeyFilenameFlag) == 0) {
             keyFilename = argument.substr(setKeyFilenameFlag.size());
         }
-        else if (argument.find(setKeyFormatFlag) == 0) {
-            keyFormat = argument.substr(setKeyFormatFlag.size());
+        else if (argument.find(setRandomFormatFlag) == 0) {
+            randomFormat = argument.substr(setRandomFormatFlag.size());
         }
         else if (argument.find(setCaCertFlag) == 0) {
             cacertPath = argument.substr(setCaCertFlag.size());
@@ -160,8 +160,8 @@ int main(int argc, char **argv) {
         displayUsage();
         return 1;
     }
-    if (keyFormat != "bin" && keyFormat != "hex") {
-        printf("Invalid key format.\n");
+    if (randomFormat != "hexstr" && randomFormat != "vector") {
+        printf("Invalid random format.\n");
         displayUsage();
         return 1;
     }
@@ -187,18 +187,19 @@ int main(int argc, char **argv) {
                 keyInit = keyGenClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, otpLen);
             }
 
-            // Display the shared key
-            std::string key = convertByteVecToHexStr(keyInit.key);
-            printf("\nAlice - Key: %s\n\n", key.c_str());
-
             // 3. Write out metadata for bob and key for encryption
             writeToFile(metadataFilename, keyInit.metadata);
-            if (keyFormat == "bin") {
+            if (randomFormat == "vector") {
                 writeToFile(keyFilename, keyInit.key);
             }
             else {
+                std::string key = convertByteVecToHexStr(keyInit.key);
                 writeToFile(keyFilename, key);
             }
+
+            // 4. Display success
+            printf("\nKey successfully created in %s.\n\n", keyFilename);
+
         }
         // Bob is the receiver
         else if (user == "bob") {
@@ -208,17 +209,17 @@ int main(int argc, char **argv) {
             // 3. Generate the key using the metadata
             std::vector<uint8_t> keySync = keyGenClient->genSync(metadata);
 
-            // Display our shared key
-            std::string key = convertByteVecToHexStr(keySync);
-            printf("\nBob - Key: %s\n\n", key.c_str());
-
             // 4. Write out key for decryption
-            if (keyFormat == "bin") {
+            if (randomFormat == "bin") {
                 writeToFile(keyFilename, keySync);
             }
             else {
+                std::string key = convertByteVecToHexStr(keySync);
                 writeToFile(keyFilename, key);
             }
+
+            // 5. Display success
+            printf("\nKey successfully created in %s.\n\n", keyFilename);
         }
         else {
             displayUsage();

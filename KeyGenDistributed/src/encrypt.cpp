@@ -28,10 +28,10 @@ std::string getUsage() {
     "\n"
     "--key-filename=<filename>      Key to use for encryption or decryption.\n"
     "\n"
-    "--key-format=<bin|hex>         Set the input format of the key.\n"
-    "                               bin - key will be in binary format.\n"
-    "                               hex - key will be in hex format.\n"
-    "                               Defaults to binary format.\n"
+    "--random-format=<hexstr|vector> Set the input format of the key.\n"
+    "                                hexstr - key will be in hex format.\n"
+    "                                vector - key will be in binary format.\n"
+    "                                Defaults to hexstr format.\n"
     "\n"
     "--file-type=<binary|bitmap>    Set the input/output file type.\n"
     "                               binary - File data will be used as a big binary blob.\n"
@@ -57,12 +57,12 @@ int main(int argc, char **argv) {
     
     std::string operation, keyFilename, inputFilename, outputFilename;
     std::string keyType = "aes";
-    std::string keyFormat = "bin";
+    std::string randomFormat = "hexstr";
     std::string fileType = "binary";
     std::string setOperationFlag = "--op=";
     std::string setKeyTypeFlag = "--key-type=";
     std::string setKeyFilenameFlag = "--key-filename=";
-    std::string setKeyFormatFlag = "--key-format=";
+    std::string setRandomFormatFlag = "--random-format=";
     std::string setFileTypeFlag = "--file-type=";
     std::string setInputFilenameFlag = "--input-filename=";
     std::string setOutputFilenameFlag = "--output-filename=";
@@ -77,8 +77,8 @@ int main(int argc, char **argv) {
         else if (argument.find(setKeyTypeFlag) == 0) {
             keyType = argument.substr(setKeyTypeFlag.size());
         }
-        else if (argument.find(setKeyFormatFlag) == 0) {
-            keyFormat = argument.substr(setKeyFormatFlag.size());
+        else if (argument.find(setRandomFormatFlag) == 0) {
+            randomFormat = argument.substr(setRandomFormatFlag.size());
         }
         else if (argument.find(setKeyFilenameFlag) == 0) {
             keyFilename = argument.substr(setKeyFilenameFlag.size());
@@ -129,8 +129,8 @@ int main(int argc, char **argv) {
         displayUsage();
         return 1;
     }
-    if (keyFormat != "bin" && keyFormat != "hex") {
-        printf("Invalid key format.\n");
+    if (randomFormat != "hexstr" && randomFormat != "vector") {
+        printf("Invalid random format.\n");
         displayUsage();
         return 1;
     }
@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
 
     // 1. Read key
     std::vector<uint8_t> key;
-    if (keyFormat == "bin") {
+    if (keyFormat == "vector") {
         key = readFromFile(keyFilename);
     }
     else {
