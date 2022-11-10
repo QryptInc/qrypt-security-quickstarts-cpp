@@ -198,7 +198,7 @@ int main(int argc, char **argv) {
             }
 
             // 4. Display success
-            printf("\nKey successfully created in %s.\n\n", keyFilename);
+            printf("\nKey successfully created in %s.\n\n", keyFilename.c_str());
 
         }
         // Bob is the receiver
@@ -210,7 +210,7 @@ int main(int argc, char **argv) {
             std::vector<uint8_t> keySync = keyGenClient->genSync(metadata);
 
             // 4. Write out key for decryption
-            if (randomFormat == "bin") {
+            if (randomFormat == "vector") {
                 writeToFile(keyFilename, keySync);
             }
             else {
@@ -219,7 +219,7 @@ int main(int argc, char **argv) {
             }
 
             // 5. Display success
-            printf("\nKey successfully created in %s.\n\n", keyFilename);
+            printf("\nKey successfully created in %s.\n\n", keyFilename.c_str());
         }
         else {
             displayUsage();

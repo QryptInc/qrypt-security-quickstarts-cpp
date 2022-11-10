@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
 
     // 1. Read key
     std::vector<uint8_t> key;
-    if (keyFormat == "vector") {
+    if (randomFormat == "vector") {
         key = readFromFile(keyFilename);
     }
     else {
