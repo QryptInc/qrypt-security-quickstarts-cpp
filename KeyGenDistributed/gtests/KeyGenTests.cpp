@@ -7,6 +7,7 @@
 using namespace QryptSecurity;
 
 static const uint64_t KB = 1024;
+static const uint64_t MB = 1024 * 1024;
 
 class KeyGenDistributedTest : public ::testing::Test {
   protected:
@@ -88,7 +89,7 @@ TEST_F(KeyGenDistributedTest, KeySizeLowerLimit) {
 
 TEST_F(KeyGenDistributedTest, KeySizeUpperLimit) {
     initialize();
-    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 512 * KB + 1), InvalidArgument);
+    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 10 * MB + 1), InvalidArgument);
 }
 
 TEST_F(KeyGenDistributedTest, MetadataWithExtraPrefix) {
