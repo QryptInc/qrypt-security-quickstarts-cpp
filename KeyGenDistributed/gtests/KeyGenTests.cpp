@@ -38,8 +38,7 @@ TEST_F(KeyGenDistributedTest, InvalidKeyMode) {
 
 TEST_F(KeyGenDistributedTest, EmptyToken) {
     _Token = "";
-    initialize();
-    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256), CannotDownload);
+    EXPECT_THROW(_AliceClient->initialize(_Token), InvalidArgument);
 }
 
 TEST_F(KeyGenDistributedTest, InvalidToken) {
@@ -89,7 +88,7 @@ TEST_F(KeyGenDistributedTest, KeySizeLowerLimit) {
 
 TEST_F(KeyGenDistributedTest, KeySizeUpperLimit) {
     initialize();
-    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 32*KB+1), InvalidArgument);
+    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 512 * KB + 1), InvalidArgument);
 }
 
 TEST_F(KeyGenDistributedTest, MetadataWithExtraPrefix) {

@@ -58,9 +58,10 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(KeyGenDistributed
        "$ENV{HOME}/Library/Frameworks/QryptSecurity.framework/QryptSecurity"
     )
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+else()
     target_link_libraries(KeyGenDistributed
         "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/libQryptSecurity.so"
+        "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/libgf2x.so"
     )
 endif()
 

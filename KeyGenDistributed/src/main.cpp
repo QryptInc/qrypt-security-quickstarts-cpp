@@ -4,6 +4,7 @@
 #include "common.h"
 
 #include <fstream>
+#include <cstring>
 
 using namespace QryptSecurity;
 
@@ -19,7 +20,7 @@ std::string getUsage() {
     "-------\n"
     "--user=<alice|bob>             Set the user to either alice or bob.\n"
     "\n"
-    "--token=<token>                Qrypt token retrieved from Qrypt portal (http://portal.qrypt.com).\n"
+    "--token=<token>                Qrypt token retrieved from Qrypt portal (https://portal.qrypt.com).\n"
     "                               Make sure the token has the BLAST scope.\n"
     "\n"
     "--key-type=<aes|otp>           Set to the type of key you would like to produce.\n"
@@ -31,6 +32,17 @@ std::string getUsage() {
     "--metadata-filename=<filename> The filename for the metadata file to be created or consumed.\n"
     "\n"
     "--key-filename=<filename>      The filename to save the generated key.\n"
+    "\n"
+    "--ca-cert=<path>               Full or relative path to a public root ca-certificate (such as the one available\n"
+    "                               at https://curl.se/docs/caextract.html) for TLS traffic with the Qrypt servers.\n"
+    "                               Use this option if the system does not have accessible root certificates or\n"
+    "                               if key generation persistently returns curl error 60 (ssl certificate problem).\n"
+    "\n"
+    "--enable_file_logging          Enable file logging. This will disable console logging.\n"
+    "                               Defaults to file logging disabled.\n"
+    "\n"
+    "--log_level_<level>            Set logging level.\n" 
+    "                               Defaults to --log_level_disable\n"
     "\n"
     "--help                         Display help.\n"
     "\n"
@@ -46,7 +58,7 @@ void displayUsage() {
 
 
 int main(int argc, char **argv) {
-    std::string user, token, metadataFilename, keyFilename;
+    std::string user, token, metadataFilename, keyFilename, cacertPath;
     std::string keyType = "aes";
     int otpLen = 0;
     std::string setUserFlag = "--user=";
@@ -55,6 +67,10 @@ int main(int argc, char **argv) {
     std::string setOTPLenFlag = "--otp-len=";
     std::string setMetadataFilenameFlag = "--metadata-filename=";
     std::string setKeyFilenameFlag = "--key-filename=";
+    std::string setCaCertFlag = "--ca-cert=";
+
+    // Set default log level
+    ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTLIB_LOG_LEVEL_DISABLE);
 
     // Parse command line parameters
     while(*++argv) {
@@ -78,6 +94,30 @@ int main(int argc, char **argv) {
         else if (argument.find(setKeyFilenameFlag) == 0) {
             keyFilename = argument.substr(setKeyFilenameFlag.size());
         }
+        else if (argument.find(setCaCertFlag) == 0) {
+            cacertPath = argument.substr(setCaCertFlag.size());
+        }
+        else if (!strcmp(*argv, "--enable_file_logging")) {
+            ::QryptSecurity::logging::getLogWriter()->enableFileLogging("qryptlib.log");
+        }
+        else if (!strcmp(*argv, "--log_level_trace")) {
+            ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTLIB_LOG_LEVEL_TRACE);
+        }
+        else if (!strcmp(*argv, "--log_level_debug")) {
+            ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTLIB_LOG_LEVEL_DEBUG);
+        }
+        else if (!strcmp(*argv, "--log_level_info")) {
+            ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTLIB_LOG_LEVEL_INFO);
+        }
+        else if (!strcmp(*argv, "--log_level_warn")) {
+            ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTLIB_LOG_LEVEL_WARNING);
+        }
+        else if (!strcmp(*argv, "--log_level_error")) {
+            ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTLIB_LOG_LEVEL_ERROR);
+        }
+        else if (!strcmp(*argv, "--log_level_disable")) {
+            ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTLIB_LOG_LEVEL_DISABLE);
+        }
         else if ((argument == "-h") || (argument == "--help")) {
             displayUsage();
             return 0;
@@ -98,26 +138,28 @@ int main(int argc, char **argv) {
     if (metadataFilename.empty()) {
         printf("Missing metadata filename.\n");
         displayUsage();
-        return 1;        
+        return 1;
     }
     if (keyFilename.empty()) {
         printf("Missing key filename.\n");
         displayUsage();
-        return 1;        
+        return 1;
     }
     if (keyType == "otp" && otpLen == 0) {
         printf("Invalid OTP length.\n");
         displayUsage();
-        return 1;        
+        return 1;
     }
-
-    // Enable QryptSecurity logging
-    logging::getLogWriter()->setLogLevel(logging::LogLevel::QRYPTLIB_LOG_LEVEL_INFO);
 
     try {
         // 1. Create and initialize our keygen client
         auto keyGenClient = IKeyGenDistributedClient::create();
-        keyGenClient->initialize(token);
+        if (cacertPath.empty()) {
+            keyGenClient->initialize(token);
+        }
+        else {
+            keyGenClient->initialize(token, cacertPath);
+        }
         
         // Alice is the sender
         if (user == "alice") {
