@@ -143,9 +143,15 @@ int main(int argc, char **argv) {
 
             // 3. Encrypt file
             if (keyType == "aes") {
+                if (key.size() != AESKeyLengthInBytes) {
+                    throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
+                }
                 cipherTextData = encryptAES256(key, plainTextData);
             }
             else if (keyType == "otp") {
+                if (key.size() != plainTextData.size()) {
+                    throw std::runtime_error("Provided OTP invalid. (File does not exist or key is the wrong size.)");
+                }
                 cipherTextData = xorVectors(key, plainTextData);
             }
 
@@ -171,9 +177,15 @@ int main(int argc, char **argv) {
             // 3. Decrypt file
             std::vector<uint8_t> plainTextData;
             if (keyType == "aes") {
+                if (key.size() != AESKeyLengthInBytes) {
+                    throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
+                }
                 plainTextData = decryptAES256(key, cipherTextData);
             }
             else if (keyType == "otp") {
+                if (key.size() != cipherTextData.size()) {
+                    throw std::runtime_error("Provided OTP invalid. (File does not exist or key is the wrong size.)");
+                }
                 plainTextData = xorVectors(key, cipherTextData);
             }
 
