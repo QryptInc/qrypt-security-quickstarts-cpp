@@ -127,71 +127,95 @@ int main(int argc, char **argv) {
     std::vector<uint8_t> cipherTextData;
     std::vector<uint8_t> plainTextData;
 
-    // 1. Read key
-    std::vector<uint8_t> key = readFromFile(keyFilename);
+    try {
+        // 1. Read key
+        std::vector<uint8_t> key = readFromFile(keyFilename);
 
-    if (operation == "encrypt") {
-        // 2. Read input file to encrypt
-        if (fileType == "bitmap") {
-            bitmapData = readBitmap(inputFilename);
-            plainTextData = bitmapData.body;
-        }
-        else if (fileType == "binary") {
-            plainTextData = readFromFile(inputFilename);
-        }
+        if (operation == "encrypt") {
+            // 2. Read input file to encrypt
+            if (fileType == "bitmap") {
+                bitmapData = readBitmap(inputFilename);
+                plainTextData = bitmapData.body;
+            }
+            else if (fileType == "binary") {
+                plainTextData = readFromFile(inputFilename);
+            }
 
-        // 3. Encrypt file
-        if (keyType == "aes") {
-            cipherTextData = encryptAES256(key, plainTextData);
-        }
-        else if (keyType == "otp") {
-            cipherTextData = xorVectors(key, plainTextData);
-        }
+            // 3. Encrypt file
+            if (keyType == "aes") {
+                if (key.size() != AESKeyLengthInBytes) {
+                    throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
+                }
+                cipherTextData = encryptAES256(key, plainTextData);
+            }
+            else if (keyType == "otp") {
+                if (key.size() != plainTextData.size()) {
+                    throw std::runtime_error("Provided OTP invalid. (File does not exist or key is the wrong size.)");
+                }
+                cipherTextData = xorVectors(key, plainTextData);
+            }
 
-        // 4. Write out encrypted file
-        if (fileType == "bitmap") {
-            bitmapData.body = cipherTextData;
-            writeBitmap(outputFilename, bitmapData);            
+            // 4. Write out encrypted file
+            if (fileType == "bitmap") {
+                bitmapData.body = cipherTextData;
+                writeBitmap(outputFilename, bitmapData);
+            }
+            else if (fileType == "binary") {
+                writeToFile(outputFilename, cipherTextData);
+            }
         }
-        else if (fileType == "binary") {
-            writeToFile(outputFilename, cipherTextData);
-        }
-    }
-    else if (operation == "decrypt") {
-        // 2. Read in encrypted file      
-        if (fileType == "bitmap") {
-            bitmapData = readBitmap(inputFilename);
-            cipherTextData = bitmapData.body;
-        }
-        else if (fileType == "binary") {
-            cipherTextData = readFromFile(inputFilename);
-        }
+        else if (operation == "decrypt") {
+            // 2. Read in encrypted file
+            if (fileType == "bitmap") {
+                bitmapData = readBitmap(inputFilename);
+                cipherTextData = bitmapData.body;
+            }
+            else if (fileType == "binary") {
+                cipherTextData = readFromFile(inputFilename);
+            }
 
-        // 3. Decrypt file
-        std::vector<uint8_t> plainTextData;
-        if (keyType == "aes") {        
-            plainTextData = decryptAES256(key, cipherTextData);
-        }
-        else if (keyType == "otp") {
-            plainTextData = xorVectors(key, cipherTextData);
-        }
+            // 3. Decrypt file
+            std::vector<uint8_t> plainTextData;
+            if (keyType == "aes") {
+                if (key.size() != AESKeyLengthInBytes) {
+                    throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
+                }
+                plainTextData = decryptAES256(key, cipherTextData);
+            }
+            else if (keyType == "otp") {
+                if (key.size() != cipherTextData.size()) {
+                    throw std::runtime_error("Provided OTP invalid. (File does not exist or key is the wrong size.)");
+                }
+                plainTextData = xorVectors(key, cipherTextData);
+            }
 
-        // 4. Write out decrypted file
-        if (fileType == "bitmap") {
-            bitmapData.body = plainTextData;
-            writeBitmap(outputFilename, bitmapData);
+            // 4. Write out decrypted file
+            if (fileType == "bitmap") {
+                bitmapData.body = plainTextData;
+                writeBitmap(outputFilename, bitmapData);
+            }
+            else if (fileType == "binary") {
+                writeToFile(outputFilename, plainTextData);
+            }
         }
-        else if (fileType == "binary") {
-            writeToFile(outputFilename, plainTextData);
+        else {
+            displayUsage();
+            return 1;
         }
-    }
-    else {
-        displayUsage();
+    } catch (std::runtime_error &ex) {
+        printf("\nFailure: %s\n", ex.what());
         return 1;
     }
+
+    printf("\nSuccess!\n");
+    return 0;
 }
 
 std::vector<uint8_t> encryptAES256(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data) {
+    if (aesKey.size() != AESKeyLengthInBytes) {
+        throw std::runtime_error("AES key is of the wrong size.");
+    }
+
     // In practice IV shouldn't be a zero vector, but to keep this demo simple we will set it to zero vector
     std::vector<uint8_t> aesKeyWithIV(IVLengthInBytes, 0);
     aesKeyWithIV.insert(aesKeyWithIV.begin(), aesKey.begin(), aesKey.end());
@@ -261,6 +285,10 @@ std::vector<uint8_t> encryptAES256(const std::vector<uint8_t> aesKey, const std:
 }
 
 std::vector<uint8_t> decryptAES256(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data) {
+    if (aesKey.size() != AESKeyLengthInBytes) {
+        throw std::runtime_error("AES key is of the wrong size.");
+    }
+
     std::vector<uint8_t> aesKeyWithIV(IVLengthInBytes, 0);
     aesKeyWithIV.insert(aesKeyWithIV.begin(), aesKey.begin(), aesKey.end());
     int resCode = 0;
