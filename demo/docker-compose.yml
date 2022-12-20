@@ -12,6 +12,8 @@ services:
         environment:
             QRYPT_TOKEN: ${QRYPT_TOKEN}
             PERSONA: alice
+        volumes:
+            - ./alice:/home/ubuntu
 
     bob:
         container_name: bob_container
@@ -24,3 +26,5 @@ services:
         environment:
             QRYPT_TOKEN: ${QRYPT_TOKEN}
             PERSONA: bob
+        volumes:
+            - ./bob:/home/ubuntu
