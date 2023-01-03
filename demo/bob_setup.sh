@@ -54,10 +54,10 @@ print_header "Bob recovers the AES key using the metadata ($AES_METADATA)."
 eval 'KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=$AES_METADATA --key-filename=$AES_KEY'
 
 print_header "Bob decrypts $AES_BIN_ENCRYPTED_IMAGE_FILE using the AES key ($AES_KEY)."
-eval 'EncryptTool --op=decrypt --key-type=aes --key-filename=$AES_KEY --file-type=binary --input-filename=$AES_BIN_ENCRYPTED_IMAGE_FILE --output-filename=$AES_BIN_DECRYPTED_IMAGE_FILE'
+eval 'EncryptTool --op=decrypt --key-type=aes-ocb --key-filename=$AES_KEY --file-type=binary --input-filename=$AES_BIN_ENCRYPTED_IMAGE_FILE --output-filename=$AES_BIN_DECRYPTED_IMAGE_FILE'
 
 print_header "Bob decrypts $AES_BMP_ENCRYPTED_IMAGE_FILE using the AES key ($AES_KEY)."
-eval 'EncryptTool --op=decrypt --key-type=aes --key-filename=$AES_KEY --file-type=bitmap --input-filename=$AES_BMP_ENCRYPTED_IMAGE_FILE --output-filename=$AES_BMP_DECRYPTED_IMAGE_FILE'
+eval 'EncryptTool --op=decrypt --key-type=aes-ocb --key-filename=$AES_KEY --file-type=bitmap --input-filename=$AES_BMP_ENCRYPTED_IMAGE_FILE --output-filename=$AES_BMP_DECRYPTED_IMAGE_FILE'
 
 print_header "Bob recovers the OTP key using the metadata ($OTP_METADATA)."
 eval 'KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=$OTP_METADATA --key-filename=$OTP_KEY'

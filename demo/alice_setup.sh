@@ -31,10 +31,10 @@ print_header "Alice generates an AES key ($AES_KEY) and metadata ($AES_METADATA)
 eval 'KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=$AES_METADATA --key-filename=$AES_KEY'
 
 print_header "Alice encrypts $ORIGINAL_IMAGE_FILE in binary format using the AES key ($AES_KEY)."
-eval 'EncryptTool --op=encrypt --key-type=aes --key-filename=$AES_KEY --file-type=binary --input-filename=$ORIGINAL_IMAGE_FILE --output-filename=$AES_BIN_ENCRYPTED_IMAGE_FILE'
+eval 'EncryptTool --op=encrypt --key-type=aes-ocb --key-filename=$AES_KEY --file-type=binary --input-filename=$ORIGINAL_IMAGE_FILE --output-filename=$AES_BIN_ENCRYPTED_IMAGE_FILE'
 
 print_header "Alice encrypts $ORIGINAL_IMAGE_FILE in bmp image format using the AES key ($AES_KEY)."
-eval 'EncryptTool --op=encrypt --key-type=aes --key-filename=$AES_KEY --file-type=bitmap --input-filename=$ORIGINAL_IMAGE_FILE --output-filename=$AES_BMP_ENCRYPTED_IMAGE_FILE'
+eval 'EncryptTool --op=encrypt --key-type=aes-ocb --key-filename=$AES_KEY --file-type=bitmap --input-filename=$ORIGINAL_IMAGE_FILE --output-filename=$AES_BMP_ENCRYPTED_IMAGE_FILE'
 
 print_header "Alice generates an OTP key and metadata."
 eval 'KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=otp --otp-len=$(stat -c%s $ORIGINAL_TEXT_FILE) --metadata-filename=$OTP_METADATA --key-filename=alice_otp.bin'
