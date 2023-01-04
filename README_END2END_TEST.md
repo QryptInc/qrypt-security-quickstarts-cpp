@@ -76,7 +76,7 @@ Alice generates AES/OTP keys and metadata files, encrypts the files, and sends t
 ```
 # AES keygen and encryption
 build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=aes_metadata.bin --key-filename=alice_aes.bin
-build/EncryptTool --op=encrypt --key-type=aes-ocb --key-filename=alice_aes.bin --file-type=bitmap --input-filename=../files/tux.bmp --output-filename=aes_encrypted_tux.bmp
+build/EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=../files/tux.bmp --output-filename=aes_encrypted_tux.bmp
 ```
 
 ```

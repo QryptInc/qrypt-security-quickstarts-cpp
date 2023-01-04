@@ -48,7 +48,7 @@ docker exec -it alice_container bash
 ```
 # AES keygen and encryption
 KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=aes_metadata.bin --key-filename=alice_aes.bin
-EncryptTool --op=encrypt --key-type=aes-ocb --key-filename=alice_aes.bin --file-type=bitmap --input-filename=/workspace/files/tux.bmp --output-filename=aes_encrypted_tux.bmp
+EncryptTool --op=encrypt --key-type=aes --key-filename=alice_aes.bin --file-type=bitmap --input-filename=/workspace/files/tux.bmp --output-filename=aes_encrypted_tux.bmp
 
 # Send the AES metadata and encrypted files to Bob
 sshpass -p "ubuntu" scp -o 'StrictHostKeyChecking no' aes_metadata.bin aes_encrypted_tux.bmp ubuntu@bob:/home/ubuntu
@@ -73,7 +73,7 @@ docker exec -it bob_container bash
 ```
 # AES keygen and decryption
 KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=aes_metadata.bin --key-filename=bob_aes.bin
-EncryptTool --op=decrypt --key-type=aes-ocb --key-filename=bob_aes.bin --file-type=bitmap --input-filename=aes_encrypted_tux.bmp --output-filename=aes_decrypted_tux.bmp
+EncryptTool --op=decrypt --key-type=aes --key-filename=bob_aes.bin --file-type=bitmap --input-filename=aes_encrypted_tux.bmp --output-filename=aes_decrypted_tux.bmp
 
 # Verify the AES decrypted files
 cmp /workspace/files/tux.bmp aes_decrypted_tux.bmp

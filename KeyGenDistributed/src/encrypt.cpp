@@ -24,10 +24,14 @@ std::string getUsage() {
     "-------\n"
     "--op=<encrypt|decrypt>             Set operation to encryption or decryption.\n"
     "\n"
-    "--key-type=<aes-ecb|aes-ocb|otp>   Set the encryption/decryption type.\n"
-    "                                   aes-ecb - AES-256 key with length 32 bytes to be used for ECB mode (known to be insecure).\n"
-    "                                   aes-ocb - AES-256 key with length 32 bytes to be used for OCB mode.\n"
+    "--key-type=<aes|otp>               Set the encryption/decryption type.\n"
+    "                                   aes - AES-256 key with length 32 bytes.\n"
     "                                   otp - One time pad.\n"
+    "\n"
+    "--aes-mode=<ecb|ocb>               Set the AES encryption/decryption mode (ignored if OTP is selected).\n"
+    "                                   ecb - AES-256 key with length 32 bytes to be used for ECB mode (known to be insecure).\n"
+    "                                   ocb - AES-256 key with length 32 bytes to be used for OCB mode.\n"
+    "                                   Defaults to ocb mode.\n"
     "\n"
     "--key-filename=<filename>          Key to use for encryption or decryption.\n"
     "\n"
@@ -59,11 +63,13 @@ void displayUsage() {
 int main(int argc, char **argv) {
     
     std::string operation, keyFilename, inputFilename, outputFilename;
-    std::string keyType = "aes-ocb";
+    std::string keyType = "aes";
+    std::string aesMode = "ocb";
     std::string randomFormat = "hexstr";
     std::string fileType = "binary";
     std::string setOperationFlag = "--op=";
     std::string setKeyTypeFlag = "--key-type=";
+    std::string setAESModeFlag = "--aes-mode=";
     std::string setKeyFilenameFlag = "--key-filename=";
     std::string setRandomFormatFlag = "--random-format=";
     std::string setFileTypeFlag = "--file-type=";
@@ -79,6 +85,9 @@ int main(int argc, char **argv) {
         }
         else if (argument.find(setKeyTypeFlag) == 0) {
             keyType = argument.substr(setKeyTypeFlag.size());
+        }
+        else if (argument.find(setAESModeFlag) == 0) {
+            aesMode = argument.substr(setAESModeFlag.size());
         }
         else if (argument.find(setRandomFormatFlag) == 0) {
             randomFormat = argument.substr(setRandomFormatFlag.size());
@@ -122,8 +131,13 @@ int main(int argc, char **argv) {
         displayUsage();
         return 1;        
     }
-    if (keyType != "aes-ecb" && keyType != "aes-ocb" && keyType != "otp") {
+    if (keyType != "aes" && keyType != "otp") {
         printf("Invalid key type.\n");
+        displayUsage();
+        return 1;
+    }
+    if (aesMode != "ocb" && aesMode != "ecb") {
+        printf("Invalid aes mode.\n");
         displayUsage();
         return 1;
     }
@@ -166,17 +180,16 @@ int main(int argc, char **argv) {
             }
 
             // 3. Encrypt file
-            if (keyType == "aes-ecb") {
+            if (keyType == "aes") {
                 if (key.size() != AESKeyLengthInBytes) {
                     throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
                 }
-                cipherTextData = encryptAES256ECB(key, plainTextData);
-            }
-            else if (keyType == "aes-ocb") {
-                if (key.size() != AESKeyLengthInBytes) {
-                    throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
+                if (aesMode == "ecb") {
+                    cipherTextData = encryptAES256ECB(key, plainTextData);
                 }
-                cipherTextData = encryptAES256OCB(key, plainTextData);
+                else if (aesMode == "ocb") {
+                    cipherTextData = encryptAES256OCB(key, plainTextData);
+                }
             }
             else if (keyType == "otp") {
                 if (key.size() != plainTextData.size()) {
@@ -206,17 +219,16 @@ int main(int argc, char **argv) {
 
             // 3. Decrypt file
             std::vector<uint8_t> plainTextData;
-            if (keyType == "aes-ecb") {
+            if (keyType == "aes") {
                 if (key.size() != AESKeyLengthInBytes) {
                     throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
                 }
-                plainTextData = decryptAES256ECB(key, cipherTextData);
-            }
-            else if (keyType == "aes-ocb") {
-                if (key.size() != AESKeyLengthInBytes) {
-                    throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
+                if (aesMode == "ecb") {
+                    plainTextData = decryptAES256ECB(key, cipherTextData);
                 }
-                plainTextData = decryptAES256OCB(key, cipherTextData);
+                else if (aesMode == "ocb") {
+                    plainTextData = decryptAES256OCB(key, cipherTextData);
+                }
             }
             else if (keyType == "otp") {
                 if (key.size() != cipherTextData.size()) {
