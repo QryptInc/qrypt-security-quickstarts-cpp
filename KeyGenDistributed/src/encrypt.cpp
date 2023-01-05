@@ -7,8 +7,10 @@
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 
-std::vector<uint8_t> encryptAES256(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
-std::vector<uint8_t> decryptAES256(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
+std::vector<uint8_t> encryptAES256ECB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
+std::vector<uint8_t> decryptAES256ECB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
+std::vector<uint8_t> encryptAES256OCB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
+std::vector<uint8_t> decryptAES256OCB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
 
 std::string getUsage() {
     std::string usage = 
@@ -20,28 +22,33 @@ std::string getUsage() {
     "\n"
     "Options\n"
     "-------\n"
-    "--op=<encrypt|decrypt>         Set operation to encryption or decryption.\n"
+    "--op=<encrypt|decrypt>             Set operation to encryption or decryption.\n"
     "\n"
-    "--key-type=<aes|otp>           Set the encryption/decryption type.\n"
-    "                               aes - AES-256 key with length 32 bytes.\n"
-    "                               otp - One time pad.\n"
+    "--key-type=<aes|otp>               Set the encryption/decryption type.\n"
+    "                                   aes - AES-256 key with length 32 bytes.\n"
+    "                                   otp - One time pad.\n"
     "\n"
-    "--key-filename=<filename>      Key to use for encryption or decryption.\n"
+    "--aes-mode=<ecb|ocb>               Set the AES encryption/decryption mode (ignored if OTP is selected).\n"
+    "                                   ecb - AES-256 key with length 32 bytes to be used for ECB mode (known to be insecure).\n"
+    "                                   ocb - AES-256 key with length 32 bytes to be used for OCB mode.\n"
+    "                                   Defaults to ocb mode.\n"
     "\n"
-    "--random-format=<hexstr|vector> Set the input format of the key.\n"
-    "                                hexstr - key will be in hex format.\n"
-    "                                vector - key will be in binary format.\n"
-    "                                Defaults to hexstr format.\n"
+    "--key-filename=<filename>          Key to use for encryption or decryption.\n"
     "\n"
-    "--file-type=<binary|bitmap>    Set the input/output file type.\n"
-    "                               binary - File data will be used as a big binary blob.\n"
-    "                               bitmap - bmp image file. Bitmap header data will be preserved.\n"
+    "--random-format=<hexstr|vector>    Set the input format of the key.\n"
+    "                                   hexstr - key will be in hex format.\n"
+    "                                   vector - key will be in binary format.\n"
+    "                                   Defaults to hexstr format.\n"
     "\n"
-    "--input-filename=<filename>    The input file.\n"
+    "--file-type=<binary|bitmap>        Set the input/output file type.\n"
+    "                                   binary - File data will be used as a big binary blob.\n"
+    "                                   bitmap - bmp image file. Bitmap header data will be preserved.\n"
     "\n"
-    "--output-filename=<filename>   The output file.\n"
+    "--input-filename=<filename>        The input file.\n"
     "\n"
-    "--help                         Display help.\n"
+    "--output-filename=<filename>       The output file.\n"
+    "\n"
+    "--help                             Display help.\n"
     "\n"
     "";
 
@@ -57,10 +64,12 @@ int main(int argc, char **argv) {
     
     std::string operation, keyFilename, inputFilename, outputFilename;
     std::string keyType = "aes";
+    std::string aesMode = "ocb";
     std::string randomFormat = "hexstr";
     std::string fileType = "binary";
     std::string setOperationFlag = "--op=";
     std::string setKeyTypeFlag = "--key-type=";
+    std::string setAESModeFlag = "--aes-mode=";
     std::string setKeyFilenameFlag = "--key-filename=";
     std::string setRandomFormatFlag = "--random-format=";
     std::string setFileTypeFlag = "--file-type=";
@@ -76,6 +85,9 @@ int main(int argc, char **argv) {
         }
         else if (argument.find(setKeyTypeFlag) == 0) {
             keyType = argument.substr(setKeyTypeFlag.size());
+        }
+        else if (argument.find(setAESModeFlag) == 0) {
+            aesMode = argument.substr(setAESModeFlag.size());
         }
         else if (argument.find(setRandomFormatFlag) == 0) {
             randomFormat = argument.substr(setRandomFormatFlag.size());
@@ -124,6 +136,11 @@ int main(int argc, char **argv) {
         displayUsage();
         return 1;
     }
+    if (aesMode != "ocb" && aesMode != "ecb") {
+        printf("Invalid aes mode.\n");
+        displayUsage();
+        return 1;
+    }
     if (fileType != "binary" && fileType != "bitmap") {
         printf("Invalid file type.\n");
         displayUsage();
@@ -167,7 +184,12 @@ int main(int argc, char **argv) {
                 if (key.size() != AESKeyLengthInBytes) {
                     throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
                 }
-                cipherTextData = encryptAES256(key, plainTextData);
+                if (aesMode == "ecb") {
+                    cipherTextData = encryptAES256ECB(key, plainTextData);
+                }
+                else if (aesMode == "ocb") {
+                    cipherTextData = encryptAES256OCB(key, plainTextData);
+                }
             }
             else if (keyType == "otp") {
                 if (key.size() != plainTextData.size()) {
@@ -201,7 +223,12 @@ int main(int argc, char **argv) {
                 if (key.size() != AESKeyLengthInBytes) {
                     throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
                 }
-                plainTextData = decryptAES256(key, cipherTextData);
+                if (aesMode == "ecb") {
+                    plainTextData = decryptAES256ECB(key, cipherTextData);
+                }
+                else if (aesMode == "ocb") {
+                    plainTextData = decryptAES256OCB(key, cipherTextData);
+                }
             }
             else if (keyType == "otp") {
                 if (key.size() != cipherTextData.size()) {
@@ -232,7 +259,76 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-std::vector<uint8_t> encryptAES256(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data) {
+std::vector<uint8_t> encryptAES256ECB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data) {
+    int resCode = 0;
+
+    // 1. Create context
+    std::unique_ptr<EVP_CIPHER_CTX, decltype(&::EVP_CIPHER_CTX_free)> pEvpCtx(EVP_CIPHER_CTX_new(), ::EVP_CIPHER_CTX_free);
+    if (pEvpCtx == nullptr) {
+        throw std::runtime_error("EVP_CIPHER_CTX_new() returned NULL!");
+    }
+
+    // 2. Set engine EVP_aes_256_ecb: AES-256 Electronic Codebook
+    resCode = EVP_EncryptInit_ex(pEvpCtx.get(), EVP_aes_256_ecb(), nullptr, aesKey.data(), nullptr); // NOLINT
+    if (resCode != OPENSSL_SUCCESS) {
+        throw std::runtime_error("EVP_EncryptInit_ex() failed!");
+    }
+
+    // Over allocate vector for encrypted data to account for block size
+    int blockSizeInBytes = EVP_CIPHER_CTX_block_size(pEvpCtx.get());
+    std::vector<uint8_t> encryptedData(data.size() + blockSizeInBytes);
+
+    // 3. Encrypt the plaintext
+    int len;
+    resCode = EVP_EncryptUpdate(pEvpCtx.get(), encryptedData.data(), &len, data.data(), data.size()); // NOLINT
+    if (resCode != OPENSSL_SUCCESS) {
+        throw std::runtime_error("EVP_EncryptUpdate() failed!");
+    }
+
+    // Finalize encrypt
+    resCode = EVP_EncryptFinal_ex(pEvpCtx.get(), encryptedData.data() + len, &len); // NOLINT
+    if (resCode != OPENSSL_SUCCESS) {
+        throw std::runtime_error("EVP_EncryptFinal_ex() failed!");
+    }
+
+    return encryptedData;
+}
+
+std::vector<uint8_t> decryptAES256ECB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data) {
+    int resCode = 0;
+
+    // 1. Create context
+    std::unique_ptr<EVP_CIPHER_CTX, decltype(&::EVP_CIPHER_CTX_free)> pEvpCtx(EVP_CIPHER_CTX_new(), ::EVP_CIPHER_CTX_free);
+    if (pEvpCtx == nullptr) {
+        throw std::runtime_error("EVP_CIPHER_CTX_new() returned NULL!");
+    }
+
+    // 2. Set engine EVP_aes_256_ecb: AES-256 Electronic Codebook
+    resCode = EVP_DecryptInit_ex(pEvpCtx.get(), EVP_aes_256_ecb(), nullptr, aesKey.data(), nullptr); // NOLINT
+    if (resCode != OPENSSL_SUCCESS) {
+        throw std::runtime_error("EVP_DecryptInit_ex() failed!");
+    }
+
+    // Allocate vector for decrypted data
+    std::vector<uint8_t> decryptedData(data.size());
+
+    // 3. Decrypt the ciphertext
+    int len;
+    resCode = EVP_DecryptUpdate(pEvpCtx.get(), decryptedData.data(), &len, data.data(), data.size()); // NOLINT
+    if (resCode != OPENSSL_SUCCESS) {
+        throw std::runtime_error("EVP_DecryptUpdate() failed!");
+    }
+
+    // Finalize decrypt
+    resCode = EVP_DecryptFinal_ex(pEvpCtx.get(), decryptedData.data() + len, &len); // NOLINT
+    if (resCode != OPENSSL_SUCCESS) {
+        throw std::runtime_error("EVP_DecryptFinal_ex() failed!");
+    }
+
+    return decryptedData;
+}
+
+std::vector<uint8_t> encryptAES256OCB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data) {
     if (aesKey.size() != AESKeyLengthInBytes) {
         throw std::runtime_error("AES key is of the wrong size.");
     }
@@ -305,7 +401,7 @@ std::vector<uint8_t> encryptAES256(const std::vector<uint8_t> aesKey, const std:
     return encryptedData;
 }
 
-std::vector<uint8_t> decryptAES256(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data) {
+std::vector<uint8_t> decryptAES256OCB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data) {
     if (aesKey.size() != AESKeyLengthInBytes) {
         throw std::runtime_error("AES key is of the wrong size.");
     }
