@@ -36,7 +36,7 @@ RUN sed -i -e 's/\r$//' /workspace/*/*.sh /workspace/*/*/*.sh
 
 # Download SDK
 RUN sdk_file='qrypt-security-ubuntu.tgz' && \
-    curl -s https://qrypt.azureedge.net/sdk/cpp/v0.7.10/qrypt-security-0.7.10-ubuntu.tgz --output $sdk_file && \
+    curl -s https://qrypt.azureedge.net/sdk/cpp/v0.8.6/qrypt-security-0.8.6-ubuntu.tgz --output $sdk_file && \
     tar -zxvf $sdk_file --strip-components=1 -C lib/QryptSecurity && \
     rm -rf $sdk_file
 
