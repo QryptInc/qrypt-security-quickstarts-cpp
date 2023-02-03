@@ -14,3 +14,6 @@ Currently we provide Distributed Key Generation.
 
 ### Gtest
 [Gtest tutorial](KeyGenDistributed/gtests/README.md)
+
+# rngd Integration
+[rngd tutorial](rngd/rngd.md)
