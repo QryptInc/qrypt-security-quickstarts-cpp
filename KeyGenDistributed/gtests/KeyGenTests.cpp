@@ -9,6 +9,69 @@ using namespace QryptSecurity;
 static const uint64_t KB = 1024;
 static const uint64_t MB = 1024 * 1024;
 
+void populate_X(blast_multi_stream *X,
+                size_t target_size,
+                size_t num_in_memory_blocks,
+                size_t num_in_storage_blocks,
+                bool use_kb) {
+
+    // Just being safe
+    zero_bytes(X, sizeof(blast_multi_stream));
+
+    size_t num_blocks               = num_in_memory_blocks + num_in_storage_blocks;
+    size_t in_memory_block_counter  = 0;
+    size_t in_storage_block_counter = 0;
+    X->blast_streams                = (blast_stream *)alloc_bytes(num_blocks * sizeof(blast_stream));
+    X->blast_streams_len            = num_blocks;
+    X->beta                         = 0.5;
+
+    // Load up our streams
+    for (size_t i = 0; i < num_blocks; i++) {
+        char *file_location      = NULL;
+        size_t file_location_len = 0;
+        // Sizing request
+        get_test_filename(target_size, i, file_location, &file_location_len, use_kb);
+        file_location = (char *)alloc_bytes(file_location_len);
+        // Set file name
+        get_test_filename(target_size, i, file_location, &file_location_len, use_kb);
+
+        // Open file for processing
+        FILE *file = fopen(file_location, "rb");
+        if (file == NULL) {
+            printf("Unable to open file: %s\n", file_location);
+            continue;
+        }
+        fseek(file, 0L, SEEK_END);
+        size_t random_file_len = ftell(file);
+        fseek(file, 0L, SEEK_SET);
+
+        if (in_memory_block_counter < num_in_memory_blocks) {
+            // Read in file if in-memory stream
+            uint8_t *buffer = (uint8_t *)alloc_bytes(random_file_len);
+            fread(buffer, 1, random_file_len, file);
+
+            X->blast_streams[i].type     = BLAST_MEMORY_STREAM;
+            X->blast_streams[i].location = (void *)buffer;
+            in_memory_block_counter++;
+
+            // Clean-up
+            free_bytes(file_location, file_location_len);
+        } else {
+            // Just record file info if file stream
+            X->blast_streams[i].type     = BLAST_FILE_STREAM;
+            X->blast_streams[i].location = (void *)file_location;
+            in_storage_block_counter++;
+        }
+
+        // Grab our lengths
+        X->blast_streams[i].stream_len = random_file_len;
+        X->n += random_file_len;
+
+        // Done with file
+        fclose(file);
+    }
+}
+
 class KeyGenDistributedTest : public ::testing::Test {
   protected:
     std::unique_ptr<IKeyGenDistributedClient> _AliceClient = nullptr;
