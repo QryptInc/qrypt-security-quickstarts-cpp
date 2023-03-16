@@ -193,7 +193,7 @@ int main(int argc, char **argv) {
                 writeToFile(keyFilename, keyInit.key);
             }
             else {
-                std::string key = convertByteVecToHexStr(keyInit.key);
+                std::string key = convertByteVecToHexStr(keyInit.key) + "\n";
                 writeToFile(keyFilename, key);
             }
 
@@ -214,7 +214,7 @@ int main(int argc, char **argv) {
                 writeToFile(keyFilename, keySync);
             }
             else {
-                std::string key = convertByteVecToHexStr(keySync);
+                std::string key = convertByteVecToHexStr(keySync) + "\n";
                 writeToFile(keyFilename, key);
             }
 
