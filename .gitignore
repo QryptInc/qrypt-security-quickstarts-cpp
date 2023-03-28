@@ -6,11 +6,3 @@ install/
 Downloads/
 artifact-tmp/
 *.DS_Store
-# Ignore .csv files generated from performance tests.
-*.csv
-# Ignore database files.
-CacheManager*
-# Ignore log files.
-testLogPath*
-# Ignore performance files.
-*QryptLibPerformance*
