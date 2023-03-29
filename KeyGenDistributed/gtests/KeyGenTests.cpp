@@ -1,4 +1,5 @@
 #include "QryptSecurity/qryptsecurity.h"
+#include "QryptSecurity/qryptsecurity_exceptions.h"
 
 #include <gtest/gtest.h>
 
