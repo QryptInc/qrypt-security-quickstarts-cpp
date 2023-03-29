@@ -1,5 +1,5 @@
 {
     "name": "quickstart",
     "image": "ubuntu:20.04",
-    "postCreateCommand": "bash .devcontainer/setup.sh"
+    "postAttachCommand": "bash .devcontainer/setup.sh"
 }
