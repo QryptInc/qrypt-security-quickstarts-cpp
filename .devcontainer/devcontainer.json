@@ -1,22 +1,5 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.238.0/containers/cpp
 {
     "name": "quickstart",
     "image": "ubuntu:20.04",
-    "settings": { 
-        "terminal.integrated.defaultProfile.linux": "bash"
-    },
-
-    // Configure tool-specific properties.
-    "customizations": {
-        // Configure properties specific to VS Code.
-        "vscode": {
-            // Add the IDs of extensions you want installed when the container is created.
-            "extensions": [
-                "ms-vscode.cpptools",
-                "ms-vscode.cmake-tools",
-                "twxs.cmake"
-            ]
-        }
-    }
+    "postCreateCommand": ".devcontainer/setup.sh"
 }
