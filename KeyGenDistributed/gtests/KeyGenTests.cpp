@@ -1,6 +1,5 @@
 #include "QryptSecurity/qryptsecurity.h"
 #include "QryptSecurity/qryptsecurity_exceptions.h"
-#include "QryptSecurity/qryptsecurity_logging.h"
 
 #include <gtest/gtest.h>
 
@@ -61,6 +60,13 @@ TEST_F(KeyGenDistributedTest, GenerateAESKey) {
     EXPECT_EQ(aliceKey.key, bobKey);
 }
 
+TEST_F(KeyGenDistributedTest, GenerateOTP1Byte) {
+    initialize();
+    SymmetricKeyData aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 1);
+    std::vector<uint8_t> bobKey = _BobClient->genSync(aliceKey.metadata);
+    EXPECT_EQ(aliceKey.key, bobKey);
+}
+
 TEST_F(KeyGenDistributedTest, GenerateOTP16Byte) {
     initialize();
     SymmetricKeyData aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 16);
@@ -84,7 +90,7 @@ TEST_F(KeyGenDistributedTest, GenerateOTP32KB) {
 
 TEST_F(KeyGenDistributedTest, KeySizeLowerLimit) {
     initialize();
-    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 15), InvalidArgument);
+    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 0), InvalidArgument);
 }
 
 TEST_F(KeyGenDistributedTest, KeySizeUpperLimit) {

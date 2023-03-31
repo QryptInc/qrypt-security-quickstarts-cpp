@@ -43,9 +43,6 @@ std::string getUsage() {
     "                                Use this option if the system does not have accessible root certificates or\n"
     "                                if key generation persistently returns curl error 60 (ssl certificate problem).\n"
     "\n"
-    "--enable_file_logging           Enable file logging. This will disable console logging.\n"
-    "                                Defaults to file logging disabled.\n"
-    "\n"
     "--log_level_<level>             Set logging level.\n" 
     "                                Defaults to --log_level_disable\n"
     "\n"
@@ -77,7 +74,7 @@ int main(int argc, char **argv) {
     std::string setCaCertFlag = "--ca-cert=";
 
     // Set default log level
-    ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTSECURITY_LOG_LEVEL_DISABLE);
+    ::QryptSecurity::setLogLevel(::QryptSecurity::LogLevel::QRYPTSECURITY_LOG_LEVEL_DISABLE);
 
     // Parse command line parameters
     while(*++argv) {
@@ -107,26 +104,23 @@ int main(int argc, char **argv) {
         else if (argument.find(setCaCertFlag) == 0) {
             cacertPath = argument.substr(setCaCertFlag.size());
         }
-        else if (!strcmp(*argv, "--enable_file_logging")) {
-            ::QryptSecurity::logging::getLogWriter()->enableFileLogging("qryptsecurity.log");
-        }
         else if (!strcmp(*argv, "--log_level_trace")) {
-            ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTSECURITY_LOG_LEVEL_TRACE);
+            ::QryptSecurity::setLogLevel(::QryptSecurity::LogLevel::QRYPTSECURITY_LOG_LEVEL_TRACE);
         }
         else if (!strcmp(*argv, "--log_level_debug")) {
-            ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTSECURITY_LOG_LEVEL_DEBUG);
+            ::QryptSecurity::setLogLevel(::QryptSecurity::LogLevel::QRYPTSECURITY_LOG_LEVEL_DEBUG);
         }
         else if (!strcmp(*argv, "--log_level_info")) {
-            ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTSECURITY_LOG_LEVEL_INFO);
+            ::QryptSecurity::setLogLevel(::QryptSecurity::LogLevel::QRYPTSECURITY_LOG_LEVEL_INFO);
         }
         else if (!strcmp(*argv, "--log_level_warn")) {
-            ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTSECURITY_LOG_LEVEL_WARNING);
+            ::QryptSecurity::setLogLevel(::QryptSecurity::LogLevel::QRYPTSECURITY_LOG_LEVEL_WARNING);
         }
         else if (!strcmp(*argv, "--log_level_error")) {
-            ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTSECURITY_LOG_LEVEL_ERROR);
+            ::QryptSecurity::setLogLevel(::QryptSecurity::LogLevel::QRYPTSECURITY_LOG_LEVEL_ERROR);
         }
         else if (!strcmp(*argv, "--log_level_disable")) {
-            ::QryptSecurity::logging::getLogWriter()->setLogLevel(::QryptSecurity::logging::LogLevel::QRYPTSECURITY_LOG_LEVEL_DISABLE);
+            ::QryptSecurity::setLogLevel(::QryptSecurity::LogLevel::QRYPTSECURITY_LOG_LEVEL_DISABLE);
         }
         else if ((argument == "-h") || (argument == "--help")) {
             displayUsage();

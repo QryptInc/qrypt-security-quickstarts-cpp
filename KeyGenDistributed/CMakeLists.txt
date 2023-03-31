@@ -61,7 +61,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 else()
     target_link_libraries(KeyGenDistributed
         "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/libQryptSecurity.so"
-        "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/libgf2x.so"
     )
 endif()
 
