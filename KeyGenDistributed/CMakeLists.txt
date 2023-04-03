@@ -19,22 +19,10 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
 endif()
 
-# Specify whether to build EncryptTool
-option(BUILD_ENCRYPT_TOOL "Build encryption tool" OFF)
-
-if(BUILD_ENCRYPT_TOOL)
-add_executable(EncryptTool
-    src/encrypt.cpp
-    src/common.cpp
-)
-target_link_libraries(EncryptTool
-    crypto
-)
-endif()
-
 add_executable(KeyGenDistributed
     src/main.cpp
     src/common.cpp
+    src/generate.cpp
 )
 
 # Pull in Qrypt Security header files
@@ -45,14 +33,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     )
 else()
     target_include_directories(KeyGenDistributed PUBLIC
-        "lib/QryptSecurity/include"
+        "QryptSecurity/include"
     )
 endif()
 
 # Link against QryptSecurity dynamic library
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_link_libraries(KeyGenDistributed
-        "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/QryptSecurity.lib"
+        "${CMAKE_CURRENT_LIST_DIR}/QryptSecurity/lib/QryptSecurity.lib"
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(KeyGenDistributed
@@ -60,8 +48,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     )
 else()
     target_link_libraries(KeyGenDistributed
-        "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/libQryptSecurity.so"
-        "${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/lib/libgf2x.so"
+        "${CMAKE_CURRENT_LIST_DIR}/QryptSecurity/lib/libQryptSecurity.so"
     )
 endif()
 
@@ -70,6 +57,6 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_custom_command(TARGET KeyGenDistributed POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_CURRENT_LIST_DIR}/lib/QryptSecurity/bin/QryptSecurity.dll
+        ${CMAKE_CURRENT_LIST_DIR}/QryptSecurity/bin/QryptSecurity.dll
         $<TARGET_FILE_DIR:KeyGenDistributed>)
 endif()

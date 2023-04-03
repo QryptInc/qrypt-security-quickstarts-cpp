@@ -7,6 +7,88 @@
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 
+EncryptDecryptArgs::EncryptDecryptArgs(std::vector<CliArgument> unparsed_args) {
+    // Set defaults
+    generate = false;
+    key_type = "otp";
+    aes_mode = "ecb";
+    file_type = "binary";
+
+    std::vector<CliArgument> gen_args;
+    for(CliArgument arg : unparsed_args) {
+        try {
+            switch(EncryptDecryptFlagsMap.at(arg.flag_string)){
+                case CRYPT_FLAG_GENERATE:
+                    if(!arg.value.empty()) throw invalid_arg_exception("Invalid argument: " + std::string(arg));
+                    generate = true;
+                    break;
+                case CRYPT_FLAG_INPUT_FILENAME:
+                    input_filename = arg.value;
+                    break;
+                case CRYPT_FLAG_OUTPUT_FILENAME:
+                    output_filename = arg.value;
+                    break;
+                case CRYPT_FLAG_KEY_FILENAME:
+                    key_filename = arg.value;
+                case CRYPT_FLAG_META_FILENAME:
+                    metadata_filename = arg.value;
+                    break;
+                case CRYPT_FLAG_KEY_TYPE:
+                    key_type = arg.value;
+                    break;
+                case CRYPT_FLAG_AES_MODE:
+                    aes_mode = arg.value;
+                    break;
+                case CRYPT_FLAG_FILE_TYPE:
+                    file_type = arg.value;
+                    break;
+                default:
+                    throw invalid_arg_exception("Invalid argument: " + std::string(arg));
+            }
+        } catch (std::out_of_range& /*ex*/) {
+            // Push_back generate args instead of throwing an error, in case --generate is specified
+            if (GenerateFlagsMap.find(arg.flag_string) == GenerateFlagsMap.end()) {
+                throw invalid_arg_exception("Invalid argument: " + std::string(arg));
+            }
+            gen_args.push_back(arg);
+        }
+    }
+
+    if (!generate && !gen_args.empty()) {
+        throw invalid_arg_exception("Argument " + std::string(gen_args.front()) + " is for use with \"--generate\" only!");
+    }
+    if (input_filename.empty()) {
+        throw invalid_arg_exception("Missing input-filename");
+    }
+    if (output_filename.empty()) {
+        throw invalid_arg_exception("Missing output-filename");
+    }
+    if (key_filename.empty() && !generate) {
+        throw invalid_arg_exception("Missing key-filename");
+    }
+    if (metadata_filename.empty()) {
+        throw invalid_arg_exception("Missing metadata-filename");
+    }
+    if (key_type != "aes" && key_type != "otp") {
+        throw invalid_arg_exception("Invalid key-type: \"" + key_type + "\"");
+    }
+    if (aes_mode != "ecb" && aes_mode != "ocb") {
+        throw invalid_arg_exception("Invalid aes-mode: \"" + aes_mode + "\"");
+    }
+    if (key_type != "aes" && key_type != "otp") {
+        throw invalid_arg_exception("Invalid key-type: \"" + key_type + "\"");
+    }
+    if (file_type != "binary" && file_type != "bitmap") {
+        throw invalid_arg_exception("Invalid file-type: \"" + file_type + "\"");
+    }
+
+    if (generate) {
+        gen_args.push_back(CliArgument("--key-filename", key_filename));
+        gen_args.push_back(CliArgument("--metadata-filename", metadata_filename));
+        generate_args = GenerateArgs(gen_args);
+    }
+}
+
 std::vector<uint8_t> encryptAES256ECB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
 std::vector<uint8_t> decryptAES256ECB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
 std::vector<uint8_t> encryptAES256OCB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
