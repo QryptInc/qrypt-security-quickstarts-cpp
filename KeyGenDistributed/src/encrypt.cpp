@@ -1,4 +1,5 @@
 #include "common.h"
+#include "encrypt.h"
 #include <fstream>
 #include <iomanip>
 #include <openssl/err.h>
@@ -7,236 +8,9 @@
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 
-EncryptDecryptArgs::EncryptDecryptArgs(std::vector<CliArgument> unparsed_args) {
-    // Set defaults
-    generate = false;
-    key_type = "otp";
-    aes_mode = "ecb";
-    file_type = "binary";
+using KeyValuePair = std::tuple<std::string, std::string>;
 
-    std::vector<CliArgument> gen_args;
-    for(CliArgument arg : unparsed_args) {
-        try {
-            switch(EncryptDecryptFlagsMap.at(arg.flag_string)){
-                case CRYPT_FLAG_GENERATE:
-                    if(!arg.value.empty()) throw invalid_arg_exception("Invalid argument: " + std::string(arg));
-                    generate = true;
-                    break;
-                case CRYPT_FLAG_INPUT_FILENAME:
-                    input_filename = arg.value;
-                    break;
-                case CRYPT_FLAG_OUTPUT_FILENAME:
-                    output_filename = arg.value;
-                    break;
-                case CRYPT_FLAG_KEY_FILENAME:
-                    key_filename = arg.value;
-                case CRYPT_FLAG_META_FILENAME:
-                    metadata_filename = arg.value;
-                    break;
-                case CRYPT_FLAG_KEY_TYPE:
-                    key_type = arg.value;
-                    break;
-                case CRYPT_FLAG_AES_MODE:
-                    aes_mode = arg.value;
-                    break;
-                case CRYPT_FLAG_FILE_TYPE:
-                    file_type = arg.value;
-                    break;
-                default:
-                    throw invalid_arg_exception("Invalid argument: " + std::string(arg));
-            }
-        } catch (std::out_of_range& /*ex*/) {
-            // Push_back generate args instead of throwing an error, in case --generate is specified
-            if (GenerateFlagsMap.find(arg.flag_string) == GenerateFlagsMap.end()) {
-                throw invalid_arg_exception("Invalid argument: " + std::string(arg));
-            }
-            gen_args.push_back(arg);
-        }
-    }
-
-    if (!generate && !gen_args.empty()) {
-        throw invalid_arg_exception("Argument " + std::string(gen_args.front()) + " is for use with \"--generate\" only!");
-    }
-    if (input_filename.empty()) {
-        throw invalid_arg_exception("Missing input-filename");
-    }
-    if (output_filename.empty()) {
-        throw invalid_arg_exception("Missing output-filename");
-    }
-    if (key_filename.empty() && !generate) {
-        throw invalid_arg_exception("Missing key-filename");
-    }
-    if (metadata_filename.empty()) {
-        throw invalid_arg_exception("Missing metadata-filename");
-    }
-    if (key_type != "aes" && key_type != "otp") {
-        throw invalid_arg_exception("Invalid key-type: \"" + key_type + "\"");
-    }
-    if (aes_mode != "ecb" && aes_mode != "ocb") {
-        throw invalid_arg_exception("Invalid aes-mode: \"" + aes_mode + "\"");
-    }
-    if (key_type != "aes" && key_type != "otp") {
-        throw invalid_arg_exception("Invalid key-type: \"" + key_type + "\"");
-    }
-    if (file_type != "binary" && file_type != "bitmap") {
-        throw invalid_arg_exception("Invalid file-type: \"" + file_type + "\"");
-    }
-
-    if (generate) {
-        gen_args.push_back(CliArgument("--key-filename", key_filename));
-        gen_args.push_back(CliArgument("--metadata-filename", metadata_filename));
-        generate_args = GenerateArgs(gen_args);
-    }
-}
-
-std::vector<uint8_t> encryptAES256ECB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
-std::vector<uint8_t> decryptAES256ECB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
-std::vector<uint8_t> encryptAES256OCB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
-std::vector<uint8_t> decryptAES256OCB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
-
-std::string getUsage() {
-    std::string usage = 
-    "\n"
-    "EncryptTool\n"
-    "=====================\n"
-    "\n"
-    "Exercises encryption or decryption.\n"
-    "\n"
-    "Options\n"
-    "-------\n"
-    "--op=<encrypt|decrypt>             Set operation to encryption or decryption.\n"
-    "\n"
-    "--key-type=<aes|otp>               Set the encryption/decryption type.\n"
-    "                                   aes - AES-256 key with length 32 bytes.\n"
-    "                                   otp - One time pad.\n"
-    "\n"
-    "--aes-mode=<ecb|ocb>               Set the AES encryption/decryption mode (ignored if OTP is selected).\n"
-    "                                   ecb - AES-256 key with length 32 bytes to be used for ECB mode (known to be insecure).\n"
-    "                                   ocb - AES-256 key with length 32 bytes to be used for OCB mode.\n"
-    "                                   Defaults to ocb mode.\n"
-    "\n"
-    "--key-filename=<filename>          Key to use for encryption or decryption.\n"
-    "\n"
-    "--random-format=<hexstr|vector>    Set the input format of the key.\n"
-    "                                   hexstr - key will be in hex format.\n"
-    "                                   vector - key will be in binary format.\n"
-    "                                   Defaults to hexstr format.\n"
-    "\n"
-    "--file-type=<binary|bitmap>        Set the input/output file type.\n"
-    "                                   binary - File data will be used as a big binary blob.\n"
-    "                                   bitmap - bmp image file. Bitmap header data will be preserved.\n"
-    "\n"
-    "--input-filename=<filename>        The input file.\n"
-    "\n"
-    "--output-filename=<filename>       The output file.\n"
-    "\n"
-    "--help                             Display help.\n"
-    "\n"
-    "";
-
-    return usage;
-}
-
-void displayUsage() {
-    std::string usage = getUsage();
-    printf("%s", usage.c_str());
-}
-
-int main(int argc, char **argv) {
-    
-    std::string operation, keyFilename, inputFilename, outputFilename;
-    std::string keyType = "aes";
-    std::string aesMode = "ocb";
-    std::string randomFormat = "hexstr";
-    std::string fileType = "binary";
-    std::string setOperationFlag = "--op=";
-    std::string setKeyTypeFlag = "--key-type=";
-    std::string setAESModeFlag = "--aes-mode=";
-    std::string setKeyFilenameFlag = "--key-filename=";
-    std::string setRandomFormatFlag = "--random-format=";
-    std::string setFileTypeFlag = "--file-type=";
-    std::string setInputFilenameFlag = "--input-filename=";
-    std::string setOutputFilenameFlag = "--output-filename=";
-
-    // Parse command line parameters
-    while(*++argv) {
-        std::string argument(*argv);
-
-        if (argument.find(setOperationFlag) == 0) {            
-            operation = argument.substr(setOperationFlag.size());
-        }
-        else if (argument.find(setKeyTypeFlag) == 0) {
-            keyType = argument.substr(setKeyTypeFlag.size());
-        }
-        else if (argument.find(setAESModeFlag) == 0) {
-            aesMode = argument.substr(setAESModeFlag.size());
-        }
-        else if (argument.find(setRandomFormatFlag) == 0) {
-            randomFormat = argument.substr(setRandomFormatFlag.size());
-        }
-        else if (argument.find(setKeyFilenameFlag) == 0) {
-            keyFilename = argument.substr(setKeyFilenameFlag.size());
-        }
-        else if (argument.find(setFileTypeFlag) == 0) {
-            fileType = argument.substr(setFileTypeFlag.size());
-        }
-        else if (argument.find(setInputFilenameFlag) == 0) {
-            inputFilename = argument.substr(setInputFilenameFlag.size());
-        }
-        else if (argument.find(setOutputFilenameFlag) == 0) {
-            outputFilename = argument.substr(setOutputFilenameFlag.size());
-        }
-        else if ((argument == "-h") || (argument == "--help")) {
-            displayUsage();
-            return 0;
-        }
-        else {
-            printf("Invalid parameter: %s\n", argument.c_str());
-            displayUsage();
-            return 1;
-        }
-    }
-
-    // Validate arguments
-    if (keyFilename.empty()) {
-        printf("Missing key filename.\n");
-        displayUsage();
-        return 1;        
-    }
-    if (inputFilename.empty()) {
-        printf("Missing input filename.\n");
-        displayUsage();
-        return 1;        
-    }
-    if (outputFilename.empty()) {
-        printf("Missing output filename.\n");
-        displayUsage();
-        return 1;        
-    }
-    if (keyType != "aes" && keyType != "otp") {
-        printf("Invalid key type.\n");
-        displayUsage();
-        return 1;
-    }
-    if (aesMode != "ocb" && aesMode != "ecb") {
-        printf("Invalid aes mode.\n");
-        displayUsage();
-        return 1;
-    }
-    if (fileType != "binary" && fileType != "bitmap") {
-        printf("Invalid file type.\n");
-        displayUsage();
-        return 1;
-    }
-    if (randomFormat != "hexstr" && randomFormat != "vector") {
-        printf("Invalid random format.\n");
-        displayUsage();
-        return 1;
-    }
-    
-    printf("\nCalling up EncryptTool to %s %s in %s format using the %s key file %s and generate %s.\n",
-            operation.c_str(), inputFilename.c_str(), fileType.c_str(), toUpper(keyType).c_str(), keyFilename.c_str(), outputFilename.c_str());
-
+void encrypt(std::vector<KeyValuePair> unparsed_args) {
     BitmapData bitmapData = {};
     std::vector<uint8_t> cipherTextData;
     std::vector<uint8_t> plainTextData;
@@ -248,7 +22,7 @@ int main(int argc, char **argv) {
             key = readFromFile(keyFilename);
         }
         else {
-            key = readFromHexFile(keyFilename);
+            key = readFromFile(keyFilename);
         }
 
         if (operation == "encrypt") {
@@ -339,6 +113,58 @@ int main(int argc, char **argv) {
 
     printf("\nSuccess!\n");
     return 0;
+}
+
+EncryptDecryptArgs parseEncryptDecryptArgs(std::vector<KeyValuePair> unparsed_args) {
+    std::string input_filename, output_filename, key_filename;
+    std::string key_type = "otp";
+    std::string aes_mode = "ecb";
+    std::string file_type = "binary";
+
+    for(auto[arg_name, arg_value] : unparsed_args) {
+        try {
+            switch(EncryptDecryptFlagsMap.at(arg_name)){
+                case CRYPT_FLAG_INPUT_FILENAME:
+                    input_filename = arg_value;
+                    break;
+                case CRYPT_FLAG_OUTPUT_FILENAME:
+                    output_filename = arg_value;
+                    break;
+                case CRYPT_FLAG_KEY_FILENAME:
+                    key_filename = arg_value;
+                case CRYPT_FLAG_KEY_TYPE:
+                    key_type = arg_value;
+                    break;
+                case CRYPT_FLAG_AES_MODE:
+                    aes_mode = arg_value;
+                    break;
+                case CRYPT_FLAG_FILE_TYPE:
+                    file_type = arg_value;
+            }
+        } catch (std::out_of_range& /*ex*/) {
+            throw invalid_arg_exception("Invalid argument: " + std::string(arg_name));
+        }
+    }
+    if (input_filename.empty()) {
+        throw invalid_arg_exception("Missing input-filename");
+    }
+    if (output_filename.empty()) {
+        throw invalid_arg_exception("Missing output-filename");
+    }
+    if (key_filename.empty() && !generate) {
+        throw invalid_arg_exception("Missing key-filename");
+    }
+    if (key_type != "aes" && key_type != "otp") {
+        throw invalid_arg_exception("Invalid key-type: \"" + key_type + "\"");
+    }
+    if (aes_mode != "ecb" && aes_mode != "ocb") {
+        throw invalid_arg_exception("Invalid aes-mode: \"" + aes_mode + "\"");
+    }
+    if (file_type != "binary" && file_type != "bitmap") {
+        throw invalid_arg_exception("Invalid file-type: \"" + file_type + "\"");
+    }
+
+    return {input_filename, output_filename, key_filename, key_type, aes_mode, file_type};
 }
 
 std::vector<uint8_t> encryptAES256ECB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data) {
