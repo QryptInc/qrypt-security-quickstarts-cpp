@@ -23,6 +23,7 @@ add_executable(KeyGenDistributed
     src/main.cpp
     src/common.cpp
     src/generate.cpp
+    src/encrypt.cpp
 )
 
 # Pull in Qrypt Security header files
@@ -49,6 +50,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 else()
     target_link_libraries(KeyGenDistributed
         "${CMAKE_CURRENT_LIST_DIR}/QryptSecurity/lib/libQryptSecurity.so"
+        "crypto"
     )
 endif()
 

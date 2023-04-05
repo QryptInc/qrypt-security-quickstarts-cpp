@@ -35,7 +35,7 @@ class invalid_arg_exception : public std::exception {
 
 void generate(std::vector<KeyValuePair> args);
 
-// void encrypt(std::vector<KeyValuePair> args);
+void encrypt(std::string operation, std::vector<KeyValuePair> args);
 
 // void decrypt(std::vector<KeyValuePair> args);
 

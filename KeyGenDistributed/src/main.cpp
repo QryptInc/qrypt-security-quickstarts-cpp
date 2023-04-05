@@ -1,5 +1,6 @@
 #include "common.h"
 #include "generate.h"
+#include "encrypt.h"
 
 #include <iostream>
 #include <fstream>
@@ -16,10 +17,12 @@ static const char* GeneralUsage = "Commands:\n"
 void printUsage(std::string mode) {
     if (mode == "generate") {
         std::cout << GenerateUsage;
-    } else if (mode == "encrypt" || mode == "decrypt") {
-
+    } else if (mode == "encrypt") {
+        std::cout << EncryptUsage;
+    } else if (mode == "decrypt") {
+        std::cout << DecryptUsage;
     } else {
-       std::cout << GeneralUsage;
+        std::cout << GeneralUsage;
     }
 }
 
@@ -53,7 +56,7 @@ int main(int argc, char** argv) {
             generate(args);
         }
         else if (mode == "encrypt" || mode == "decrypt") {
-
+            encrypt(mode, args);
         } else {
             std::cout << GeneralUsage;
             std::cout << "\nERROR: Unrecognized command. See 'KeyGen --help'.\n";

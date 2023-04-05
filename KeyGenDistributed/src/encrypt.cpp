@@ -10,109 +10,93 @@
 
 using KeyValuePair = std::tuple<std::string, std::string>;
 
-void encrypt(std::vector<KeyValuePair> unparsed_args) {
+void encrypt(std::string operation, std::vector<KeyValuePair> unparsed_args) {
+    auto args = parseEncryptDecryptArgs(unparsed_args);
+
     BitmapData bitmapData = {};
     std::vector<uint8_t> cipherTextData;
     std::vector<uint8_t> plainTextData;
 
-    try {
-        // 1. Read key
-        std::vector<uint8_t> key;
-        if (randomFormat == "vector") {
-            key = readFromFile(keyFilename);
+    // 1. Read key
+    std::vector<uint8_t> key = readFromFile(args.key_filename);
+
+    if (operation == "encrypt") {
+        // 2. Read input file to encrypt
+        if (args.file_type == "bitmap") {
+            bitmapData = readBitmap(args.input_filename);
+            plainTextData = bitmapData.body;
         }
-        else {
-            key = readFromFile(keyFilename);
+        else if (args.file_type == "binary") {
+            plainTextData = readFromFile(args.input_filename);
         }
 
-        if (operation == "encrypt") {
-            // 2. Read input file to encrypt
-            if (fileType == "bitmap") {
-                bitmapData = readBitmap(inputFilename);
-                plainTextData = bitmapData.body;
+        // 3. Encrypt file
+        if (args.key_type == "aes") {
+            if (key.size() != AESKeyLengthInBytes) {
+                throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
             }
-            else if (fileType == "binary") {
-                plainTextData = readFromFile(inputFilename);
+            if (args.aes_mode == "ecb") {
+                cipherTextData = encryptAES256ECB(key, plainTextData);
             }
-
-            // 3. Encrypt file
-            if (keyType == "aes") {
-                if (key.size() != AESKeyLengthInBytes) {
-                    throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
-                }
-                if (aesMode == "ecb") {
-                    cipherTextData = encryptAES256ECB(key, plainTextData);
-                }
-                else if (aesMode == "ocb") {
-                    cipherTextData = encryptAES256OCB(key, plainTextData);
-                }
-            }
-            else if (keyType == "otp") {
-                if (key.size() != plainTextData.size()) {
-                    throw std::runtime_error("Provided OTP invalid. (File does not exist or key is the wrong size.)");
-                }
-                cipherTextData = xorVectors(key, plainTextData);
-            }
-
-            // 4. Write out encrypted file
-            if (fileType == "bitmap") {
-                bitmapData.body = cipherTextData;
-                writeBitmap(outputFilename, bitmapData);
-            }
-            else if (fileType == "binary") {
-                writeToFile(outputFilename, cipherTextData);
+            else if (args.aes_mode == "ocb") {
+                cipherTextData = encryptAES256OCB(key, plainTextData);
             }
         }
-        else if (operation == "decrypt") {
-            // 2. Read in encrypted file
-            if (fileType == "bitmap") {
-                bitmapData = readBitmap(inputFilename);
-                cipherTextData = bitmapData.body;
+        else if (args.key_type == "otp") {
+            if (key.size() != plainTextData.size()) {
+                throw std::runtime_error("Provided OTP invalid. (File does not exist or key is the wrong size.)");
             }
-            else if (fileType == "binary") {
-                cipherTextData = readFromFile(inputFilename);
-            }
-
-            // 3. Decrypt file
-            std::vector<uint8_t> plainTextData;
-            if (keyType == "aes") {
-                if (key.size() != AESKeyLengthInBytes) {
-                    throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
-                }
-                if (aesMode == "ecb") {
-                    plainTextData = decryptAES256ECB(key, cipherTextData);
-                }
-                else if (aesMode == "ocb") {
-                    plainTextData = decryptAES256OCB(key, cipherTextData);
-                }
-            }
-            else if (keyType == "otp") {
-                if (key.size() != cipherTextData.size()) {
-                    throw std::runtime_error("Provided OTP invalid. (File does not exist or key is the wrong size.)");
-                }
-                plainTextData = xorVectors(key, cipherTextData);
-            }
-
-            // 4. Write out decrypted file
-            if (fileType == "bitmap") {
-                bitmapData.body = plainTextData;
-                writeBitmap(outputFilename, bitmapData);
-            }
-            else if (fileType == "binary") {
-                writeToFile(outputFilename, plainTextData);
-            }
+            cipherTextData = xorVectors(key, plainTextData);
         }
-        else {
-            displayUsage();
-            return 1;
+
+        // 4. Write out encrypted file
+        if (args.file_type == "bitmap") {
+            bitmapData.body = cipherTextData;
+            writeBitmap(args.output_filename, bitmapData);
         }
-    } catch (std::runtime_error &ex) {
-        printf("\nFailure: %s\n", ex.what());
-        return 1;
+        else if (args.file_type == "binary") {
+            writeToFile(args.output_filename, cipherTextData);
+        }
     }
+    else if (operation == "decrypt") {
+        // 2. Read in encrypted file
+        if (args.file_type == "bitmap") {
+            bitmapData = readBitmap(args.input_filename);
+            cipherTextData = bitmapData.body;
+        }
+        else if (args.file_type == "binary") {
+            cipherTextData = readFromFile(args.input_filename);
+        }
 
-    printf("\nSuccess!\n");
-    return 0;
+        // 3. Decrypt file
+        std::vector<uint8_t> plainTextData;
+        if (args.key_type == "aes") {
+            if (key.size() != AESKeyLengthInBytes) {
+                throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
+            }
+            if (args.aes_mode == "ecb") {
+                plainTextData = decryptAES256ECB(key, cipherTextData);
+            }
+            else if (args.aes_mode == "ocb") {
+                plainTextData = decryptAES256OCB(key, cipherTextData);
+            }
+        }
+        else if (args.key_type == "otp") {
+            if (key.size() != cipherTextData.size()) {
+                throw std::runtime_error("Provided OTP invalid. (File does not exist or key is the wrong size.)");
+            }
+            plainTextData = xorVectors(key, cipherTextData);
+        }
+
+        // 4. Write out decrypted file
+        if (args.file_type == "bitmap") {
+            bitmapData.body = plainTextData;
+            writeBitmap(args.output_filename, bitmapData);
+        }
+        else if (args.file_type == "binary") {
+            writeToFile(args.output_filename, plainTextData);
+        }
+    }
 }
 
 EncryptDecryptArgs parseEncryptDecryptArgs(std::vector<KeyValuePair> unparsed_args) {
