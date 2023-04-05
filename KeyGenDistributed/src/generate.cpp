@@ -136,6 +136,7 @@ void writeKeyToFile(std::string key_filename, std::vector<uint8_t> key, std::str
         writeToFile(key_filename, key);
     }
     else {
-        writeToFile(key_filename, byteVecToHexStr(key) + "\n");
+        std::string key_string(byteVecToHexStr(key) + "\n");
+        writeToFile(key_filename, key_string);
     }
 }

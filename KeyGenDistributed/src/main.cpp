@@ -1,6 +1,7 @@
 #include "common.h"
 #include "generate.h"
 
+#include <iostream>
 #include <fstream>
 #include <cstring>
 
@@ -14,23 +15,23 @@ static const char* GeneralUsage = "Commands:\n"
 
 void printUsage(std::string mode) {
     if (mode == "generate") {
-        printf(GenerateUsage);
+        std::cout << GenerateUsage;
     } else if (mode == "encrypt" || mode == "decrypt") {
 
     } else {
-        printf(GeneralUsage);
+       std::cout << GeneralUsage;
     }
 }
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        printf(GeneralUsage);
+        std::cout << GeneralUsage;
         return 0;
     }
 
     std::string mode = *++argv; // first argument after the executable name
     if(mode == "--help") {
-        printf(GeneralUsage);
+        std::cout << GeneralUsage;
         return 0;
     }
 
@@ -54,18 +55,18 @@ int main(int argc, char** argv) {
         else if (mode == "encrypt" || mode == "decrypt") {
 
         } else {
-            printf(GeneralUsage);
-            printf("\nERROR: Unrecognized command. See 'KeyGen --help'.\n");
+            std::cout << GeneralUsage;
+            std::cout << "\nERROR: Unrecognized command. See 'KeyGen --help'.\n";
             return 1;
         }
     }
     catch (invalid_arg_exception& ex) {
         printUsage(mode);
-        printf("\nERROR: %s\n", ex.what());
+        std::cout << "\nERROR: %s\n", ex.what();
         return 1;
     }
     catch (QryptSecurity::QryptSecurityException& ex) {
-        printf("SDK ERROR: %s\n", ex.what());
+        std::cout << "SDK ERROR: %s\n", ex.what();
         return 1;
     }
     return 0;
