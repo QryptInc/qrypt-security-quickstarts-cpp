@@ -1,7 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <exception>
+#include <stdexcept>
 #include <map>
 #include <vector>
 #include <string>
@@ -20,26 +20,6 @@ struct BitmapData {
     std::vector<uint8_t> header;
     std::vector<uint8_t> body;
 };
-
-class invalid_arg_exception : public std::exception {
-  private:
-    std::string _ExceptionMsg;
-
-  public:
-    invalid_arg_exception(std::string message) {
-        _ExceptionMsg = message;
-    }
-    ~invalid_arg_exception() = default;
-    const char *what() const noexcept override { return _ExceptionMsg.c_str(); };
-};
-
-void generate(std::vector<KeyValuePair> args);
-
-void encrypt(std::string operation, std::vector<KeyValuePair> args);
-
-// void decrypt(std::vector<KeyValuePair> args);
-
-KeyValuePair tokenizeArg(std::string arg);
 
 std::vector<uint8_t> readFromFile(const std::string filename);
 

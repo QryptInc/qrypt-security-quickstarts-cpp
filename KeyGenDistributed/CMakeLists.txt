@@ -20,10 +20,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 add_executable(KeyGenDistributed
-    src/main.cpp
+    src/cli.cpp
     src/common.cpp
-    src/generate.cpp
-    src/encrypt.cpp
+    src/keygen.cpp
 )
 
 # Pull in Qrypt Security header files

@@ -6,19 +6,6 @@
 #include <sstream>
 #include <algorithm>
 
-std::tuple<std::string, std::string> tokenizeArg(std::string arg) {
-    std::string flag, value;
-    if(!(arg.find("--") == 0)) {
-        throw invalid_arg_exception("Invalid argument: " + arg);
-    }
-    size_t delim_pos = arg.find("=");
-    flag = arg.substr(0, delim_pos);
-    if (arg.length() > delim_pos) {
-        value = arg.substr(delim_pos + 1);
-    }
-    return {flag, value};
-}
-
 std::vector<uint8_t> readFromFile(const std::string filename) {
     std::ifstream input(filename, std::ios::binary);
     std::vector<uint8_t> buffer(std::istreambuf_iterator<char>(input), {});

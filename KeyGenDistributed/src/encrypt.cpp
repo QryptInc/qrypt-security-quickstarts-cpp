@@ -126,26 +126,26 @@ EncryptDecryptArgs parseEncryptDecryptArgs(std::vector<KeyValuePair> unparsed_ar
                     file_type = arg_value;
             }
         } catch (std::out_of_range& /*ex*/) {
-            throw invalid_arg_exception("Invalid argument: " + std::string(arg_name));
+            throw std::invalid_argument("Invalid argument: " + std::string(arg_name));
         }
     }
     if (input_filename.empty()) {
-        throw invalid_arg_exception("Missing input-filename");
+        throw std::invalid_argument("Missing input-filename");
     }
     if (output_filename.empty()) {
-        throw invalid_arg_exception("Missing output-filename");
+        throw std::invalid_argument("Missing output-filename");
     }
     if (key_filename.empty() && !generate) {
-        throw invalid_arg_exception("Missing key-filename");
+        throw std::invalid_argument("Missing key-filename");
     }
     if (key_type != "aes" && key_type != "otp") {
-        throw invalid_arg_exception("Invalid key-type: \"" + key_type + "\"");
+        throw std::invalid_argument("Invalid key-type: \"" + key_type + "\"");
     }
     if (aes_mode != "ecb" && aes_mode != "ocb") {
-        throw invalid_arg_exception("Invalid aes-mode: \"" + aes_mode + "\"");
+        throw std::invalid_argument("Invalid aes-mode: \"" + aes_mode + "\"");
     }
     if (file_type != "binary" && file_type != "bitmap") {
-        throw invalid_arg_exception("Invalid file-type: \"" + file_type + "\"");
+        throw std::invalid_argument("Invalid file-type: \"" + file_type + "\"");
     }
 
     return {input_filename, output_filename, key_filename, key_type, aes_mode, file_type};
