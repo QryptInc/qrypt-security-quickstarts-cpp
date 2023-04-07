@@ -1,6 +1,5 @@
 .vs/
 build
-QryptSecurity
 *.DS_Store
 # Ignore .csv files generated from performance tests.
 *.csvd
