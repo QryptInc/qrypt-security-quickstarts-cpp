@@ -7,6 +7,8 @@
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 
+#include <memory>
+
 void encryptDecrypt(std::string operation,
                     std::istream& input_stream, std::istream& key_stream, std::ostream& output_stream,
                     std::string file_type, std::string aes_mode, std::string key_type) {
