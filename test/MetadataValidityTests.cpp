@@ -1,6 +1,5 @@
 #include "QryptSecurity/qryptsecurity.h"
 #include "QryptSecurity/qryptsecurity_exceptions.h"
-#include "QryptSecurity/qryptsecurity_logging.h"
 
 #include <gtest/gtest.h>
 #include <thread>
