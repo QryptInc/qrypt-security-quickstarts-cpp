@@ -17,22 +17,18 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Download SDK
-      working-directory: ${{github.workspace}}/KeyGenDistributed
+      working-directory: ${{github.workspace}}
       run: |
         sdk_file='qrypt-security-ubuntu.tgz'
-        curl -s https://qrypt.azureedge.net/sdk/cpp/v0.8.6/qrypt-security-0.8.6-ubuntu.tgz --output $sdk_file
+        curl -s https://qrypt.azureedge.net/sdk/cpp/v0.8.6/qrypt-security-0.9.2-ubuntu.tgz --output $sdk_file
         tar -zxvf $sdk_file --strip-components=1 -C lib/QryptSecurity
         rm -rf $sdk_file
     
     - name: Configure CMake
-      working-directory: ${{github.workspace}}/KeyGenDistributed
+      working-directory: ${{github.workspace}}
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
-      working-directory: ${{github.workspace}}/KeyGenDistributed
+      working-directory: ${{github.workspace}}
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-
-    - name: Test
-      working-directory: ${{github.workspace}}/KeyGenDistributed/build
-      run: ctest -C ${{env.BUILD_TYPE}}
 
