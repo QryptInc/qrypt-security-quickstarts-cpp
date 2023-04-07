@@ -8,7 +8,7 @@
 
 void encryptDecrypt(std::string operation,
                     std::istream& ciphertext_in, std::istream& key_in, std::ostream& output,
-                    std::string file_type = "binary", std::string aes_mode = "ecb", std::string key_type = "otp");
+                    std::string file_type = "binary", std::string aes_mode = "ocb", std::string key_type = "otp");
 
 std::vector<uint8_t> encryptAES256ECB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);
 std::vector<uint8_t> decryptAES256ECB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data);

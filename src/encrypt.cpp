@@ -29,7 +29,7 @@ void encryptDecrypt(std::string operation,
     std::vector<uint8_t> input(std::istreambuf_iterator<char>(input_stream), {});
     std::vector<uint8_t> key(std::istreambuf_iterator<char>(key_stream), {});
     // Preserve bmp header so it doesn't get decrypted
-    if (file_type = "bitmap") {
+    if (file_type == "bitmap") {
         header = std::vector<uint8_t>(input.begin(), input.begin() + BMP_HEADER_SIZE);
         input = std::vector<uint8_t>(input.begin() + BMP_HEADER_SIZE, input.end());
     }
@@ -43,7 +43,7 @@ void encryptDecrypt(std::string operation,
     std::vector<uint8_t> output;
     if (key_type == "aes") {
         if (key.size() != AESKeyLengthInBytes) {
-            throw std::runtime_error("Provided AES key invalid. (File does not exist or key is the wrong size.)");
+            throw std::invalid_argument("AES-256 key is invalid. The file is not the correct size.");
         }
         if (operation == "encrypt") {
             output = (aes_mode == "ecb") ? encryptAES256ECB(key, input) : encryptAES256OCB(key, input);
@@ -53,15 +53,15 @@ void encryptDecrypt(std::string operation,
         }
     }
     else { // key_type == "otp"
-        if (key.size() != ciphertext.size()) {
-            throw std::runtime_error("Provided OTP invalid. (File does not exist or key is the wrong size.)");
+        if (key.size() != input.size()) {
+            throw std::invalid_argument("One-time-pad is invalid. The key file must be the same length as the input file.");
         }
         output = xorVectors(key, input);
     }
 
     // Write output
-    output.write((char *)&(header)[0], header.size());
-    output.write((char *)&(output)[0], output.size());
+    output_stream.write((char *)&(header)[0], header.size());
+    output_stream.write((char *)&(output)[0], output.size());
 }
 
 std::vector<uint8_t> encryptAES256ECB(const std::vector<uint8_t> aesKey, const std::vector<uint8_t> &data) {

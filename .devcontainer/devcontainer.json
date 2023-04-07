@@ -13,5 +13,5 @@
         }
     },
 
-    // "postAttachCommand": "bash .devcontainer/setup.sh"
+    "postAttachCommand": "bash .devcontainer/setup.sh"
 }

@@ -9,7 +9,6 @@
 
 static const char* GeneralUsage = 
     "Commands:\n"
-    "  test        Run a set of tests for demonstrating key generation and NIST randomness.\n"
     "  generate    Initialize an AES-256 key or one-time-pad using BLAST distributed key generation.\n"
     "  replicate   Re-create an AES-256 key or one-time-pad from stored metadata, using BLAST distributed key generation.\n"
     "  encrypt     Encrypt data using an AES-256 key or one-time-pad.\n"

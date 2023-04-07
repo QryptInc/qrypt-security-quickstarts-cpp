@@ -8,6 +8,8 @@
 #include <fstream>
 #include <cstring>
 
+const char* demo_token = "abcd";
+
 void printUsage(std::string mode) {
     if (mode == "generate") {
         std::cout << GenerateUsage;
@@ -37,12 +39,8 @@ int main(int argc, const char* argv[]) {
     }
 
     try{
-        // Run a set of demonstration tests and the NIST suite
-        if (mode == "test") {
-
-        }
         // Create a key using the QryptSecurity SDK
-        else if (mode == "generate" || mode == "replicate") {
+        if (mode == "generate" || mode == "replicate") {
             // Parse and unpack cli arguments
             auto keygen_args = parseKeygenArgs(++argv);
             const auto& [
@@ -74,13 +72,16 @@ int main(int argc, const char* argv[]) {
                 keygen_client.replicate(key_out, metadata_file);
             }
 
+            // Close files
             if (key_file.is_open()) {
                 std::cout << "Wrote key to file: " << key_filename << std::endl;
                 key_file.close();
             } else {
                 std::cout << std::endl; // formatting when printing key to stdout
             }
-            std::cout << "Wrote metadata to file: " << metadata_filename << std::endl;
+            if (mode == "generate") {
+                std::cout << "Wrote metadata to file: " << metadata_filename << std::endl;
+            }
             metadata_file.close();
         }
         // Use a key to encrypt or decrypt a file
@@ -92,8 +93,17 @@ int main(int argc, const char* argv[]) {
             ] = encrypt_decrypt_args;
 
             std::ifstream input_file(input_filename, std::ios::in | std::ios::binary);
+            if (!input_file.is_open()) {
+                throw std::invalid_argument("Unable to open input file " + input_filename);
+            }
             std::ifstream key_file(key_filename, std::ios::in | std::ios::binary);
+            if (!key_file.is_open()) {
+                throw std::invalid_argument("Unable to open key file " + key_filename);
+            }
             std::ofstream output_file(output_filename, std::ios::out | std::ios::binary);
+            if (!output_file.is_open()) {
+                throw std::invalid_argument("Unable to open output file " + output_filename);
+            }
 
             encryptDecrypt(mode, input_file, key_file, output_file, file_type, aes_mode, key_type);
 
@@ -134,9 +144,10 @@ std::tuple<std::string, std::string> tokenizeArg(std::string arg) {
 }
 
 KeygenArgs parseKeygenArgs(const char** unparsed_args) {
-    std::string key_filename, token, cacert_path;
+    std::string key_filename, cacert_path;
+    std::string token = demo_token;
     std::string metadata_filename = "meta.dat";
-    std::string key_type = "aes";
+    std::string key_type = "otp";
     size_t key_len = 32;
     std::string key_format = "hexstr";
     std::string metadata_format = "text";
@@ -200,7 +211,7 @@ KeygenArgs parseKeygenArgs(const char** unparsed_args) {
 EncryptDecryptArgs parseEncryptDecryptArgs(const char** unparsed_args) {
     std::string input_filename, output_filename, key_filename;
     std::string key_type = "otp";
-    std::string aes_mode = "ecb";
+    std::string aes_mode = "ocb";
     std::string file_type = "binary";
 
     while(*unparsed_args) {
@@ -248,5 +259,5 @@ EncryptDecryptArgs parseEncryptDecryptArgs(const char** unparsed_args) {
         throw std::invalid_argument("Invalid file-type: \"" + file_type + "\"");
     }
 
-    return {input_filename, output_filename, key_filename, key_type, aes_mode, file_type};
+    return { input_filename, output_filename, key_filename, key_type, aes_mode, file_type };
 }
