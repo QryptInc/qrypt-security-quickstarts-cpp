@@ -1,15 +1,9 @@
 .vs/
-build/
-settings.json
-ext/
-install/
-Downloads/
-artifact-tmp/
+build
+QryptSecurity
 *.DS_Store
 # Ignore .csv files generated from performance tests.
-*.csv
-# Ignore database files.
-CacheManager*
+*.csvd
 # Ignore log files.
 testLogPath*
 # Ignore performance files.

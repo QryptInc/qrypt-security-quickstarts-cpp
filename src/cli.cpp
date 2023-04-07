@@ -1,4 +1,5 @@
 #include "cli.h"
+#include "encrypt.h"
 #include "keygen.h"
 
 #include "QryptSecurity/qryptsecurity_exceptions.h"
@@ -49,20 +50,17 @@ int main(int argc, const char* argv[]) {
             ] = keygen_args;
 
             // Open input/output streams
-            std::fstream metadata_file(
-                metadata_filename, (mode == "generate") ? std::ios::out : std::ios::in | std::ios::binary
-            );
+            auto metadata_io_flags = ((mode == "generate") ? std::ios::out : std::ios::in) | std::ios::binary;
+            std::fstream metadata_file(metadata_filename, metadata_io_flags);
             if (!metadata_file.is_open()) {
                 throw std::invalid_argument("Unable to open metadata file " + metadata_filename);
             }
-
             std::ofstream key_file;
             if (!key_filename.empty()) {
                 key_file.open(key_filename, std::ios::out | std::ios::binary);
                 if (!key_file.is_open()) {
                     throw std::invalid_argument("Unable to open key file " + key_filename);
                 }
-                std::cout << "Writing key to file: " << key_filename << std::endl;
             } else {
                 std::cout << "Writing key to stdout: " << std::endl;
             }
@@ -77,11 +75,12 @@ int main(int argc, const char* argv[]) {
             }
 
             if (key_file.is_open()) {
+                std::cout << "Wrote key to file: " << key_filename << std::endl;
                 key_file.close();
             } else {
                 std::cout << std::endl; // formatting when printing key to stdout
             }
-            std::cout << "Writing metadata to file: " << metadata_filename << std::endl;
+            std::cout << "Wrote metadata to file: " << metadata_filename << std::endl;
             metadata_file.close();
         }
         // Use a key to encrypt or decrypt a file
@@ -93,10 +92,10 @@ int main(int argc, const char* argv[]) {
             ] = encrypt_decrypt_args;
 
             std::ifstream input_file(input_filename, std::ios::in | std::ios::binary);
+            std::ifstream key_file(key_filename, std::ios::in | std::ios::binary);
             std::ofstream output_file(output_filename, std::ios::out | std::ios::binary);
-            std::ofstream key_file(key_filename, std::ios::out | std::ios::binary);
 
-            // encrypt(mode, args);
+            encryptDecrypt(mode, input_file, key_file, output_file, file_type, aes_mode, key_type);
 
             input_file.close();
             output_file.close();
