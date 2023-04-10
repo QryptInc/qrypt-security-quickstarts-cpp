@@ -11,13 +11,8 @@ RUN echo 'export PS1="\[\033[36m\]\u\[\033[m\]@\[\033[32m\]${PERSONA}:\[\033[33;
 RUN echo 'export CLICOLOR=1' >> /root/.bashrc
 RUN echo 'export LSCOLORS=ExFxBxDxCxegedabagacad' >> /root/.bashrc
 
-# Set timezone to avoid user interaction when installing cmake
-ENV TZ=America/New_York
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
-RUN echo $TZ > /etc/timezone
-
 RUN apt-get update
-RUN apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev openssh-server ufw sshpass curl jq
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev openssh-server ufw sshpass curl jq
 
 # Setup SSH
 EXPOSE 22
@@ -26,23 +21,20 @@ RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1000 ubuntu
 RUN echo "ubuntu:ubuntu" | chpasswd
 
 # Copy the sample files and quickstarts codes for testing
-COPY files/ /workspace/files/
-COPY demo/${PERSONA}_setup.sh /workspace/files/
-COPY KeyGenDistributed/ /workspace/KeyGenDistributed/
-WORKDIR /workspace/KeyGenDistributed
-
-# Fix the line break formats for Linux by removing carriage return (CR, or '\r')
-RUN sed -i -e 's/\r$//' /workspace/*/*.sh /workspace/*/*/*.sh
+COPY . /workspace/
+WORKDIR /workspace/
 
 # Download SDK
 RUN sdk_file='qrypt-security-ubuntu.tgz' && \
     curl -s https://qrypt.azureedge.net/sdk/cpp/v0.9.2/qrypt-security-0.9.2-ubuntu.tgz --output $sdk_file && \
-    tar -zxvf $sdk_file --strip-components=1 -C lib/QryptSecurity && \
+    tar -zxvf $sdk_file --strip-components=1 -C QryptSecurity && \
     rm -rf $sdk_file
 
 # Build SDK
-RUN ./build.sh --build_encrypt_tool
-ENV PATH="${PATH}:/workspace/KeyGenDistributed/build"
+RUN rm -rf build
+RUN cmake . -B build
+RUN cmake --build build
+ENV PATH="${PATH}:/workspace/build"
 
 WORKDIR /home/ubuntu
 

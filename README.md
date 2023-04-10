@@ -56,7 +56,7 @@ The `compose` subdirectory contains a docker-compose.yml and sample scripts for 
     ```
     ```
     # OTP generation and encryption
-    qrypt generate --key-len=$(stat -c%s /workspace/files/sample.txt) --key-filename=key.dat
+    qrypt generate --token=$QRYPT_TOKEN --key-len=$(stat -c%s /workspace/files/sample.txt) --key-filename=key.dat
     qrypt encrypt --input-filename=/workspace/files/sample.txt --key-filename=key.dat --output-filename=ciphertext.dat
     ```
     ```
@@ -66,15 +66,14 @@ The `compose` subdirectory contains a docker-compose.yml and sample scripts for 
 1. Enter the "Bob" container, replicate the key, decrypt the ciphertext, and compare the result with the original sample text:
     ```
     # Enter Bob's container
-    # If running on Windows Git Bash, replace "docker" with "winpty docker"
     docker exec -it bob_container bash
     ```
     ```
     # OTP replication and decryption
-    qrypt replicate --key-len=$(stat -c%s ciphertext.dat) --key-filename=key.dat
+    qrypt replicate --token=$QRYPT_TOKEN --key-len=$(stat -c%s ciphertext.dat) --key-filename=key.dat
     qrypt encrypt --input-filename=ciphertext.dat --key-filename=key.dat --output-filename=decrypted.txt
     ```
     ```
     # Verify the OTP decrypted files
-    cmp /workspace/files/sample.tx decrypted.txt
+    cmp /workspace/files/sample.txt decrypted.txt
     ```
