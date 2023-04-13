@@ -13,6 +13,9 @@ static const char* GeneralUsage =
     "  replicate   Re-create an AES-256 key or one-time-pad from stored metadata, using BLAST distributed key generation.\n"
     "  encrypt     Encrypt data using an AES-256 key or one-time-pad.\n"
     "  decrypt     Decrypt data using an AES-256 key or one-time-pad.\n"
+#ifdef ENABLE_TESTS
+    "  test        Validate the Qrypt SDK using a set of end-to-end tests.\n"
+#endif
     "\n";
 
 static const char* GenerateUsage = 
@@ -100,7 +103,7 @@ struct KeygenArgs {
     ::QryptSecurity::LogLevel log_level;
     std::string cacert_path;
 };
-KeygenArgs parseKeygenArgs(const char** unparsed_args);
+KeygenArgs parseKeygenArgs(char** unparsed_args);
 
 static const char* EncryptUsage = 
     "Usage: qrypt encrypt --input-filename=<file> --key-filename=<file> --output-filename=<file> [Optional Args]\n"
@@ -164,6 +167,6 @@ struct EncryptDecryptArgs {
     std::string aes_mode;
     std::string file_type;
 };
-EncryptDecryptArgs parseEncryptDecryptArgs(const char** unparsed_args);
+EncryptDecryptArgs parseEncryptDecryptArgs(char** unparsed_args);
 
 #endif /* QRYPTCLI_H */

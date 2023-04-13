@@ -7,14 +7,14 @@ set(CMAKE_CXX_EXTENSIONS        OFF)
 project(QryptDemo_project)
 set(QRYPTDEMO_TARGET "qrypt")
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+option(ENABLE_TESTS "Add a validation suite to the qrypt executable" OFF)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # Qrypt Security is built on Windows using the multi-threaded dll runtime library
     # Our executable must use the same runtime library.
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-
     # Enable -fPIC
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -39,17 +39,28 @@ else()
     )
 endif()
 
+# Build tests if enabled
+if(ENABLE_TESTS)
+    find_package(GTest REQUIRED)
+    find_package(Threads REQUIRED)
+    add_subdirectory(test)
+    target_compile_definitions(${QRYPTDEMO_TARGET} PUBLIC ENABLE_TESTS)
+endif()
+
 # Link against QryptSecurity dynamic library
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_link_libraries(${QRYPTDEMO_TARGET}
+        ${SDKTest_OBJS}
         "${CMAKE_CURRENT_LIST_DIR}/QryptSecurity/lib/QryptSecurity.lib"
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(${QRYPTDEMO_TARGET}
+        ${SDKTest_OBJS}
        "$ENV{HOME}/Library/Frameworks/QryptSecurity.framework/QryptSecurity"
     )
 else()
     target_link_libraries(${QRYPTDEMO_TARGET}
+        ${SDKTest_OBJS}
         "${CMAKE_CURRENT_LIST_DIR}/QryptSecurity/lib/libQryptSecurity.so"
         "crypto"
     )
