@@ -11,6 +11,7 @@ target_include_directories(SDKTests_Interface INTERFACE
     ${GTEST_INCLUDE_DIRS}
     ${GMOCK_INCLUDE_DIRS}
     "${CMAKE_CURRENT_LIST_DIR}/../QryptSecurity/include"
+    "../src"
 )
 
 add_library(SDKTests OBJECT
