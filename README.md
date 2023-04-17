@@ -13,6 +13,7 @@ The QryptSecurity SDK contains cryptographic functionality that may be [export c
 1. [Multi-device demonstration using Docker-Compose](#multi-device-demonstration-using-docker-compose)
 
 ## Quickstart using Github Codespaces
+![Codespaces Setup](res/codespace_setup.gif)
 To start this quickstart in a github codespace for easy online setup, create the codespace from the `<> Code` dropdown on github.
 
 Once started, the devcontainer will automatically build the `qrypt` executable and you can start creating distributed one-time-pads right away!
