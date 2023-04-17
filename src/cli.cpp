@@ -1,4 +1,5 @@
 #include "cli.h"
+#include "common.h"
 #include "encrypt.h"
 #include "keygen.h"
 
@@ -12,8 +13,6 @@
 #include <gtest/gtest.h>
 #endif
 
-const char* demo_token = "abcd";
-
 void printUsage(std::string mode) {
     if (mode == "generate") {
         std::cout << GenerateUsage;
@@ -23,6 +22,10 @@ void printUsage(std::string mode) {
         std::cout << EncryptUsage;
     } else if (mode == "decrypt") {
         std::cout << DecryptUsage;
+#ifdef ENABLE_TESTS
+    } else if (mode == "test") {
+        std::cout << TestUsage;
+#endif
     } else {
         std::cout << GeneralUsage;
     }
@@ -49,9 +52,15 @@ int main(int argc, char* argv[]) {
             testing::InitGoogleTest(&argc, argv);
             // Note GTest will remove the arguments that it recognizes during InitGoogleTest
             if (*++argv) {
-                // test takes no args
-                printUsage(mode);
-                return 0;
+                auto[arg_name, arg_value] = tokenizeArg(*argv);
+                // Test can only take the "token" arg.
+                if (arg_name == "--token") {
+                    test_token = arg_value;
+                }
+                else {
+                    printUsage(mode);
+                    return 0;
+                }
             }
             return RUN_ALL_TESTS();
         }

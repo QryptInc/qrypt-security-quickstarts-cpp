@@ -30,14 +30,12 @@ class KeyGenTest : public ::testing::Test {
   protected:
     std::unique_ptr<IKeyGenDistributedClient> _AliceClient = nullptr;
     std::unique_ptr<IKeyGenDistributedClient> _BobClient = nullptr;
-    const char* _Token = std::getenv("QRYPT_TOKEN");
 
     void SetUp() override {
-        std::string token = (strlen(_Token)) ? _Token : "abcd";
         _AliceClient = IKeyGenDistributedClient::create();
-        _AliceClient->initialize(token);
+        _AliceClient->initialize(test_token);
         _BobClient = IKeyGenDistributedClient::create();
-        _BobClient->initialize(token);
+        _BobClient->initialize(test_token);
         std::cout << white_text;
     }
 

@@ -169,4 +169,16 @@ struct EncryptDecryptArgs {
 };
 EncryptDecryptArgs parseEncryptDecryptArgs(char** unparsed_args);
 
+#ifdef ENABLE_TESTS
+static const char* TestUsage = 
+    "Usage: qrypt test [Optional Arguments]\n"
+    "\n"
+    "Run a suite of tests for validating and demonstrating the capabilities of the QryptSecurity SDK and Qrypt EaaS."
+    "\n"
+    "Optional Arguments:\n"
+    "  --help                          Display this message.\n"
+    "  --token=<token>                 API token for portal.qrypt.com. Defaults to a demo token.\n"
+    "\n";
+#endif
+
 #endif /* QRYPTCLI_H */
