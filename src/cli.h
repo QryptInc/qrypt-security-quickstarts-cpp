@@ -1,11 +1,14 @@
 #ifndef QRYPTCLI_H
 #define QRYPTCLI_H
 
+#include "common.h"
 #include "QryptSecurity/qryptsecurity_logging.h"
 
 #include <map>
 #include <string>
 #include <vector>
+
+std::tuple<std::string, std::string> tokenizeArg(std::string arg);
 
 static const char* GeneralUsage = 
     "Commands:\n"

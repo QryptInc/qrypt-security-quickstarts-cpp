@@ -33,9 +33,9 @@ class KeyGenTest : public ::testing::Test {
 
     void SetUp() override {
         _AliceClient = IKeyGenDistributedClient::create();
-        _AliceClient->initialize(test_token);
+        _AliceClient->initialize(sdk_token);
         _BobClient = IKeyGenDistributedClient::create();
-        _BobClient->initialize(test_token);
+        _BobClient->initialize(sdk_token);
         std::cout << white_text;
     }
 

@@ -1,5 +1,4 @@
 #include "cli.h"
-#include "common.h"
 #include "encrypt.h"
 #include "keygen.h"
 
@@ -55,7 +54,7 @@ int main(int argc, char* argv[]) {
                 auto[arg_name, arg_value] = tokenizeArg(*argv);
                 // Test can only take the "token" arg.
                 if (arg_name == "--token") {
-                    test_token = arg_value;
+                    sdk_token = arg_value;
                 }
                 else {
                     printUsage(mode);
@@ -172,7 +171,6 @@ std::tuple<std::string, std::string> tokenizeArg(std::string arg) {
 
 KeygenArgs parseKeygenArgs(char** unparsed_args) {
     std::string key_filename, cacert_path;
-    std::string token = demo_token;
     std::string metadata_filename = "meta.dat";
     std::string key_type = "otp";
     size_t key_len = 32;
@@ -198,7 +196,7 @@ KeygenArgs parseKeygenArgs(char** unparsed_args) {
                     key_len = stoi(arg_value);
                     break;
                 case KEYGEN_FLAG_TOKEN:
-                    token = arg_value;
+                    sdk_token = arg_value;
                     break;
                 case KEYGEN_FLAG_KEY_FORMAT:
                     key_format = arg_value;
@@ -232,7 +230,7 @@ KeygenArgs parseKeygenArgs(char** unparsed_args) {
         throw std::invalid_argument("Invalid key-format: \"" + key_format + "\"");
     }
 
-    return { key_filename, metadata_filename, token, key_type, key_len, key_format, log_level, cacert_path };
+    return { key_filename, metadata_filename, sdk_token, key_type, key_len, key_format, log_level, cacert_path };
 }
 
 EncryptDecryptArgs parseEncryptDecryptArgs(char** unparsed_args) {
