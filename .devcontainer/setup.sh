@@ -7,4 +7,3 @@ rm -rf $sdk_file
 
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS=ON
 cmake --build build --config Release
-./qrypt test

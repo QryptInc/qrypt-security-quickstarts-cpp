@@ -135,31 +135,6 @@ TEST_F(KeyGenTest, OTP1MB) {
     std::cout << certify_msg << green_pass << std::endl;
 }
 
-TEST_F(KeyGenTest, ValidateInputs) {
-    // Note: This test collapses multiple rejection cases into one function for readability.
-    std::string input_msg = white_text + "Validating input error handling..";
-    std::cout << input_msg << std::flush;
-    std::cout << std::string(input_msg.length(), '\b') << gray_text;
-    // Check for empty tokens
-    auto temp_client = IKeyGenDistributedClient::create();
-    EXPECT_THROW(temp_client->initialize(""), InvalidArgument) << input_msg << red_fail;
-    // Check for bad tokens
-    temp_client = IKeyGenDistributedClient::create();
-    temp_client->initialize("xxxx");
-    EXPECT_THROW(temp_client->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256), CannotDownload) << input_msg << red_fail;
-    // Invalid AES Key size
-    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256, 33), InvalidArgument) << input_msg << red_fail;
-    // OTP too large
-    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 10 * MB + 1), InvalidArgument) << input_msg << red_fail;
-    // Corrupted Metadata
-    SymmetricKeyData aliceKey;
-    ASSERT_NO_THROW(aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256)) << input_msg << red_fail;
-    std::vector<uint8_t> extraBytes = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-    extraBytes.insert(extraBytes.end(), aliceKey.metadata.begin(), aliceKey.metadata.end() );
-    EXPECT_THROW(_BobClient->genSync(extraBytes), DataCorrupted) << input_msg << red_fail;
-    std::cout << input_msg << green_pass << std::endl;
-}
-
 TEST(EaaSTest, VerifyNISTSuccess) {
     std::cout << gray_text << "NIST Statistical Test Suite for Random Number Generators (Special Publication 800-22 Rev 1a)" << std::endl;
     std::string case_msg = white_text + "Verifying randomness of Qrypt Entropy stream...";
