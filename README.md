@@ -8,7 +8,7 @@ Click the `<> Code` dropdown on github and select `Create codespace on main`. Th
 ![Codespaces Setup](docs/res/codespace_setup_small.gif)
 
 ### 2. Execute validation tests
-We've taken the Qrypt SDK and built it into a CLI with some basic functionality. Run `./qrypt test` to validate:
+We've taken the Qrypt SDK and integrated it into a CLI with some basic functionality. After the envrionment loads it will automatically build the CLI. Wait until you see `[100%] Built target qrypt`, indicating that the CLI build is complete, and then run `./qrypt test` to validate:
 - Qrypt can be used to securely generate an AES key
 - Qrypt can be used to securely generate a 1KB one-time-pad
 - Qrypt can be used to securely generate a 1MB one-time-pad
@@ -17,8 +17,8 @@ We've taken the Qrypt SDK and built it into a CLI with some basic functionality.
 ## More advanced CLI usage
 ### Help menu
 Use the `--help` option on the `qrypt` executable and its submenus for more information on available operations and their optional arguments.
-Ex: `./qrypt --help`
-Ex: `./qrypt generate --help`
+<br />Ex: `./qrypt --help`
+<br />Ex: `./qrypt generate --help`
 
 ### Generate
 Run `./qrypt generate` to generate a key and save instructions to `./meta.dat`
