@@ -2,6 +2,11 @@
 #include "QryptSecurity/qryptsecurity_exceptions.h"
 #include "QryptSecurity/qryptsecurity_logging.h"
 
+#include "common.h"
+
+#include <filesystem>
+#include <iostream>
+#include <thread>
 #include <gtest/gtest.h>
 
 using namespace QryptSecurity;
@@ -9,105 +14,144 @@ using namespace QryptSecurity;
 static const uint64_t KB = 1024;
 static const uint64_t MB = 1024 * 1024;
 
-class KeyGenDistributedTest : public ::testing::Test {
+static const std::string green_pass = "\x1B[32mPASS\x1B[0m";
+static const std::string red_fail = "\x1B[31mFAIL\x1B[0m";
+static const std::string gray_text = "\x1B[90m";
+static const std::string white_text = "\x1B[0m";
+
+/*
+    Validation tests
+
+    A test suite intended to simultaneously validate and demonstrate the capabilities of the Qrypt SDK
+    Places a high empasis on output readability, as this will be run OnAttach with the devcontainer
+ */
+
+class KeyGenTest : public ::testing::Test {
   protected:
     std::unique_ptr<IKeyGenDistributedClient> _AliceClient = nullptr;
     std::unique_ptr<IKeyGenDistributedClient> _BobClient = nullptr;
-    std::string _Token;
 
     void SetUp() override {
         _AliceClient = IKeyGenDistributedClient::create();
+        _AliceClient->initialize(sdk_token);
         _BobClient = IKeyGenDistributedClient::create();
-        _Token = std::string(std::getenv("QRYPT_TOKEN"));
+        _BobClient->initialize(sdk_token);
+        std::cout << white_text;
     }
 
     void TearDown() override {
         _AliceClient = nullptr;
         _BobClient = nullptr;
     }
-
-    void initialize() {
-        _AliceClient->initialize(_Token);
-        _BobClient->initialize(_Token);
-    }
 };
 
-TEST_F(KeyGenDistributedTest, InvalidKeyMode) {
-    initialize();
-    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::NUM_SYMMETRIC_KEY_MODES), InvalidArgument);
+TEST_F(KeyGenTest, AES256) {
+    const std::string gen_msg = white_text + "Generating an AES256 key.........";
+    std::cout << gen_msg << std::flush; // Case message
+    std::cout << std::string(gen_msg.length(), '\b') << gray_text; // Return cursor to top so gtest error messages can overwrite case message
+    SymmetricKeyData aliceKey;
+    ASSERT_NO_THROW(
+        aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256, 32)
+    ) << gen_msg << red_fail; // Re-print case message as a gtest diagnostic message in the event of a failure
+    ASSERT_EQ(aliceKey.key.size(), 32) << gen_msg << red_fail;
+    std::cout << gen_msg << green_pass << std::endl; // Print success
+
+    const std::string sync_msg = white_text + "Replicating an AES256 key........";
+    std::cout << sync_msg << std::flush;
+    std::cout << std::string(sync_msg.length(), '\b') << gray_text;
+    std::vector<uint8_t> bobKey;
+    ASSERT_NO_THROW(
+        bobKey = _BobClient->genSync(aliceKey.metadata)
+    ) << sync_msg << red_fail;
+    ASSERT_EQ(bobKey.size(), 32) << sync_msg << red_fail;
+    std::cout << sync_msg << green_pass << std::endl;
+
+    const std::string certify_msg = white_text + "Verifying keys match.............";
+    std::cout << certify_msg << std::flush;
+    std::cout << std::string(certify_msg.length(), '\b') << gray_text;
+    ASSERT_EQ(
+        byteVecToHexStr(aliceKey.key), byteVecToHexStr(bobKey)
+    ) << certify_msg << red_fail;
+    std::cout << certify_msg << green_pass << std::endl;
 }
 
-TEST_F(KeyGenDistributedTest, EmptyToken) {
-    _Token = "";
-    EXPECT_THROW(_AliceClient->initialize(_Token), InvalidArgument);
+TEST_F(KeyGenTest, OTP1KB) {
+    const std::string gen_msg = white_text + "Generating a 1KB one-time-pad....";
+    std::cout << gen_msg << std::flush;
+    std::cout << std::string(gen_msg.length(), '\b') << gray_text;
+    SymmetricKeyData aliceKey;
+    ASSERT_NO_THROW(
+        aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, KB)
+    ) << gen_msg << red_fail;
+    ASSERT_EQ(aliceKey.key.size(), KB) << gen_msg << red_fail;
+    std::cout << gen_msg << green_pass << std::endl;
+
+    const std::string sync_msg = white_text + "Replicating a 1KB one-time-pad...";
+    std::cout << sync_msg << std::flush;
+    std::cout << std::string(sync_msg.length(), '\b') << gray_text;
+    std::vector<uint8_t> bobKey;
+    ASSERT_NO_THROW(
+        bobKey = _BobClient->genSync(aliceKey.metadata)
+    ) << sync_msg << red_fail;
+    ASSERT_EQ(bobKey.size(), KB) << sync_msg << red_fail;
+    std::cout << sync_msg << green_pass << std::endl;
+
+    const std::string certify_msg = white_text + "Verifying keys match.............";
+    std::cout << certify_msg << std::flush;
+    std::cout << std::string(certify_msg.length(), '\b') << gray_text;
+    ASSERT_EQ(
+        byteVecToHexStr(aliceKey.key), byteVecToHexStr(bobKey)
+    ) << certify_msg << red_fail;
+    std::cout << certify_msg << green_pass << std::endl;
 }
 
-TEST_F(KeyGenDistributedTest, InvalidToken) {
-    _Token = "xxxxx";
-    initialize();
-    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256), CannotDownload);
+TEST_F(KeyGenTest, OTP1MB) {
+    const std::string gen_msg = white_text + "Generating a 1MB one-time-pad....";
+    std::cout << gen_msg << std::flush;
+    std::cout << std::string(gen_msg.length(), '\b') << gray_text;
+    SymmetricKeyData aliceKey;
+    ASSERT_NO_THROW(
+        aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, MB)
+    ) << gen_msg << red_fail;
+    ASSERT_EQ(aliceKey.key.size(), MB) << gen_msg << red_fail;
+    std::cout << gen_msg << green_pass << std::endl;
+
+    const std::string sync_msg = white_text + "Replicating a 1MB one-time-pad...";
+    std::cout << sync_msg << std::flush;
+    std::cout << std::string(sync_msg.length(), '\b') << gray_text;
+    std::vector<uint8_t> bobKey;
+    ASSERT_NO_THROW(
+        bobKey = _BobClient->genSync(aliceKey.metadata)
+    ) << sync_msg << red_fail;
+    ASSERT_EQ(bobKey.size(), MB) << sync_msg << red_fail;
+    std::cout << sync_msg << green_pass << std::endl;
+
+    const std::string certify_msg = white_text + "Verifying keys match.............";
+    std::cout << certify_msg << std::flush;
+    std::cout << std::string(certify_msg.length(), '\b') << gray_text;
+    if(byteVecToHexStr(aliceKey.key) != byteVecToHexStr(bobKey)) {
+        FAIL() << "Generated/Replicated keys do not match! (Too large to print diff)" << std::endl << certify_msg << red_fail;
+    }
+    std::cout << certify_msg << green_pass << std::endl;
 }
 
-TEST_F(KeyGenDistributedTest, InvalidAESKeySize) {
-    initialize();
-    // AES256 key should be 32 bytes instead of 33 bytes
-    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256, 33), InvalidArgument);
-}
-
-TEST_F(KeyGenDistributedTest, GenerateAESKey) {
-    initialize();
-    SymmetricKeyData aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256);
-    std::vector<uint8_t> bobKey = _BobClient->genSync(aliceKey.metadata);
-    EXPECT_EQ(aliceKey.key, bobKey);
-}
-
-TEST_F(KeyGenDistributedTest, GenerateOTP16Byte) {
-    initialize();
-    SymmetricKeyData aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 16);
-    std::vector<uint8_t> bobKey = _BobClient->genSync(aliceKey.metadata);
-    EXPECT_EQ(aliceKey.key, bobKey);
-}
-
-TEST_F(KeyGenDistributedTest, GenerateOTP1KB) {
-    initialize();
-    SymmetricKeyData aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, KB);
-    std::vector<uint8_t> bobKey = _BobClient->genSync(aliceKey.metadata);
-    EXPECT_EQ(aliceKey.key, bobKey);
-}
-
-TEST_F(KeyGenDistributedTest, GenerateOTP32KB) {
-    initialize();
-    SymmetricKeyData aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 32 * KB);
-    std::vector<uint8_t> bobKey = _BobClient->genSync(aliceKey.metadata);
-    EXPECT_EQ(aliceKey.key, bobKey);
-}
-
-TEST_F(KeyGenDistributedTest, KeySizeLowerLimit) {
-    initialize();
-    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 15), InvalidArgument);
-}
-
-TEST_F(KeyGenDistributedTest, KeySizeUpperLimit) {
-    initialize();
-    EXPECT_THROW(_AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_OTP, 10 * MB + 1), InvalidArgument);
-}
-
-TEST_F(KeyGenDistributedTest, MetadataWithExtraPrefix) {
-    initialize();
-    SymmetricKeyData aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256);
-
-    std::vector<uint8_t> extraBytes = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-    aliceKey.metadata.insert(aliceKey.metadata.begin(), extraBytes.begin(), extraBytes.end() );
-
-    EXPECT_THROW(_BobClient->genSync(aliceKey.metadata), DataCorrupted);
-}
-
-TEST_F(KeyGenDistributedTest, CorruptedMetadata) {
-    initialize();
-    SymmetricKeyData aliceKey = _AliceClient->genInit(SymmetricKeyMode::SYMMETRIC_KEY_MODE_AES_256);
-
-    std::vector<uint8_t> extraBytes = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-    aliceKey.metadata.insert(aliceKey.metadata.begin() + 50, extraBytes.begin(), extraBytes.end() );
-
-    EXPECT_THROW(_BobClient->genSync(aliceKey.metadata), DataCorrupted);
+TEST(EaaSTest, VerifyNISTSuccess) {
+    std::cout << gray_text << "NIST Statistical Test Suite for Random Number Generators (Special Publication 800-22 Rev 1a)" << std::endl;
+    std::string case_msg = white_text + "Verifying randomness of Qrypt Entropy stream...";
+    std::cout << case_msg << std::flush;
+    testing::internal::CaptureStdout();
+    testing::internal::CaptureStderr();
+    std::filesystem::path cwd = std::filesystem::current_path();
+    if (cwd.filename() == "build") {
+        cwd /= ".."; // Navigate to project root if we're in the build directory
+    }
+    std::string cmd = "python3 " + std::string((cwd / "test") / "parse_nist_api.py");
+    int fail = std::system(cmd.c_str());
+    std::string script_stdout = testing::internal::GetCapturedStdout();
+    std::string script_stderr = testing::internal::GetCapturedStderr();
+    if (fail || script_stderr.length() > 0) {
+        std::cout << std::string(case_msg.length(), '\b') << gray_text;
+        FAIL() << script_stderr << case_msg << red_fail;
+    }
+     std::cout << green_pass << std::endl;
 }

@@ -6,6 +6,14 @@
 #include <sstream>
 #include <algorithm>
 
+namespace {
+const char* _demo_token = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjExOThmMDEyZTA2ZjRmZjFhYWE4NzM2MzFkNTkxNmU1In0.e"
+    "yJleHAiOjE3MTMyODI2NDYsIm5iZiI6MTY4MTc0NjY0NiwiaXNzIjoiQVVUSCIsImlhdCI6MTY4MTc0NjY0NiwiZ3JwcyI6WyJQVUIiXSwiYXVkIjp"
+    "bIlFERUEiLCJSUFMiXSwicmxzIjpbIlFERVVTUiIsIlJORFVTUiJdLCJjaWQiOiJmYUtwQVhVUVI3NUJURzdIVjFJMksiLCJkdmMiOiI3YzA1MDc2Z"
+    "DE0ODU0YTRkYjdkZTJhYjVhN2U4YTVkYSIsImp0aSI6IjBjZDY4YjY4ODNmNzRmN2FiYjgwMGYyN2ZiYTYyMDNiIiwidHlwIjozfQ.cHBCxYkQQgZt"
+    "4Z0Y6ZGYeZKzBOIT5e4oZ962T153svZ7QXO2s3Ed6VLGk75CZdFRb2rFwFdZnnH2xK5tQdhcqg";
+}
+std::string sdk_token = _demo_token;
 
 std::vector<uint8_t> xorVectors(const std::vector<uint8_t> otp, const std::vector<uint8_t> &data) {
     std::vector<uint8_t> result;

@@ -7,6 +7,8 @@
 #include <string>
 #include <tuple>
 
+extern std::string sdk_token;
+
 const uint32_t IVLengthInBytes = 12;
 const uint32_t AESKeyLengthInBytes = 32;
 const uint32_t AESKeyWithIVLengthInBytes = AESKeyLengthInBytes + IVLengthInBytes;

@@ -6,7 +6,7 @@ services:
         image: alice_image
         build:
             context: ..
-            dockerfile: demo/Dockerfile
+            dockerfile: compose/Dockerfile
             args:
                 persona: alice
         environment:
@@ -20,7 +20,7 @@ services:
         image: bob_image
         build:
             context: ..
-            dockerfile: demo/Dockerfile
+            dockerfile: compose/Dockerfile
             args:
                 persona: bob
         environment:

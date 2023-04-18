@@ -8,7 +8,9 @@
 #include <fstream>
 #include <cstring>
 
-const char* demo_token = "abcd";
+#ifdef ENABLE_TESTS
+#include <gtest/gtest.h>
+#endif
 
 void printUsage(std::string mode) {
     if (mode == "generate") {
@@ -19,12 +21,16 @@ void printUsage(std::string mode) {
         std::cout << EncryptUsage;
     } else if (mode == "decrypt") {
         std::cout << DecryptUsage;
+#ifdef ENABLE_TESTS
+    } else if (mode == "test") {
+        std::cout << TestUsage;
+#endif
     } else {
         std::cout << GeneralUsage;
     }
 }
 
-int main(int argc, const char* argv[]) {
+int main(int argc, char* argv[]) {
     // Set mode and handle --help
     if (argc < 2) {
         std::cout << GeneralUsage;
@@ -39,6 +45,26 @@ int main(int argc, const char* argv[]) {
     }
 
     try{
+#ifdef ENABLE_TESTS
+        // Run validation suite
+        if (mode == "test") {
+            testing::InitGoogleTest(&argc, argv);
+            // Note GTest will remove the arguments that it recognizes during InitGoogleTest
+            if (*++argv) {
+                auto[arg_name, arg_value] = tokenizeArg(*argv);
+                // Test can only take the "token" arg.
+                if (arg_name == "--token") {
+                    sdk_token = arg_value;
+                }
+                else {
+                    printUsage(mode);
+                    return 0;
+                }
+            }
+            return RUN_ALL_TESTS();
+        }
+        else
+#endif
         // Create a key using the QryptSecurity SDK
         if (mode == "generate" || mode == "replicate") {
             // Parse and unpack cli arguments
@@ -143,9 +169,8 @@ std::tuple<std::string, std::string> tokenizeArg(std::string arg) {
     return {flag, value};
 }
 
-KeygenArgs parseKeygenArgs(const char** unparsed_args) {
+KeygenArgs parseKeygenArgs(char** unparsed_args) {
     std::string key_filename, cacert_path;
-    std::string token = demo_token;
     std::string metadata_filename = "meta.dat";
     std::string key_type = "otp";
     size_t key_len = 32;
@@ -171,7 +196,7 @@ KeygenArgs parseKeygenArgs(const char** unparsed_args) {
                     key_len = stoi(arg_value);
                     break;
                 case KEYGEN_FLAG_TOKEN:
-                    token = arg_value;
+                    sdk_token = arg_value;
                     break;
                 case KEYGEN_FLAG_KEY_FORMAT:
                     key_format = arg_value;
@@ -205,10 +230,10 @@ KeygenArgs parseKeygenArgs(const char** unparsed_args) {
         throw std::invalid_argument("Invalid key-format: \"" + key_format + "\"");
     }
 
-    return { key_filename, metadata_filename, token, key_type, key_len, key_format, log_level, cacert_path };
+    return { key_filename, metadata_filename, sdk_token, key_type, key_len, key_format, log_level, cacert_path };
 }
 
-EncryptDecryptArgs parseEncryptDecryptArgs(const char** unparsed_args) {
+EncryptDecryptArgs parseEncryptDecryptArgs(char** unparsed_args) {
     std::string input_filename, output_filename, key_filename;
     std::string key_type = "otp";
     std::string aes_mode = "ocb";

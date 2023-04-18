@@ -1,87 +1,40 @@
-# Basic Quickstart Setup
-This tutorial demonstrates the steps to setup basic Qrypt Security SDK. It clones this quickstart repo, builds the sample apps codes to generate a command line tool for distributed key gen. Then it runs the command line tool to generate a key (as Alice) and recover the key (as Bob) respectively.
+# Qrypt SDK Test Envrionment
+This template can be used to create an environment with resources in place to test and validate Qrypt's SDK.
 
-## Setup environment
+## Quickstart
+### 1. Create the codespace
+Click the `<> Code` dropdown on github and select `Create codespace on main`. This will create a new codespace, which is a sandboxed devcontainer with everything you need to experiement with the Qrypt SDK.
 
-The commands shown in this tutorial should be run on an Ubuntu 20.04 system.
+![Codespaces Setup](docs/res/codespace_setup_small.gif)
 
-## Prerequisites
-- A Qrypt Account. [Create an account for free](https://portal.qrypt.com/register)
+### 2. Execute validation tests
+We've taken the Qrypt SDK and integrated it into a CLI with some basic functionality. After the envrionment loads it will automatically build the CLI. Wait until you see `[100%] Built target qrypt`, indicating that the CLI build is complete, and then run `./qrypt test` to validate:
+- Qrypt can be used to securely generate an AES key
+- Qrypt can be used to securely generate a 1KB one-time-pad
+- Qrypt can be used to securely generate a 1MB one-time-pad
+- Qrypts quantum generated random passes [NIST 800-22](https://csrc.nist.gov/publications/detail/sp/800-22/rev-1a/final) Statistical Tests for Random Number Generators
 
-## Setup
-1. *Optional: If you have docker installed on the system (e.g. Mac OS), you could run Alice and Bob in Ubuntu containers instead of Ubuntu desktops.*
-    ```
-    docker run --name qrypt_ubuntu -it --rm ubuntu:20.04 bash
-    ```
+## More advanced CLI usage
+### Help menu
+Use the `--help` option on the `qrypt` executable and its submenus for more information on available operations and their optional arguments.
+<br />Ex: `./qrypt --help`
+<br />Ex: `./qrypt generate --help`
 
-1. Retrieve a token from the [Qrypt Portal](https://portal.qrypt.com/tokens).
-    
-    Create an environment variable **QRYPT_TOKEN** for the token.
-    ```
-    export QRYPT_TOKEN="eyJhbGciOiJ......"
-    ```
-    *Optional: to set QRYPT_TOKEN permanently for all future bash sessions, put it in ~/.bashrc*
-    ```
-    export QRYPT_TOKEN="eyJhbGciOiJ......" >> ~/.bashrc
-    ```
-1. Install the development and network tools.
-    ```
-    apt-get update
-    DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y cmake git gcc g++ libgtest-dev curl jq
-    ```
+### Generate
+Run `./qrypt generate` to generate a key and save instructions to `./meta.dat`
 
-1. Clone the [repo](https://github.com/QryptInc/qrypt-security-quickstarts-cpp) containing this quickstart to a local folder.
-    ```
-    git clone https://github.com/QryptInc/qrypt-security-quickstarts-cpp.git
-    cd qrypt-security-quickstarts-cpp
-    ```
+### Replicate
+Run `./qrypt replicate` to read `./meta.dat` and use it to generate and output the same key.
 
-1. Download the Qrypt Security SDK from the [Qrypt Portal](https://portal.qrypt.com/downloads/sdk-downloads) for Ubuntu.
+### Encrypt
+TBD
 
-1. Extract the Qrypt SDK into the /qrypt-security-quickstarts-cpp/KeyGenDistributed/lib/QryptSecurity folder
-    ```
-    tar -zxvf <sdk_file> --strip-components=1 -C KeyGenDistributed/lib/QryptSecurity
-    ```
-    *Optional: At this point you should be able to see the header files and libraries under KeyGenDistributed/lib/QryptSecurity.*
-    ```
-    # Expected output:  include  lib  licenses
-    ls KeyGenDistributed/lib/QryptSecurity/ 
-    ```
+### Decrypt
+TBD
 
-1. Build the keygen tool.
-    ```
-    cd KeyGenDistributed
-    ./build.sh
-    ```
-    
-    *Optional: to make a debug build*
-    ```
-    ./build.sh --build_type=Debug
-    ```
+## Additional resources
+- [Building the quickstart locally](./docs/QUICKSTART-BUILD.md)
+- [Multi-device demonstration using Docker-Compose](./docs/MULTIDEVICE-DEMO.md)
 
-## Test commands
-#### Test OTP keygen
-    
-Alice generates the OTP key and metadata file.
-  
-```
-build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=otp --otp-len=32768 --metadata-filename=otp_metadata.bin --key-filename=alice_otp.bin
-```
-    
-Bob recovers the OTP key using the metadata file. This key should be identical to Alice's OTP key.
-```
-build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=otp_metadata.bin --key-filename=bob_otp.bin
-```
-
-
-#### Test AES keygen
-Alice generates the AES key and metadata file.
-
-```
-build/KeyGenDistributed --user=alice --token=$QRYPT_TOKEN --key-type=aes --metadata-filename=aes_metadata.bin --key-filename=alice_aes.bin
-```
-
-Bob recovers the AES key using the metadata file. This key should be identical to Alice's AES key.
-```
-build/KeyGenDistributed --user=bob --token=$QRYPT_TOKEN --metadata-filename=aes_metadata.bin --key-filename=bob_aes.bin
-```
+## Terms of Use
+_The QryptSecurity SDK contains cryptographic functionality that may be [export controlled](https://www.qrypt.com/terms). By using this software, any user acknowledges that they have reviewed and agreed to the [terms of use and privacy policy](https://www.qrypt.com/terms), to the extent permissible by applicable law._
