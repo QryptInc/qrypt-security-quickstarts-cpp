@@ -10,4 +10,5 @@ The QryptSecurity SDK is intended to be run on an Ubuntu 20.04 system. The follo
 1. `./qrypt --help`
 
 If googletest is installed on your system, you may add `-DBUILD_TESTS=ON` to your cmake command to enable an automated
-validation suite which can be run with `./qrypt test`
+validation suite which can be run with `./qrypt test`:
+![test example](res/rest_run.png)
