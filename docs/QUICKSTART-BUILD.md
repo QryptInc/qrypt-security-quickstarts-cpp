@@ -1,5 +1,5 @@
 ## Building this quickstart manually
-The QryptSecurity SDK is intended to be run on an Ubuntu 20.04 system. The following commands assume a system configured with OpenSSL, CMake, and g++.
+The QryptSecurity SDK is intended to be run on an Ubuntu 20.04 system with an arm64 architecture, either natively or using an emulated platform. The following commands assume a system configured with OpenSSL, CMake, and g++.
 
 1. [Create a Qrypt account for free](https://portal.qrypt.com/register).
 1. On the Qrypt portal, download the Qrypt SDK from "Products > Qrypt SDK" and save the .tgz to the project root.

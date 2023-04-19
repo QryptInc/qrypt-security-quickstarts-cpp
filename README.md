@@ -14,11 +14,7 @@ We've taken the Qrypt SDK and integrated it into a CLI with some basic functiona
 - Qrypt can be used to securely generate a 1MB one-time-pad
 - Qrypts quantum generated random passes [NIST 800-22](https://csrc.nist.gov/publications/detail/sp/800-22/rev-1a/final) Statistical Tests for Random Number Generators
 
-## More advanced CLI usage
-### Help menu
-Use the `--help` option on the `qrypt` executable and its submenus for more information on available operations and their optional arguments.
-<br />Ex: `./qrypt --help`
-<br />Ex: `./qrypt generate --help`
+## CLI usage
 
 ### Generate
 Run `./qrypt generate` to generate a key and save instructions to `./meta.dat`
@@ -26,11 +22,10 @@ Run `./qrypt generate` to generate a key and save instructions to `./meta.dat`
 ### Replicate
 Run `./qrypt replicate` to read `./meta.dat` and use it to generate and output the same key.
 
-### Encrypt
-TBD
-
-### Decrypt
-TBD
+### Advanced options
+Use the `--help` option on the `qrypt` executable and its submenus for more information on available operations and their optional arguments.
+<br />Ex: `./qrypt --help`
+<br />Ex: `./qrypt generate --help
 
 ## Additional resources
 - [Building the quickstart locally](./docs/QUICKSTART-BUILD.md)
