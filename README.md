@@ -10,8 +10,8 @@ Click the `<> Code` dropdown on github and select `Create codespace on main`. Th
 ### 2. Execute validation tests
 We've taken the Qrypt SDK and integrated it into a CLI with some basic functionality. After the envrionment loads it will automatically build the CLI. Wait until you see `[100%] Built target qrypt`, indicating that the CLI build is complete, and then run `./qrypt test` to validate:
 - The Qrypt SDK can be used to securely generate and independently replicate an AES key
-- The Qrypt SDK can be used to securely generate and independently replicatea 1KB one-time-pad
-- The Qrypt SDK can be used to securely generate and independently replicatea 1MB one-time-pad
+- The Qrypt SDK can be used to securely generate and independently replicate a 1KB one-time-pad
+- The Qrypt SDK can be used to securely generate and independently replicate a 1MB one-time-pad
 - Qrypt's quantum generated random passes [NIST 800-22](https://csrc.nist.gov/publications/detail/sp/800-22/rev-1a/final) Statistical Tests for Random Number Generators
 
 ## CLI usage
