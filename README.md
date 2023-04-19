@@ -25,7 +25,7 @@ Run `./qrypt replicate` to read `./meta.dat` and use it to replicate the same ke
 ### Advanced options
 Use the `--help` option on the `qrypt` executable and its submenus for more information on available operations and their optional arguments.
 <br />Ex: `./qrypt --help`
-<br />Ex: `./qrypt generate --help
+<br />Ex: `./qrypt generate --help`
 
 ## Additional resources
 - [Building the quickstart manually](./docs/QUICKSTART-BUILD.md)
