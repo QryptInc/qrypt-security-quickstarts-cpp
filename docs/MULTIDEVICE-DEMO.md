@@ -31,7 +31,7 @@ The `compose` subdirectory contains a docker-compose.yml and sample scripts for 
     ```
     # OTP replication and decryption
     qrypt replicate --token=$QRYPT_TOKEN --key-len=$(stat -c%s ciphertext.dat) --key-filename=key.dat
-    qrypt encrypt --input-filename=ciphertext.dat --key-filename=key.dat --output-filename=decrypted.txt
+    qrypt decrypt --input-filename=ciphertext.dat --key-filename=key.dat --output-filename=decrypted.txt
     ```
     ```
     # Verify the OTP decrypted files
