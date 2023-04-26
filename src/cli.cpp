@@ -4,13 +4,16 @@
 
 #include "QryptSecurity/qryptsecurity_exceptions.h"
 
-#include <iostream>
-#include <fstream>
 #include <cstring>
+#include <iostream>
+#include <filesystem>
+#include <fstream>
 
 #ifdef ENABLE_TESTS
 #include <gtest/gtest.h>
 #endif
+
+namespace fs = std::filesystem;
 
 void printUsage(std::string mode) {
     if (mode == "generate") {
@@ -193,7 +196,12 @@ KeygenArgs parseKeygenArgs(char** unparsed_args) {
                     key_type = arg_value;
                     break;
                 case KEYGEN_FLAG_KEY_LEN:
-                    key_len = stoi(arg_value);
+                    try {
+                        key_len = stoi(arg_value);
+                    }
+                    catch(...) {
+                        throw std::invalid_argument("Could not interpret --key_len=\"" + arg_value + "\" as a number!\n");
+                    }
                     break;
                 case KEYGEN_FLAG_TOKEN:
                     sdk_token = arg_value;
@@ -219,12 +227,17 @@ KeygenArgs parseKeygenArgs(char** unparsed_args) {
             throw std::invalid_argument("Invalid argument: " + arg_name);
         }
     }
-
     if (key_filename.empty() && key_format == "binary") {
         throw std::invalid_argument("Cannot output key with key-type \"binary\" to stdout!");
     }
+    if (!cacert_path.empty() && !fs::exists(fs::path{cacert_path})) {
+        throw std::invalid_argument("CA Certificate \"" + cacert_path + "\" does not exist!");
+    } 
     if (key_type != "aes" && key_type != "otp") {
         throw std::invalid_argument("Invalid key-type: \"" + key_type + "\"");
+    }
+    if (key_type == "aes" && key_len != 32) {
+        throw std::invalid_argument("AES-256 keys must be 32 bytes long!");
     }
     if (key_format != "hexstr" && key_format != "binary") {
         throw std::invalid_argument("Invalid key-format: \"" + key_format + "\"");
@@ -267,12 +280,18 @@ EncryptDecryptArgs parseEncryptDecryptArgs(char** unparsed_args) {
     }
     if (input_filename.empty()) {
         throw std::invalid_argument("Missing input-filename");
+    } 
+    else if (!fs::exists(fs::path(input_filename))) {
+        throw std::invalid_argument("Input file \"" + input_filename + "\" does not exist!");
     }
     if (output_filename.empty()) {
         throw std::invalid_argument("Missing output-filename");
     }
     if (key_filename.empty()) {
         throw std::invalid_argument("Missing key-filename");
+    }
+    else if (!fs::exists(fs::path(key_filename))) {
+        throw std::invalid_argument("Key file \"" + key_filename + "\" does not exist!");
     }
     if (key_type != "aes" && key_type != "otp") {
         throw std::invalid_argument("Invalid key-type: \"" + key_type + "\"");
