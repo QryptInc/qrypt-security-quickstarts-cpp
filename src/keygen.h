@@ -12,7 +12,7 @@
 
 class KeyGen {
 public:
-    KeyGen(std::string token, std::string key_type = "otp", size_t key_len = 32, std::string key_format = "hexstr",
+    KeyGen(std::string token, std::string key_type = "otp", size_t key_len = 32, uint32_t key_ttl = 3600, std::string key_format = "hexstr",
            ::QryptSecurity::LogLevel log_level = ::QryptSecurity::LogLevel::QRYPTSECURITY_LOG_LEVEL_DISABLE,
            std::string cacert_path = "");
 
@@ -22,6 +22,7 @@ private:
     std::unique_ptr<QryptSecurity::IKeyGenDistributedClient> sdk_client;
     std::string key_type;
     size_t key_len;
+    uint32_t key_ttl;
     std::string key_format;
 };
 
