@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
             // Parse and unpack cli arguments
             auto keygen_args = parseKeygenArgs(++argv);
             const auto& [
-                key_filename, metadata_filename, token, key_type, key_len, key_format, log_level, cacert_path
+                key_filename, metadata_filename, token, key_type, key_len, key_ttl, key_format, log_level, cacert_path
             ] = keygen_args;
 
             // Open input/output streams
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
             std::ostream& key_out((!key_file.is_open())? std::cout : key_file);
 
             // Create key
-            KeyGen keygen_client(token, key_type, key_len, key_format, log_level, cacert_path);
+            KeyGen keygen_client(token, key_type, key_len, key_ttl, key_format, log_level, cacert_path);
             if (mode == "generate") {
                 keygen_client.generate(key_out, metadata_file);
             } else { // mode == "replicate"
@@ -177,6 +177,7 @@ KeygenArgs parseKeygenArgs(char** unparsed_args) {
     std::string metadata_filename = "meta.dat";
     std::string key_type = "otp";
     size_t key_len = 32;
+    uint32_t key_ttl = 3600;
     std::string key_format = "hexstr";
     std::string metadata_format = "text";
     ::QryptSecurity::LogLevel log_level = ::QryptSecurity::LogLevel::QRYPTSECURITY_LOG_LEVEL_DISABLE;
@@ -201,6 +202,14 @@ KeygenArgs parseKeygenArgs(char** unparsed_args) {
                     }
                     catch(...) {
                         throw std::invalid_argument("Could not interpret --key_len=\"" + arg_value + "\" as a number!\n");
+                    }
+                    break;
+                case KEYGEN_FLAG_KEY_TTL:
+                    try {
+                        key_ttl = stoi(arg_value);
+                    }
+                    catch(...) {
+                        throw std::invalid_argument("Could not interpret --key_ttl=\"" + arg_value + "\" as a number!\n");
                     }
                     break;
                 case KEYGEN_FLAG_TOKEN:
@@ -243,7 +252,7 @@ KeygenArgs parseKeygenArgs(char** unparsed_args) {
         throw std::invalid_argument("Invalid key-format: \"" + key_format + "\"");
     }
 
-    return { key_filename, metadata_filename, sdk_token, key_type, key_len, key_format, log_level, cacert_path };
+    return { key_filename, metadata_filename, sdk_token, key_type, key_len, key_ttl, key_format, log_level, cacert_path };
 }
 
 EncryptDecryptArgs parseEncryptDecryptArgs(char** unparsed_args) {

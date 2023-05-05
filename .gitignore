@@ -1,9 +1,4 @@
 .vs/
 build
 *.DS_Store
-# Ignore .csv files generated from performance tests.
-*.csvd
-# Ignore log files.
-testLogPath*
-# Ignore performance files.
-*QryptLibPerformance*
+*.dat
