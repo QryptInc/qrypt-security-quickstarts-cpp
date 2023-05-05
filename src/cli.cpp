@@ -209,7 +209,7 @@ KeygenArgs parseKeygenArgs(char** unparsed_args) {
                         key_ttl = stoi(arg_value);
                     }
                     catch(...) {
-                        throw std::invalid_argument("Could not interpret --key_len=\"" + arg_value + "\" as a number!\n");
+                        throw std::invalid_argument("Could not interpret --key_ttl=\"" + arg_value + "\" as a number!\n");
                     }
                     break;
                 case KEYGEN_FLAG_TOKEN:
