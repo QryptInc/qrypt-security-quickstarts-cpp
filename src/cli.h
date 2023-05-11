@@ -34,6 +34,7 @@ static const char* GenerateUsage =
     "  --metadata-filename=<filename>  Path of the metadata output file. Default \"./meta.dat\"\n"
     "  --key-type=<aes|otp>            Type of key to generate; AES-256 or one-time-pad. Default \"otp\".\n"
     "  --key-len=<byte_length>         Length of key to generate, if otp. Ignored for aes. Default 32.\n"
+    "  --key-ttl=<ttl>                 Length of time that the key can be replicated for in seconds. Default 3600.\n"
     "  --key-format=<hexstr|binary>    Key output format. Default \"hexstr\".\n"
     "                                  hexstr - key file will be in human-readable hex format.\n"
     "                                  binary - key file will be in binary format.\n"
@@ -77,6 +78,7 @@ enum KeygenFlag {
     KEYGEN_FLAG_META_FILENAME,
     KEYGEN_FLAG_KEY_TYPE,
     KEYGEN_FLAG_KEY_LEN,
+    KEYGEN_FLAG_KEY_TTL,
     KEYGEN_FLAG_KEY_FORMAT,
     KEYGEN_FLAG_TOKEN,
     KEYGEN_FLAG_CACERT_PATH
@@ -88,6 +90,7 @@ static const std::map<std::string, KeygenFlag> KeygenFlagsMap = {
     {"--token", KEYGEN_FLAG_TOKEN},
     {"--key-type", KEYGEN_FLAG_KEY_TYPE},
     {"--key-len", KEYGEN_FLAG_KEY_LEN},
+    {"--key-ttl", KEYGEN_FLAG_KEY_TTL},
     {"--key-format", KEYGEN_FLAG_KEY_FORMAT},
     {"--ca-cert", KEYGEN_FLAG_CACERT_PATH},
     {"--log-level-disable", KEYGEN_FLAG_LOG_LEVEL_DISABLE},
@@ -104,6 +107,7 @@ struct KeygenArgs {
     std::string token;
     std::string key_type;
     size_t key_len;
+    uint32_t key_ttl;
     std::string key_format;
     ::QryptSecurity::LogLevel log_level;
     std::string cacert_path;
