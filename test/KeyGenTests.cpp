@@ -165,13 +165,14 @@ TEST_F(KeyGenTest, CustomTTL) {
     ) << certify_msg << red_fail;
     std::cout << certify_msg << green_pass << std::endl;
 
-    for (int sec = keyConfig.ttl; sec > 0; --sec) {
+    // The tolerance for TTL is at most a 2 second delay
+    for (int sec = keyConfig.ttl + 2; sec > 0; --sec) {
         printf("Counting down: %d seconds\n", sec);
         std::cout.flush();
         std::this_thread::sleep_for(std::chrono::seconds(1));  
     }
 
-    const std::string sync_msg_2 = white_text + "Verifying key replication fails after 5 seconds...";
+    const std::string sync_msg_2 = white_text + "Verifying key replication fails after 7 seconds...";
     std::cout << sync_msg_2 << std::flush;
     std::cout << std::string(sync_msg_2.length(), '\b') << gray_text;
     ASSERT_THROW(
