@@ -1,10 +1,13 @@
 {
     "name": "quickstart",
+    "forwardPorts": [5000],
     "build": {
         "dockerfile": "Dockerfile"
     },
     "runArgs": [
-        "--platform=linux/amd64"
+        "--platform=linux/amd64",
+        "-p",
+        "5000:5000"
     ],
     "customizations": {
         "vscode": {
@@ -14,6 +17,10 @@
             ]
         }
     },
-
+    "portsAttributes": {
+        "5000": {
+            "label": "flask_5000"
+        }
+    },
     "postAttachCommand": "bash .devcontainer/setup.sh"
 }

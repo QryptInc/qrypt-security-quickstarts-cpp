@@ -8,3 +8,7 @@ rm -rf $sdk_file
 rm -rf build
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS=ON
 cmake --build build --config Release
+
+# Host the flask server on port 5000
+gh codespace ports visibility 5000:public -c $CODESPACE_NAME
+python3 /workspaces/qrypt-security-quickstarts-cpp/scripts/flask_app.py

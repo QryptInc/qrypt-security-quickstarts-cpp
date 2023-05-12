@@ -8,12 +8,16 @@
 #include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <curl/curl.h>
 
 #ifdef ENABLE_TESTS
 #include <gtest/gtest.h>
 #endif
 
 namespace fs = std::filesystem;
+
+static const char* FLASK_PORT = "5000";
+static long curlConnectionTimeout = 10L;
 
 void printUsage(std::string mode) {
     if (mode == "generate") {
@@ -24,12 +28,54 @@ void printUsage(std::string mode) {
         std::cout << EncryptUsage;
     } else if (mode == "decrypt") {
         std::cout << DecryptUsage;
+    } else if (mode == "send") {
+        std::cout << FileSendUsage;
 #ifdef ENABLE_TESTS
     } else if (mode == "test") {
         std::cout << TestUsage;
 #endif
     } else {
         std::cout << GeneralUsage;
+    }
+}
+
+static size_t curlWriteCallback(char* data, size_t size, size_t nmemb, std::string* response) {
+    size_t totalSize = size * nmemb;
+    response->append(data, totalSize);
+    return totalSize;
+}
+
+static void uploadFileToCodespace(const std::string& filename, const std::string& codespaceName) {
+    std::string url = "https://" + codespaceName + "-" + FLASK_PORT +  ".preview.app.github.dev/upload";
+
+    CURL* curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, curlConnectionTimeout);
+
+        // Set the multipart/form-data request
+        curl_mime* mime = curl_mime_init(curl);
+        curl_mimepart* part = curl_mime_addpart(mime);
+        curl_mime_name(part, "file");
+        curl_mime_filedata(part, filename.c_str());
+
+        curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
+
+        std::string serverResponse;
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &serverResponse);
+
+        CURLcode res = curl_easy_perform(curl);
+        if (res == CURLE_OK) {
+            std::cout << "File uploaded successfully to the remote codespace at " << serverResponse << std::endl;
+        } else {
+            throw std::invalid_argument("Error: " + std::string(curl_easy_strerror(res)));
+        }
+
+        curl_mime_free(mime);
+        curl_easy_cleanup(curl);
+    } else {
+        throw std::invalid_argument("Failed to initialize libcurl");
     }
 }
 
@@ -139,6 +185,16 @@ int main(int argc, char* argv[]) {
             input_file.close();
             output_file.close();
             key_file.close();
+
+        // Send the metadata file to a remote github codespace
+        } else if (mode == "send") {
+            auto file_send_args = parseFileSendArgs(++argv);
+            const auto& [
+                codespace, filename
+            ] = file_send_args;
+
+            uploadFileToCodespace(filename, codespace);
+
         // Unrecognized command
         } else {
             std::cout << GeneralUsage;
@@ -313,4 +369,35 @@ EncryptDecryptArgs parseEncryptDecryptArgs(char** unparsed_args) {
     }
 
     return { input_filename, output_filename, key_filename, key_type, aes_mode, file_type };
+}
+
+FileSendArgs parseFileSendArgs(char** unparsed_args) {
+    std::string codespace;
+    std::string filename = "meta.dat";
+
+    while(*unparsed_args) {
+        auto[arg_name, arg_value] = tokenizeArg(*unparsed_args++);
+        try {
+            switch(FileSendFlagsMap.at(arg_name)){
+                case FILE_SEND_FLAG_CODESPACE:
+                    codespace = arg_value;
+                    break;
+                case FILE_SEND_FLAG_FILENAME:
+                    filename = arg_value;
+                    break;
+            }
+        } catch (std::out_of_range& /*ex*/) {
+            throw std::invalid_argument("Invalid argument: " + std::string(arg_name));
+        }
+    }
+
+    if (codespace.empty()) {
+        throw std::invalid_argument("Missing receiver codespace name");
+    }
+
+    if (!fs::exists(fs::path(filename))) {
+        throw std::invalid_argument("File \"" + filename + "\" does not exist!");
+    }
+
+    return { codespace, filename };
 }
