@@ -21,8 +21,8 @@ jobs:
     - name: Install tools
       working-directory: ${{github.workspace}}
       run: |
-        apt-get update
-        apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev openssh-server ufw sshpass curl jq
+        sudo apt-get update
+        sudo apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev openssh-server ufw sshpass curl jq
 
     - name: Download SDK
       working-directory: ${{github.workspace}}
