@@ -90,7 +90,6 @@ int main(int argc, char* argv[]) {
                 }
             } else {
                 std::cout << "Writing key to stdout: " << std::endl;
-                throw std::invalid_argument("Demo exception");
             }
             std::ostream& key_out((!key_file.is_open())? std::cout : key_file);
 
