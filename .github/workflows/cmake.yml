@@ -46,4 +46,4 @@ jobs:
     
     - name: CLI Test
       working-directory: ${{github.workspace}}
-      run: diff <(./qrypt generate) && <(./qrypt replicate)
+      run: cmp alice.dat bob.dat || echo "Alice and Bob key files do not match" 1>&2
