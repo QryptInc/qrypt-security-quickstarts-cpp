@@ -46,4 +46,4 @@ jobs:
     
     - name: CLI Test
       working-directory: ${{github.workspace}}
-      run: ./qrypt generate --key-filename=alice.dat --metadata-filename=meta2.dat && ./qrypt generate --key-filename=alice2.dat && ./qrypt replicate --key-filename=bob.dat && cmp alice.dat bob.dat || echo "Alice and Bob key files do not match" && exit 1
+      run: ./qrypt generate --key-filename=alice.dat && ./qrypt replicate --key-filename=bob.dat && cmp alice.dat bob.dat || echo "Alice and Bob key files do not match" && exit 1
