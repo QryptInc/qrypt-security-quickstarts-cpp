@@ -46,4 +46,4 @@ jobs:
     
     - name: CLI Test
       working-directory: ${{github.workspace}}
-      run: ./qrypt generate && ./qrypt replicate
+      run: diff <(./qrypt generate) && <(./qrypt replicate)
