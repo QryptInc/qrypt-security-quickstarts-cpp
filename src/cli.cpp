@@ -163,12 +163,12 @@ int main(int argc, char* argv[]) {
         std::cout << "\nERROR: " << ex.what() << std::endl << std::endl;
         return 1;
     }
-    catch (const std::exception& ex) {
-        std::cout << "\nERROR: " << ex.what() << std::endl << std::endl;
-    }
     catch (QryptSecurity::QryptSecurityException& ex) {
         std::cout << "\nSDK ERROR: " << ex.what() << std::endl << std::endl;
         return 1;
+    }
+    catch (const std::exception& ex) {
+        std::cout << "\nERROR: " << ex.what() << std::endl << std::endl;
     }
     return 0;
 }
