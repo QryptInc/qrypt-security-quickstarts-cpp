@@ -26,4 +26,6 @@ private:
     std::string key_format;
 };
 
+void uploadFileToCodespace(const std::string& filename, const std::string& codespaceName);
+
 #endif /* KEYGEN_H */
