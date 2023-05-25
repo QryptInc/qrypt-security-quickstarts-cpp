@@ -6,7 +6,7 @@ RUN echo 'export CLICOLOR=1' >> /root/.bashrc
 RUN echo 'export LSCOLORS=ExFxBxDxCxegedabagacad' >> /root/.bashrc
 
 RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev libcurl4-openssl-dev curl jq
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev libcurl4-openssl-dev openssh-server ufw sshpass curl jq
 
 # Install flask
 RUN apt -y install python3-pip
