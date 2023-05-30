@@ -22,6 +22,9 @@ Run `./qrypt generate` to generate a key and save replication instructions to `.
 ### Replicate
 Run `./qrypt replicate` to read `./meta.dat` and use it to replicate the same key.
 
+### Send
+Run `./qrypt send --codespace=$remote_codespace_name` to send `./meta.dat` to the spcified remote codespace.
+
 ### Advanced options
 Use the `--help` option on the `qrypt` executable and its submenus for more information on available operations and their optional arguments.
 <br />Ex: `./qrypt --help`
