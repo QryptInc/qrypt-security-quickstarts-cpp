@@ -14,4 +14,4 @@ gh codespace ports visibility 5000:public -c $CODESPACE_NAME
 nohup python3 /workspaces/qrypt-security-quickstarts-cpp/scripts/flask_app.py >nohup.out 2>&1 &
 
 # Print the codespace name
-echo -e "\nUse this as the codespace destination for metadata file transmission: $CODESPACE_NAME\n"
+echo -e "\nProvide the following codespace name to the key generation demo peer as the codespace destination for metadata file transmission: $CODESPACE_NAME\n"
