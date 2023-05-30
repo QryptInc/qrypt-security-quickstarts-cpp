@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <sstream>
 #include <algorithm>
+#include <iostream>
 #include <curl/curl.h>
 
 static const char* FLASK_PORT = "5000";
