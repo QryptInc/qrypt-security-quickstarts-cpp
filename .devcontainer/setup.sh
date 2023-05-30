@@ -11,4 +11,8 @@ cmake --build build --config Release
 
 # Host the flask server on port 5000
 gh codespace ports visibility 5000:public -c $CODESPACE_NAME
-python3 /workspaces/qrypt-security-quickstarts-cpp/scripts/flask_app.py
+nohup python3 /workspaces/qrypt-security-quickstarts-cpp/scripts/flask_app.py >nohup.out 2>&1 &
+
+# Print the codespace name
+echo ""
+echo "Use this as the codespace destination for metadata file transmission: $CODESPACE_NAME"

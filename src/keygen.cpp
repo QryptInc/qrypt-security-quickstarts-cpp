@@ -1,11 +1,7 @@
 #include "common.h"
 #include "keygen.h"
-#include <curl/curl.h>
 
 using KeyValuePair = std::tuple<std::string, std::string>;
-
-static const char* FLASK_PORT = "5000";
-static long curlConnectionTimeout = 10L;
 
 KeyGen::KeyGen(std::string token, std::string key_type, size_t key_len, uint32_t key_ttl, std::string key_format, 
                QryptSecurity::LogLevel log_level, std::string cacert_path) :
@@ -68,45 +64,5 @@ void KeyGen::replicate(std::ostream& key_out, std::istream& meta_in) {
     } 
     else  {
         key_out.write((char *)&(key)[0], key.size());
-    }
-}
-
-static size_t curlWriteCallback(char* data, size_t size, size_t nmemb, std::string* response) {
-    size_t totalSize = size * nmemb;
-    response->append(data, totalSize);
-    return totalSize;
-}
-
-void uploadFileToCodespace(const std::string& filename, const std::string& codespaceName) {
-    std::string url = "https://" + codespaceName + "-" + FLASK_PORT +  ".preview.app.github.dev/upload";
-
-    CURL* curl = curl_easy_init();
-    if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, curlConnectionTimeout);
-
-        // Set the multipart/form-data request
-        curl_mime* mime = curl_mime_init(curl);
-        curl_mimepart* part = curl_mime_addpart(mime);
-        curl_mime_name(part, "file");
-        curl_mime_filedata(part, filename.c_str());
-
-        curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
-
-        std::string serverResponse;
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteCallback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &serverResponse);
-
-        CURLcode res = curl_easy_perform(curl);
-        if (res == CURLE_OK) {
-            std::cout << "File uploaded successfully to the remote codespace at " << serverResponse << std::endl;
-        } else {
-            throw std::runtime_error("Error: " + std::string(curl_easy_strerror(res)));
-        }
-
-        curl_mime_free(mime);
-        curl_easy_cleanup(curl);
-    } else {
-        throw std::runtime_error("Failed to initialize libcurl");
     }
 }

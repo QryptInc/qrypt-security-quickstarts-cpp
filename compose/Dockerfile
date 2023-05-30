@@ -12,7 +12,7 @@ RUN echo 'export CLICOLOR=1' >> /root/.bashrc
 RUN echo 'export LSCOLORS=ExFxBxDxCxegedabagacad' >> /root/.bashrc
 
 RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev openssh-server ufw sshpass curl jq
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev libcurl4-openssl-dev openssh-server ufw sshpass curl jq
 
 # Setup SSH
 EXPOSE 22
