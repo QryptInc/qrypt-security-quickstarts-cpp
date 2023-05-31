@@ -87,7 +87,13 @@ void uploadFileToCodespace(const std::string& filename, const std::string& codes
 
         CURLcode res = curl_easy_perform(curl);
         if (res == CURLE_OK) {
-            std::cout << "File uploaded successfully to the remote codespace at " << serverResponse << std::endl;
+            long http_response_code = 0;
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_response_code);
+            if (http_response_code == 200) {
+                std::cout << "File uploaded successfully to the remote codespace at " << serverResponse << std::endl;
+            } else {
+                throw std::runtime_error("Error: Unexpected HTTP response code: " + std::to_string(http_response_code));
+            }
         } else {
             throw std::runtime_error("Error: " + std::string(curl_easy_strerror(res)));
         }
