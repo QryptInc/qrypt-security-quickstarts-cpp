@@ -5,9 +5,7 @@
         "dockerfile": "Dockerfile"
     },
     "runArgs": [
-        "--platform=linux/amd64",
-        "-p",
-        "5000:5000"
+        "--platform=linux/amd64"
     ],
     "customizations": {
         "vscode": {

@@ -9,9 +9,12 @@ rm -rf build
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS=ON
 cmake --build build --config Release
 
-# Host the flask server on port 5000
-gh codespace ports visibility 5000:public -c $CODESPACE_NAME
-nohup python3 /workspaces/qrypt-security-quickstarts-cpp/scripts/flask_app.py >nohup.out 2>&1 &
+if [[ -n $CODESPACE_NAME ]]; then
+    # Running in GitHub Codespaces
 
-# Print the codespace name
-echo -e "\nProvide the following codespace name to the key generation demo peer as the codespace destination for metadata file transmission: $CODESPACE_NAME\n"
+    # Host the flask server on port 5000
+    gh codespace ports visibility 5000:public -c $CODESPACE_NAME
+    nohup python3 /workspaces/qrypt-security-quickstarts-cpp/scripts/flask_app.py >nohup.out 2>&1 &
+
+    echo -e "\nProvide the following codespace name to the key generation demo peer as the codespace destination for metadata file transmission: $CODESPACE_NAME\n"
+fi
