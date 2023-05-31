@@ -146,10 +146,10 @@ int main(int argc, char* argv[]) {
         } else if (mode == "send") {
             auto file_send_args = parseFileSendArgs(++argv);
             const auto& [
-                codespace, filename
+                destination_codespace, filename
             ] = file_send_args;
 
-            uploadFileToCodespace(filename, codespace);
+            uploadFileToCodespace(filename, destination_codespace);
 
         // Unrecognized command
         } else {
@@ -331,15 +331,15 @@ EncryptDecryptArgs parseEncryptDecryptArgs(char** unparsed_args) {
 }
 
 FileSendArgs parseFileSendArgs(char** unparsed_args) {
-    std::string codespace;
+    std::string destination_codespace;
     std::string filename = "meta.dat";
 
     while(*unparsed_args) {
         auto[arg_name, arg_value] = tokenizeArg(*unparsed_args++);
         try {
             switch(FileSendFlagsMap.at(arg_name)){
-                case FILE_SEND_FLAG_CODESPACE:
-                    codespace = arg_value;
+                case FILE_SEND_FLAG_DESTINATION:
+                    destination_codespace = arg_value;
                     break;
                 case FILE_SEND_FLAG_FILENAME:
                     filename = arg_value;
@@ -350,13 +350,13 @@ FileSendArgs parseFileSendArgs(char** unparsed_args) {
         }
     }
 
-    if (codespace.empty()) {
-        throw std::invalid_argument("Missing receiver codespace name");
+    if (destination_codespace.empty()) {
+        throw std::invalid_argument("Missing destination codespace name");
     }
 
     if (!fs::exists(fs::path(filename))) {
         throw std::invalid_argument("File \"" + filename + "\" does not exist!");
     }
 
-    return { codespace, filename };
+    return { destination_codespace, filename };
 }

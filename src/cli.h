@@ -82,8 +82,7 @@ enum KeygenFlag {
     KEYGEN_FLAG_KEY_TTL,
     KEYGEN_FLAG_KEY_FORMAT,
     KEYGEN_FLAG_TOKEN,
-    KEYGEN_FLAG_CACERT_PATH,
-    KEYGEN_FLAG_RECEIVER_CODESPACE
+    KEYGEN_FLAG_CACERT_PATH
 };
 
 static const std::map<std::string, KeygenFlag> KeygenFlagsMap = {
@@ -187,22 +186,22 @@ static const char* FileSendUsage =
     "\n"
     "Optional Arguments:\n"
     "  --help                          Display this message.\n"
-    "  --codespace=<codespace_name>    Receiver's gitHub codespace destination name to send the file to.\n"
+    "  --destination=<codespace_name>  Receiver's gitHub codespace destination name to send the file to.\n"
     "  --filename=<filename>           Path of the file to be sent to the remote codespace. Default \"./meta.dat\"\n"
     "\n";
 
 enum FileSendFlag {
-    FILE_SEND_FLAG_CODESPACE,
+    FILE_SEND_FLAG_DESTINATION,
     FILE_SEND_FLAG_FILENAME
 };
 
 static const std::map<std::string, FileSendFlag> FileSendFlagsMap = {
-    {"--codespace", FILE_SEND_FLAG_CODESPACE},
+    {"--destination", FILE_SEND_FLAG_DESTINATION},
     {"--filename", FILE_SEND_FLAG_FILENAME}
 };
 
 struct FileSendArgs {
-    std::string codespace;
+    std::string destination_codespace;
     std::string filename;
 };
 FileSendArgs parseFileSendArgs(char** unparsed_args);
