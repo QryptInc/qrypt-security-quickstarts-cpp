@@ -1,5 +1,6 @@
 {
     "name": "quickstart",
+    "forwardPorts": [5000],
     "build": {
         "dockerfile": "Dockerfile"
     },
@@ -14,6 +15,10 @@
             ]
         }
     },
-
+    "portsAttributes": {
+        "5000": {
+            "label": "flask_5000"
+        }
+    },
     "postAttachCommand": "bash .devcontainer/setup.sh"
 }

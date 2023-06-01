@@ -24,6 +24,8 @@ void printUsage(std::string mode) {
         std::cout << EncryptUsage;
     } else if (mode == "decrypt") {
         std::cout << DecryptUsage;
+    } else if (mode == "send") {
+        std::cout << FileSendUsage;
 #ifdef ENABLE_TESTS
     } else if (mode == "test") {
         std::cout << TestUsage;
@@ -139,6 +141,16 @@ int main(int argc, char* argv[]) {
             input_file.close();
             output_file.close();
             key_file.close();
+
+        // Send the metadata file to a remote github codespace
+        } else if (mode == "send") {
+            auto file_send_args = parseFileSendArgs(++argv);
+            const auto& [
+                destination_codespace, filename
+            ] = file_send_args;
+
+            uploadFileToCodespace(filename, destination_codespace);
+
         // Unrecognized command
         } else {
             std::cout << GeneralUsage;
@@ -154,6 +166,9 @@ int main(int argc, char* argv[]) {
     catch (QryptSecurity::QryptSecurityException& ex) {
         std::cout << "\nSDK ERROR: " << ex.what() << std::endl << std::endl;
         return 1;
+    }
+    catch (const std::exception& ex) {
+        std::cout << "\nERROR: " << ex.what() << std::endl << std::endl;
     }
     return 0;
 }
@@ -313,4 +328,35 @@ EncryptDecryptArgs parseEncryptDecryptArgs(char** unparsed_args) {
     }
 
     return { input_filename, output_filename, key_filename, key_type, aes_mode, file_type };
+}
+
+FileSendArgs parseFileSendArgs(char** unparsed_args) {
+    std::string destination_codespace;
+    std::string filename = "meta.dat";
+
+    while(*unparsed_args) {
+        auto[arg_name, arg_value] = tokenizeArg(*unparsed_args++);
+        try {
+            switch(FileSendFlagsMap.at(arg_name)){
+                case FILE_SEND_FLAG_DESTINATION:
+                    destination_codespace = arg_value;
+                    break;
+                case FILE_SEND_FLAG_FILENAME:
+                    filename = arg_value;
+                    break;
+            }
+        } catch (std::out_of_range& /*ex*/) {
+            throw std::invalid_argument("Invalid argument: " + std::string(arg_name));
+        }
+    }
+
+    if (destination_codespace.empty()) {
+        throw std::invalid_argument("Missing destination codespace name");
+    }
+
+    if (!fs::exists(fs::path(filename))) {
+        throw std::invalid_argument("File \"" + filename + "\" does not exist!");
+    }
+
+    return { destination_codespace, filename };
 }

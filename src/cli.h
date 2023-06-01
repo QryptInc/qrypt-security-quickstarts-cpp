@@ -16,6 +16,7 @@ static const char* GeneralUsage =
     "  replicate   Re-create an AES-256 key or one-time-pad from stored metadata, using BLAST distributed key generation.\n"
     "  encrypt     Encrypt data using an AES-256 key or one-time-pad.\n"
     "  decrypt     Decrypt data using an AES-256 key or one-time-pad.\n"
+    "  send        Send a file to a remote github codespace.\n"
 #ifdef ENABLE_TESTS
     "  test        Validate the Qrypt SDK using a set of end-to-end tests.\n"
 #endif
@@ -177,6 +178,33 @@ struct EncryptDecryptArgs {
     std::string file_type;
 };
 EncryptDecryptArgs parseEncryptDecryptArgs(char** unparsed_args);
+
+static const char* FileSendUsage = 
+    "Usage: qrypt send [Optional Arguments]\n"
+    "\n"
+    "Send the metadata file to another github codespace."
+    "\n"
+    "Optional Arguments:\n"
+    "  --help                          Display this message.\n"
+    "  --destination=<codespace_name>  Receiver's gitHub codespace destination name to send the file to.\n"
+    "  --filename=<filename>           Path of the file to be sent to the remote codespace. Default \"./meta.dat\"\n"
+    "\n";
+
+enum FileSendFlag {
+    FILE_SEND_FLAG_DESTINATION,
+    FILE_SEND_FLAG_FILENAME
+};
+
+static const std::map<std::string, FileSendFlag> FileSendFlagsMap = {
+    {"--destination", FILE_SEND_FLAG_DESTINATION},
+    {"--filename", FILE_SEND_FLAG_FILENAME}
+};
+
+struct FileSendArgs {
+    std::string destination_codespace;
+    std::string filename;
+};
+FileSendArgs parseFileSendArgs(char** unparsed_args);
 
 #ifdef ENABLE_TESTS
 static const char* TestUsage = 

@@ -24,4 +24,6 @@ size_t hexCharToInt(char input);
 
 std::vector<uint8_t> hexStrToByteVec(std::string& str);
 
+void uploadFileToCodespace(const std::string& filename, const std::string& codespaceName);
+
 #endif /* COMMON_H */

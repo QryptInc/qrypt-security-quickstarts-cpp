@@ -5,6 +5,11 @@
 #include <iomanip>
 #include <sstream>
 #include <algorithm>
+#include <iostream>
+#include <curl/curl.h>
+
+static const char* FLASK_PORT = "5000";
+static long curlConnectionTimeout = 10L;
 
 namespace {
 const char* _demo_token = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjExOThmMDEyZTA2ZjRmZjFhYWE4NzM2MzFkNTkxNmU1In0.e"
@@ -52,4 +57,50 @@ std::vector<uint8_t> hexStrToByteVec(std::string& str) {
         buffer[i / 2] = (hexCharToInt(str[i + 1]) & 0x0F) + ((hexCharToInt(str[i]) << 4) & 0xF0);
     }
     return buffer;
+}
+
+static size_t curlWriteCallback(char* data, size_t size, size_t nmemb, std::string* response) {
+    size_t totalSize = size * nmemb;
+    response->append(data, totalSize);
+    return totalSize;
+}
+
+void uploadFileToCodespace(const std::string& filename, const std::string& codespaceName) {
+    std::string url = "https://" + codespaceName + "-" + FLASK_PORT +  ".preview.app.github.dev/upload";
+
+    CURL* curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, curlConnectionTimeout);
+
+        // Set the multipart/form-data request
+        curl_mime* mime = curl_mime_init(curl);
+        curl_mimepart* part = curl_mime_addpart(mime);
+        curl_mime_name(part, "file");
+        curl_mime_filedata(part, filename.c_str());
+
+        curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
+
+        std::string serverResponse;
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &serverResponse);
+
+        CURLcode res = curl_easy_perform(curl);
+        if (res == CURLE_OK) {
+            long http_response_code = 0;
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_response_code);
+            if (http_response_code == 200) {
+                std::cout << "File uploaded successfully to the remote codespace at " << serverResponse << std::endl;
+            } else {
+                throw std::runtime_error("Unexpected HTTP response:\n" + serverResponse);
+            }
+        } else {
+            throw std::runtime_error(std::string(curl_easy_strerror(res)));
+        }
+
+        curl_mime_free(mime);
+        curl_easy_cleanup(curl);
+    } else {
+        throw std::runtime_error("Failed to initialize libcurl");
+    }
 }
