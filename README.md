@@ -13,6 +13,7 @@ We've taken the Qrypt SDK and integrated it into a CLI with some basic functiona
 - The Qrypt SDK can be used to securely generate and independently replicate a 1KB one-time-pad
 - The Qrypt SDK can be used to securely generate and independently replicate a 1MB one-time-pad
 - Qrypt's quantum generated random passes [NIST 800-22](https://csrc.nist.gov/publications/detail/sp/800-22/rev-1a/final) Statistical Tests for Random Number Generators
+- Qrypt can supply 1KB of quantum generated random via REST API
 
 ## CLI usage
 
