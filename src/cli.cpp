@@ -1,6 +1,8 @@
+#include "common.h"
 #include "cli.h"
 #include "encrypt.h"
 #include "keygen.h"
+#include "eaas.h"
 
 #include "QryptSecurity/qryptsecurity_exceptions.h"
 
@@ -26,6 +28,8 @@ void printUsage(std::string mode) {
         std::cout << DecryptUsage;
     } else if (mode == "send") {
         std::cout << FileSendUsage;
+    } else if (mode == "entropy") {
+        std::cout << EntropyUsage;          
 #ifdef ENABLE_TESTS
     } else if (mode == "test") {
         std::cout << TestUsage;
@@ -150,6 +154,17 @@ int main(int argc, char* argv[]) {
             ] = file_send_args;
 
             uploadFileToCodespace(filename, destination_codespace);
+        
+        // Request entropy from EaaS
+        } else if (mode == "entropy") {
+            auto entropy_args = parseEntropyArgs(++argv);
+            const auto& [
+                size
+            ] = entropy_args;
+
+            EaaS eaasClient(sdk_token);
+
+            std::cout << eaasClient.requestEntropy(size);
 
         // Unrecognized command
         } else {
@@ -359,4 +374,27 @@ FileSendArgs parseFileSendArgs(char** unparsed_args) {
     }
 
     return { destination_codespace, filename };
+}
+
+EntropyArgs parseEntropyArgs(char** unparsed_args) {
+    uint32_t size = 1;
+
+    while(*unparsed_args) {
+        auto[arg_name, arg_value] = tokenizeArg(*unparsed_args++);
+        try {
+            switch(EntropyFlagsMap.at(arg_name)){
+                case ENTROPY_FLAG_SIZE:
+                    try {
+                        size = stoi(arg_value);
+                    }
+                    catch(...) {
+                        throw std::invalid_argument("Could not interpret --size=\"" + arg_value + "\" as a number!\n");
+                    }
+            }
+        } catch (std::out_of_range& /*ex*/) {
+            throw std::invalid_argument("Invalid argument: " + std::string(arg_name));
+        }
+    }
+
+    return { size };
 }

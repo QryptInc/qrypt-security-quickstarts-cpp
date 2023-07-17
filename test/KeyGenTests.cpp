@@ -3,11 +3,13 @@
 #include "QryptSecurity/qryptsecurity_logging.h"
 
 #include "common.h"
+#include "eaas.h"
 
 #include <filesystem>
 #include <iostream>
 #include <thread>
 #include <gtest/gtest.h>
+#include <sstream>
 
 using namespace QryptSecurity;
 
@@ -200,4 +202,21 @@ TEST(EaaSTest, VerifyNISTSuccess) {
         FAIL() << script_stderr << case_msg << red_fail;
     }
      std::cout << green_pass << std::endl;
+}
+
+TEST(EaaSTest, 1KBRequest) {
+    const std::string gen_msg = white_text + "Requesting 1KB entropy from EaaS......";
+    std::cout << gen_msg << std::flush;
+    std::cout << std::string(gen_msg.length(), '\b') << gray_text;
+    EaaS eaasClient(sdk_token);
+    std::string eaasResponse;
+    ASSERT_NO_THROW(
+        eaasResponse = eaasClient.requestEntropy(1)
+    ) << gen_msg << red_fail;
+    //simulate a base64 encoded 1KB response
+    std::string rndbase64(1368, 'a');
+    std::ostringstream os;
+    os << "{\"random\":[\"" << rndbase64 << "\"],\"size\":1}";
+    ASSERT_EQ((eaasResponse.length() -1), os.str().length()) << gen_msg << red_fail;
+    std::cout << gen_msg << green_pass << std::endl;
 }

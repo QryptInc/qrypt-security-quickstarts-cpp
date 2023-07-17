@@ -24,6 +24,8 @@ size_t hexCharToInt(char input);
 
 std::vector<uint8_t> hexStrToByteVec(std::string& str);
 
+std::string curlRequest(const std::string& fqdn, const std::string& filename, const std::vector<std::string>& headers);
+
 void uploadFileToCodespace(const std::string& filename, const std::string& codespaceName);
 
 #endif /* COMMON_H */
