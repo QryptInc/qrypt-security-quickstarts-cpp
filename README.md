@@ -13,7 +13,7 @@ We've taken the Qrypt SDK and integrated it into a CLI with some basic functiona
 - The Qrypt SDK can be used to securely generate and independently replicate a 1KB one-time-pad
 - The Qrypt SDK can be used to securely generate and independently replicate a 1MB one-time-pad
 - Qrypt's quantum generated random passes [NIST 800-22](https://csrc.nist.gov/publications/detail/sp/800-22/rev-1a/final) Statistical Tests for Random Number Generators
-- Qrypt can supply 1KB of quantum generated random via REST API
+- Qrypt can supply 1KB of quantum-generated random via REST API
 
 ## CLI usage
 
@@ -25,6 +25,9 @@ Run `./qrypt replicate` to read `./meta.dat` and use it to replicate the same ke
 
 ### Send
 Run `./qrypt send --destination=remote_codespace_name` to send `./meta.dat` to the specified remote codespace.
+
+### Entropy
+Run `./qrypt entropy` to request 1KB of quantum-generated random. Optional `--help` and `--size` tags are also available.
 
 ### Advanced options
 Use the `--help` option on the `qrypt` executable and its submenus for more information on available operations and their optional arguments.
