@@ -139,5 +139,5 @@ void uploadFileToCodespace(const std::string& filename, const std::string& codes
     // send request
     curlRequest(url, filename.c_str(), empty);
 
-    std::cout << "File uploaded successfully to the remote codespace at " << std::endl;
+    std::cout << "File uploaded successfully to the remote codespace" << std::endl;
 }
