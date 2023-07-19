@@ -105,9 +105,7 @@ std::string curlRequest(const std::string& fqdn, const std::string& filename, co
         if (res == CURLE_OK) {
             long http_response_code = 0;
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_response_code);
-            if (http_response_code == 200) {
-                std::cout << "File uploaded successfully to the remote codespace at " << serverResponse << std::endl;
-            } else if (http_response_code != 200) {
+            if (http_response_code != 200) {
                 throw std::runtime_error("Unexpected HTTP response:\n" + serverResponse);
             }
         } else {
