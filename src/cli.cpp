@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
 
             EaaS eaasClient(sdk_token);
 
-            std::cout << eaasClient.requestEntropy(size);
+            eaasClient.requestEntropy(size);
 
         // Unrecognized command
         } else {
