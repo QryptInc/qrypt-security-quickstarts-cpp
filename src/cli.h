@@ -17,6 +17,7 @@ static const char* GeneralUsage =
     "  encrypt     Encrypt data using an AES-256 key or one-time-pad.\n"
     "  decrypt     Decrypt data using an AES-256 key or one-time-pad.\n"
     "  send        Send a file to a remote github codespace.\n"
+    "  entropy     Request 1KB base-64 encoded entropy.\n"
 #ifdef ENABLE_TESTS
     "  test        Validate the Qrypt SDK using a set of end-to-end tests.\n"
 #endif
@@ -217,5 +218,28 @@ static const char* TestUsage =
     "  --token=<token>                 API token for portal.qrypt.com. Defaults to a demo token.\n"
     "\n";
 #endif
+
+static const char* EntropyUsage = 
+    "Usage: qrypt entropy [Optional Args]\n"
+    "\n"
+    "Request random from Qrypt Quantum Entropy as a Service API.\n"
+    "\n"
+    "Optional Arguments:\n"
+    "  --help                          Display this message.\n"
+    "  --size=<amount in KB>           The amount of entropy to request, in KBs. Min=1. Max=512. Default=1.\n"
+    "\n";
+
+enum EntropyFlag {
+    ENTROPY_FLAG_SIZE,
+};
+
+static const std::map<std::string, EntropyFlag> EntropyFlagsMap = {
+    {"--size", ENTROPY_FLAG_SIZE}
+};
+
+struct EntropyArgs {
+    uint32_t size;
+};
+EntropyArgs parseEntropyArgs(char** unparsed_args);
 
 #endif /* QRYPTCLI_H */

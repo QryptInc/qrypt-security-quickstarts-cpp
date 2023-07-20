@@ -25,6 +25,7 @@ add_executable(${QRYPTDEMO_TARGET}
     src/common.cpp
     src/keygen.cpp
     src/encrypt.cpp
+    src/eaas.cpp
 )
 
 # Pull in Qrypt Security header files

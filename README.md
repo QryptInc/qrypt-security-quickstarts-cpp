@@ -1,4 +1,4 @@
-# Qrypt SDK Test Envrionment
+# Qrypt SDK Test Environment
 This template can be used to create an environment with resources in place to test and validate Qrypt's SDK.
 
 ## Quickstart
@@ -8,11 +8,12 @@ Click the `<> Code` dropdown on github and select `Create codespace on main`. Th
 ![Codespaces Setup](docs/res/codespace_setup_small.gif)
 
 ### 2. Execute validation tests
-We've taken the Qrypt SDK and integrated it into a CLI with some basic functionality. After the envrionment loads it will automatically build the CLI. Wait until you see `[100%] Built target qrypt`, indicating that the CLI build is complete, and then run `./qrypt test` to validate:
+We've taken the Qrypt SDK and integrated it into a CLI with some basic functionality. After the environment loads it will automatically build the CLI. Wait until you see `[100%] Built target qrypt`, indicating that the CLI build is complete, and then run `./qrypt test` to validate:
 - The Qrypt SDK can be used to securely generate and independently replicate an AES key
 - The Qrypt SDK can be used to securely generate and independently replicate a 1KB one-time-pad
 - The Qrypt SDK can be used to securely generate and independently replicate a 1MB one-time-pad
 - Qrypt's quantum generated random passes [NIST 800-22](https://csrc.nist.gov/publications/detail/sp/800-22/rev-1a/final) Statistical Tests for Random Number Generators
+- Qrypt can supply 1KB of quantum-generated random via REST API
 
 ## CLI usage
 
@@ -23,7 +24,10 @@ Run `./qrypt generate` to generate a key and save replication instructions to `.
 Run `./qrypt replicate` to read `./meta.dat` and use it to replicate the same key.
 
 ### Send
-Run `./qrypt send --destination=$remote_codespace_name` to send `./meta.dat` to the spcified remote codespace.
+Run `./qrypt send --destination=remote_codespace_name` to send `./meta.dat` to the specified remote codespace.
+
+### Entropy
+Run `./qrypt entropy` to request 1KB of quantum-generated random. Optional `--help` and `--size` tags are also available.
 
 ### Advanced options
 Use the `--help` option on the `qrypt` executable and its submenus for more information on available operations and their optional arguments.

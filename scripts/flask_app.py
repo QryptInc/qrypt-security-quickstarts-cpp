@@ -8,7 +8,7 @@ def upload_file():
     if file:
         dest_path = '/workspaces/qrypt-security-quickstarts-cpp/' + file.filename
         file.save(dest_path)
-        return dest_path
+        return 'File uploaded successfully to the remote codespace at ' + dest_path
     else:
         return 'No file received.'
 

@@ -65,42 +65,79 @@ static size_t curlWriteCallback(char* data, size_t size, size_t nmemb, std::stri
     return totalSize;
 }
 
-void uploadFileToCodespace(const std::string& filename, const std::string& codespaceName) {
-    std::string url = "https://" + codespaceName + "-" + FLASK_PORT +  ".preview.app.github.dev/upload";
+std::string curlRequest(const std::string& fqdn, const std::string& filename, const std::vector<std::string>& headers) {
 
-    CURL* curl = curl_easy_init();
-    if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    CURL *curl;
+    std::string serverResponse;
+    curl = curl_easy_init();
+    if(curl) {
+        
+        // set standard options
+        curl_easy_setopt(curl, CURLOPT_URL, fqdn.c_str());
         curl_easy_setopt(curl, CURLOPT_TIMEOUT, curlConnectionTimeout);
-
-        // Set the multipart/form-data request
-        curl_mime* mime = curl_mime_init(curl);
-        curl_mimepart* part = curl_mime_addpart(mime);
-        curl_mime_name(part, "file");
-        curl_mime_filedata(part, filename.c_str());
-
-        curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
-
-        std::string serverResponse;
+        
+        // define where response is saved
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &serverResponse);
 
+        // set the multipart/form-data request
+        curl_mime* mime = curl_mime_init(curl);
+        curl_mimepart* part = curl_mime_addpart(mime);
+        if (!filename.empty()) {
+            curl_mime_name(part, "file");
+            curl_mime_filedata(part, filename.c_str());
+            curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
+        }
+        
+        // set headers
+        struct curl_slist *list = NULL;
+        if (headers.size() > 0) {
+            for (auto& header : headers) {
+                list = curl_slist_append(list, header.c_str());
+            }
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+        }
+
+        // execute
         CURLcode res = curl_easy_perform(curl);
+
+        // process response
         if (res == CURLE_OK) {
             long http_response_code = 0;
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_response_code);
             if (http_response_code == 200) {
-                std::cout << "File uploaded successfully to the remote codespace at " << serverResponse << std::endl;
-            } else {
+                std::cout << serverResponse << std::endl;
+            } else if (http_response_code != 200) {
                 throw std::runtime_error("Unexpected HTTP response:\n" + serverResponse);
             }
         } else {
             throw std::runtime_error(std::string(curl_easy_strerror(res)));
         }
-
-        curl_mime_free(mime);
+     
+        // cleanup
         curl_easy_cleanup(curl);
-    } else {
+        if (mime != NULL) {
+            curl_mime_free(mime);
+        }
+        if (list != NULL) {
+            curl_slist_free_all(list);
+        }
+    }
+    else {
         throw std::runtime_error("Failed to initialize libcurl");
     }
+
+    return serverResponse;
+}
+
+void uploadFileToCodespace(const std::string& filename, const std::string& codespaceName) {
+    
+    // fqdn
+    std::string url = "https://" + codespaceName + "-" + FLASK_PORT +  ".preview.app.github.dev/upload";
+
+    // no headers
+    std::vector<std::string> empty;
+
+    // send request
+    curlRequest(url, filename.c_str(), empty);
 }
