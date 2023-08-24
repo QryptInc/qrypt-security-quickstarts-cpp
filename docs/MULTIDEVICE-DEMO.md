@@ -1,6 +1,8 @@
 ## Multi-device demonstration using Docker-Compose
 The `compose` subdirectory contains a docker-compose.yml and sample scripts for simulating true distributed keygen on two separate systems.
 
+If you're coming here from "Get Started with Key Generation" on the Qrypt portal, you can skip step 1 and the `git clone` in step 3. Remember to use your previously generated token in step 2!
+
 1. On the [Qrypt portal](https://portal.qrypt.com/register), register a free account and create a personal access token for keygen.
 1. Export the token to your environment: `export QRYPT_TOKEN="eyJhbGciOiJ......"`
 1. Bring up the "Alice" and "Bob" demonstration containers:
