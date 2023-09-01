@@ -21,8 +21,9 @@ KeyGen::KeyGen(std::string token, std::string key_type, size_t key_len, uint32_t
         sdk_client->initialize(token);
     }
     else {
-        // 
-        sdk_client->initialize(token, cacert_path);
+        ClientConfiguration clientConfig = {};
+        clientConfig.caCertPath = cacert_path;
+        sdk_client->initialize(token, clientConfig);
     }
 }
 
