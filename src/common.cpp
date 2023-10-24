@@ -133,7 +133,7 @@ std::string curlRequest(const std::string& fqdn, const std::string& filename, co
 void uploadFileToCodespace(const std::string& filename, const std::string& codespaceName) {
     
     // fqdn
-    std::string url = "https://" + codespaceName + "-" + FLASK_PORT +  ".preview.app.github.dev/upload";
+    std::string url = "https://" + codespaceName + "-" + FLASK_PORT +  ".app.github.dev/upload";
 
     // no headers
     std::vector<std::string> empty;
