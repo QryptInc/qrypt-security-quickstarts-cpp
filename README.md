@@ -3,7 +3,7 @@ This template can be used to create an environment with resources in place to te
 
 ## Quickstart
 ### 1. Create the codespace
-Click the `<> Code` dropdown on github and select `Create codespace on main`. This will create a new codespace, which is a sandbox with everything you need to experiment with the Qrypt SDK. Please allow up to 5 minutes for the codespace to set up the environment and build the quickstart.
+Click the `<> Code` dropdown on github and select `Create codespace on main`. This will create a new codespace, which is a sandbox with everything you need to experiment with the Qrypt SDK. Please allow up to 15 minutes for the codespace to set up the environment and build the quickstart.
 
 ![Codespaces Setup](docs/res/codespace_setup_small.gif)
 
