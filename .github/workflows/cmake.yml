@@ -1,4 +1,4 @@
-name: CMake
+name: Quickstart Test
 
 on:
   schedule:
