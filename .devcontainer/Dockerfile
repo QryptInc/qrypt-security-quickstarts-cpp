@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ubuntu:20.04
+FROM --platform=linux/amd64 ubuntu:22.04
 
 # Beautify the command prompt
 RUN echo 'export PS1="\[\033[36m\]\u\[\033[m\]@\[\033[32m\]QRYPT:\[\033[33;1m\]\w\[\033[m\]\$ "' >> /root/.bashrc

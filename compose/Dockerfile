@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ARG persona=docker
 ENV PERSONA=$persona
@@ -26,7 +26,7 @@ WORKDIR /workspace/
 
 # Download SDK
 RUN sdk_file='qrypt-security-ubuntu.tgz' && \
-    curl -s https://qrypt.azureedge.net/sdk/cpp/v0.11.14/qrypt-security-0.11.14-ubuntu.tgz --output $sdk_file && \
+    curl -s https://qrypt.azureedge.net/sdk/cpp/v0.11.19/qrypt-security-0.11.19-ubuntu.tgz --output $sdk_file && \
     tar -zxvf $sdk_file --strip-components=1 -C QryptSecurity && \
     rm -rf $sdk_file
 

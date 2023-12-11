@@ -13,7 +13,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v3
@@ -47,7 +47,7 @@ jobs:
       working-directory: ${{github.workspace}}
       run: |
         sdk_file='qrypt-security-ubuntu.tgz'
-        curl -s https://qrypt.azureedge.net/sdk/cpp/v0.11.14/qrypt-security-0.11.14-ubuntu.tgz --output $sdk_file
+        curl -s https://qrypt.azureedge.net/sdk/cpp/v0.11.19/qrypt-security-0.11.19-ubuntu.tgz --output $sdk_file
         tar -zxvf $sdk_file --strip-components=1 -C QryptSecurity
         rm -rf $sdk_file
     
