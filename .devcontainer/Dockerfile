@@ -26,11 +26,7 @@ RUN cd openssl && \
     ./config && \
     make && \
     make install && \
-    ln -sf /usr/local/lib64/libssl.so.3 /usr/local/lib/libssl.so && \
-    ln -sf /usr/local/lib64/libcrypto.so.3 /usr/local/lib/libcrypto.so && \
-    ln -sf /usr/local/lib64/libssl.so.3 /usr/lib/x86_64-linux-gnu/libssl.so && \
-    ln -sf /usr/local/lib64/libcrypto.so.3 /usr/lib/x86_64-linux-gnu/libcrypto.so && \
-    echo "/usr/local/lib64" >> /etc/ld.so.conf && \
+    echo "/usr/local/lib64" > /etc/ld.so.conf.d/openssl.conf && \
     ldconfig && \
     cd .. && \
     rm -rf openssl
