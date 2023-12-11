@@ -12,6 +12,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git cmake gcc g++ xxd libs
 RUN apt -y install python3-pip
 RUN python3 -m pip install flask
 
+# Install python packages for NIST tests
+RUN python3 -m pip install requests
+
 # Install github CLI
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && \
     chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg && \

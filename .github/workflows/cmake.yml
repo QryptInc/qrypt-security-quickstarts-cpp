@@ -33,7 +33,7 @@ jobs:
         ./config
         make
         sudo make install
-        sudo echo "/usr/local/lib64" > /etc/ld.so.conf.d/openssl.conf
+        sudo sh -c "echo '/usr/local/lib64' > /etc/ld.so.conf.d/openssl.conf"
         sudo ldconfig
         cd ..
         rm -rf openssl
