@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ubuntu:20.04
+FROM --platform=linux/amd64 ubuntu:22.04
 
 # Beautify the command prompt
 RUN echo 'export PS1="\[\033[36m\]\u\[\033[m\]@\[\033[32m\]QRYPT:\[\033[33;1m\]\w\[\033[m\]\$ "' >> /root/.bashrc
@@ -11,6 +11,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git cmake gcc g++ xxd libs
 # Install flask
 RUN apt -y install python3-pip
 RUN python3 -m pip install flask
+
+# Install python packages for NIST tests
+RUN python3 -m pip install requests
 
 # Install github CLI
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && \
@@ -26,11 +29,7 @@ RUN cd openssl && \
     ./config && \
     make && \
     make install && \
-    ln -sf /usr/local/lib64/libssl.so.3 /usr/local/lib/libssl.so && \
-    ln -sf /usr/local/lib64/libcrypto.so.3 /usr/local/lib/libcrypto.so && \
-    ln -sf /usr/local/lib64/libssl.so.3 /usr/lib/x86_64-linux-gnu/libssl.so && \
-    ln -sf /usr/local/lib64/libcrypto.so.3 /usr/lib/x86_64-linux-gnu/libcrypto.so && \
-    echo "/usr/local/lib64" >> /etc/ld.so.conf && \
+    echo "/usr/local/lib64" > /etc/ld.so.conf.d/openssl.conf && \
     ldconfig && \
     cd .. && \
     rm -rf openssl

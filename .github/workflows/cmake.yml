@@ -13,7 +13,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v3
@@ -33,11 +33,7 @@ jobs:
         ./config
         make
         sudo make install
-        sudo ln -sf /usr/local/lib64/libssl.so.3 /usr/local/lib/libssl.so
-        sudo ln -sf /usr/local/lib64/libcrypto.so.3 /usr/local/lib/libcrypto.so
-        sudo ln -sf /usr/local/lib64/libssl.so.3 /usr/lib/x86_64-linux-gnu/libssl.so
-        sudo ln -sf /usr/local/lib64/libcrypto.so.3 /usr/lib/x86_64-linux-gnu/libcrypto.so
-        sudo sh -c "echo '/usr/local/lib64' >> /etc/ld.so.conf"
+        sudo sh -c "echo '/usr/local/lib64' > /etc/ld.so.conf.d/openssl.conf"
         sudo ldconfig
         cd ..
         rm -rf openssl
@@ -47,7 +43,7 @@ jobs:
       working-directory: ${{github.workspace}}
       run: |
         sdk_file='qrypt-security-ubuntu.tgz'
-        curl -s https://qrypt.azureedge.net/sdk/cpp/v0.11.14/qrypt-security-0.11.14-ubuntu.tgz --output $sdk_file
+        curl -s https://qrypt.azureedge.net/sdk/cpp/v0.11.19/qrypt-security-0.11.19-ubuntu.tgz --output $sdk_file
         tar -zxvf $sdk_file --strip-components=1 -C QryptSecurity
         rm -rf $sdk_file
     
