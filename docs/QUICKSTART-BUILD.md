@@ -18,12 +18,13 @@ Without VSCode, create the Docker container manually:
 ### Manual Build
 The following commands assume an Ubuntu 22.04 system with an amd64 architecture configured with OpenSSL, CURL, CMake, and g++.
 
-Recommended packages to install:
-> apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev libcurl4-openssl-dev openssh-server ufw sshpass curl jq
+Prerequisites: 
+1. Install the recommended packages: `apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev libcurl4-openssl-dev openssh-server ufw sshpass curl jq`
+2. Clone the quickstarts repo.
 
 Steps:
 1. [Create a Qrypt account for free](https://portal.qrypt.com/register).
-1. On the Qrypt portal, download the Qrypt SDK from "Products > Qrypt SDK" and save the .tgz to the project root.
+1. On the Qrypt portal, download the Qrypt SDK from "Products > Qrypt SDK" and save the .tgz to the repository root.
 1. (Optional) On the Qrypt portal, register a personal access token for keygen.
 1. `tar -zxvf qrypt-security-0.11.19-ubuntu.tgz --strip-components=1 -C QryptSecurity`
 1. `cmake . -B build`
@@ -31,6 +32,8 @@ Steps:
 1. `./qrypt --help`
 
 ### Testing
-If googletest is installed on your system, you may add `-DENABLE_TESTS=ON` to your cmake command to enable an automated
-validation suite which can be run with `./qrypt test`:
+If googletest is installed on your system, you may add `-DENABLE_TESTS=ON` to your cmake command to enable an automated validation suite which can be run with `./qrypt test`:
+1. `cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS=ON`
+2. `cmake --build build --config Release`
+
 ![test example](res/rest_run.png)
