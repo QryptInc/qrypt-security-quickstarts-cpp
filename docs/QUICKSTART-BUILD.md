@@ -1,5 +1,22 @@
 ## Building this quickstart manually
-The QryptSecurity SDK is intended to be run on an Ubuntu 22.04 system with an arm64 architecture, either natively or using an emulated platform. The following commands assume a system configured with OpenSSL, CURL, CMake, and g++.
+The QryptSecurity SDK is intended to be run on an Ubuntu 22.04 system with an amd64 architecture, either natively or using an emulated platform. 
+
+### Docker Container Build
+A standardized Dockerfile is provided in `./devcontainer` that installs dependencies and builds the quickstarts.
+
+If a VSCode editor is being used, the containerized environment can be created using the "Dev Containers" extension.
+
+Without VSCode, create the Docker container manually:
+1. `docker image build -t qrypt-quickstarts ./.devcontainer`
+1. `docker container run -d --name qrypt-quickstarts qrypt-quickstarts tail -f /dev/null`
+1. `docker exec -it qrypt-quickstarts /bin/bash`
+1. `git clone https://github.com/QryptInc/qrypt-security-quickstarts-cpp.git`
+1. `cd qrypt-security-quickstarts-cpp`
+1. `./.devcontainer/setup.sh`
+1. `./qrypt --help`
+
+### Manual Build
+The following commands assume an Ubuntu 22.04 system with an amd64 architecture configured with OpenSSL, CURL, CMake, and g++.
 
 Recommended packages to install:
 > apt-get -y install git cmake gcc g++ xxd libssl-dev libgtest-dev libcurl4-openssl-dev openssh-server ufw sshpass curl jq
@@ -13,6 +30,7 @@ Steps:
 1. `cmake --build build`
 1. `./qrypt --help`
 
+### Testing
 If googletest is installed on your system, you may add `-DENABLE_TESTS=ON` to your cmake command to enable an automated
 validation suite which can be run with `./qrypt test`:
 ![test example](res/rest_run.png)
