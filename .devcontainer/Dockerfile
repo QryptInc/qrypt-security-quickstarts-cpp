@@ -21,16 +21,3 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
     apt update && \
     apt install -y gh
-
-# Install openssl 3.1+
-RUN git clone git://git.openssl.org/openssl.git
-RUN cd openssl && \
-    git checkout openssl-3.1.4 && \
-    ./config && \
-    make && \
-    make install && \
-    echo "/usr/local/lib64" > /etc/ld.so.conf.d/openssl.conf && \
-    ldconfig && \
-    cd .. && \
-    rm -rf openssl
-RUN openssl version
