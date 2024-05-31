@@ -26,7 +26,7 @@ Steps:
 1. [Create a Qrypt account for free](https://portal.qrypt.com/register).
 1. On the Qrypt portal, download the Qrypt SDK from "Products > Qrypt SDK" and save the .tgz to the repository root.
 1. (Optional) On the Qrypt portal, register a personal access token for keygen.
-1. `tar -zxvf qrypt-security-0.11.22-ubuntu.tgz --strip-components=1 -C QryptSecurity`
+1. `tar -zxvf qrypt-security-0.11.23-ubuntu.tgz --strip-components=1 -C QryptSecurity`
 1. `cmake . -B build`
 1. `cmake --build build`
 1. `./qrypt --help`
